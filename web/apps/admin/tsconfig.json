@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["app/**/*.ts", "app/**/*.tsx", "vite.config.ts", "tailwind.config.ts"],
+  "compilerOptions": {
+    "types": ["@remix-run/node", "vite/client"],
+    "paths": {
+      "@/*": ["./app/*"]
+    }
+  }
+}

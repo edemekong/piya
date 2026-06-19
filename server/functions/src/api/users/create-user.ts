@@ -1,0 +1,81 @@
+import { Router } from "express";
+import { UserModel } from "../../shared/model/user";
+import { createUserSchema, CreateUserBody } from "../../shared/schema/user";
+import { UserService } from "../../shared/services/user.service";
+import {
+    asyncHandler,
+    ErrorResult,
+    SuccessResult,
+} from "../../shared/utils/api-response";
+import { API_RESPONSE } from "../../shared/utils/constants";
+import { validateRequest } from "../../shared/utils/validator";
+
+const createUserRouter = Router();
+
+createUserRouter.post(
+    "/",
+    validateRequest({ body: createUserSchema }),
+    asyncHandler(async (req, res) => {
+        const currentUser = req.currentUser;
+
+        if (!currentUser) {
+            const error = API_RESPONSE.unauthorized;
+            return ErrorResult(res, error.statusCode, error.message, error.code);
+        }
+
+        const now = Date.now();
+        const existingUser = await UserService.getUser(currentUser.uid);
+        const body = req.body as CreateUserBody;
+
+        const user: UserModel = {
+            id: currentUser.uid,
+            email: body.email ?? currentUser.email ?? "",
+            phoneNumber: body.phoneNumber ?? currentUser.phoneNumber ?? null,
+            accountType: body.accountType ?? null,
+            name: body.name ?? currentUser.displayName ?? "",
+            profileImageUrl: body.profileImageUrl ?? currentUser.photoURL ?? "",
+            device: body.device ?? {
+                currentAppVersion: "",
+                locale: "",
+                timezone: {
+                    timezoneId: "",
+                    offset: 0,
+                },
+            },
+            dob: body.dob ?? null,
+            gender: body.gender ?? null,
+            business: body.business ?? null,
+            verification: {
+                emailVerified:
+                    body.verification?.emailVerified ?? currentUser.emailVerified,
+                phoneVerified:
+                    body.verification?.phoneVerified ?? Boolean(currentUser.phoneNumber),
+                authProviders:
+                    body.verification?.authProviders ??
+                    currentUser.providerData.map((provider) => provider.providerId),
+            },
+            lastKnownLocation: body.lastKnownLocation ?? null,
+            settings: body.settings ?? {
+                notifications: {
+                    enabledPushNotification: true,
+                    enabledEmailNotification: true,
+                    enabledSmsNotification: true,
+                },
+            },
+            createdAt: existingUser?.createdAt ?? now,
+            updatedAt: now,
+        };
+
+        const createdUser = await UserService.createUser(user);
+        const response = API_RESPONSE.userCreated;
+        return SuccessResult(
+            res,
+            response.message,
+            { user: createdUser },
+            response.statusCode,
+            response.code,
+        );
+    }),
+);
+
+export { createUserRouter };
