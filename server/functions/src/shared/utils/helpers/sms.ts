@@ -1,6 +1,6 @@
 import axios from "axios";
 import { finalConfiguration } from "../../../configs/configurations";
-import { SendSMSParams, SendSMSResponse } from "../../types/auth";
+import { SendSMSParams, SendSMSResponse } from "../../types/auth.type";
 
 async function sendSMS(
   params: SendSMSParams,

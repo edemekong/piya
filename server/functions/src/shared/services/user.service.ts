@@ -1,5 +1,5 @@
 import { db } from "../../configs/firebase";
-import { UserData } from "../model/user";
+import type { UserData } from "../model/user";
 import { CustomerAccountSetupBody, UpdateUserBody } from "../schema/user";
 import { COLLECTIONS } from "../utils/collections";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";

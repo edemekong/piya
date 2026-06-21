@@ -1,18 +1,11 @@
-import { BaseModel } from "./base";
-
-type Providers = "cloudflare" | "resend" | "whatsapp_cloud" | "link_mobility";
-
-type DomainType = "portal" | "email";
-
-type DomainStatusType = "pending" | "active" | "failed" | "disabled";
-
-type DNSRecordType = "TXT" | "CNAME" | "MX";
-
-type DNSRecordStatusType =
-  | "pending"
-  | "verified"
-  | "failed";
-
+import type {
+  DNSRecordStatusType,
+  DNSRecordType,
+  DomainStatusType,
+  DomainType,
+  Providers,
+} from "../types/domain.type";
+import type { BaseModel } from "./base";
 
 interface DNSRecord {
   type: DNSRecordType;
@@ -20,7 +13,6 @@ interface DNSRecord {
   value: string;
   status: DNSRecordStatusType;
 }
-
 interface DomainData extends BaseModel {
   businessId: string;
   domain: string;
@@ -33,6 +25,4 @@ interface DomainData extends BaseModel {
   lastError?: string | null;
 }
 
-
-
-export { DomainData, DomainType, DomainStatusType, Providers, DNSRecord };
+export { DomainData, DNSRecord };

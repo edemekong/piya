@@ -1,4 +1,4 @@
-import type { OTPDeliveryChannel, OTPRequestType } from "../types/auth";
+import type { OTPDeliveryChannel, OTPRequestType } from "../types/auth.type";
 
 const STATUS_CODES = {
   ok: 200,

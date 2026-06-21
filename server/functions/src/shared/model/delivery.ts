@@ -1,6 +1,7 @@
-import { LocationData } from "../types/location";
-import { BaseModel } from "./base";
-import { MiniUserData } from "./user";
+import type { DeliveryStatusType } from "../types/delivery.type";
+import type { BaseModel } from "./base";
+import type { LocationData } from "./location";
+import type { MiniUserData } from "./user";
 
 interface DeliveryData extends BaseModel {
   shareId?: string;
@@ -13,7 +14,6 @@ interface DeliveryData extends BaseModel {
   deliveryPackages?: Record<string, DeliveryPackageData>;
   metadata?: Record<string, any>;
 }
-
 interface LogisticsData {
   vehicleType: string;
   distanceInMeters: number;
@@ -25,25 +25,10 @@ interface LogisticsData {
   estimatedDeliveryAt?: number;
   chargePerKm: number;
 }
-
 interface AssignedRider {
   riderId: string;
   assignedAt: number;
 }
-
-
-type DeliveryStatusType =
-  | "pending"
-  | "assigned"
-  | "accepted"
-  | "picked_up"
-  | "in_transit"
-  | "delivered"
-  | "cancelled"
-  | "rejected"
-  | "expired";
-
-
 interface DeliveryContactData {
   userId?: string;
   name: string;
@@ -53,18 +38,15 @@ interface DeliveryContactData {
   status: DeliveryStatusTypeData;
   location?: LocationData;
 }
-
 interface DeliveryStatusTypeData {
   current: DeliveryStatusType;
   updatedAt: number;
   history: Record<string, DeliveryStatusHistory>;
 }
-
 interface DeliveryStatusHistory {
   status: DeliveryStatusType;
   timestamp: number;
 }
-
 interface DeliveryItem {
   itemId: string;
   category: string;
@@ -73,7 +55,6 @@ interface DeliveryItem {
   amount: number;
   fragile: boolean;
 }
-
 interface DeliveryPackageData {
   packageId: string;
   items: DeliveryItem[];

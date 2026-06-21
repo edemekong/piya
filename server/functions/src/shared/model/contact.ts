@@ -1,8 +1,9 @@
-import { LocationData } from "../types/location";
-import { BaseModel } from "./base";
-
-type ContactStatusType = "active" | "inactive" | "lead" | "blocked";
-type ContactBadgeType = "regular" | "bronze" | "silver" | "gold" | "platinum";
+import type {
+  ContactBadgeType,
+  ContactStatusType,
+} from "../types/contact.type";
+import type { BaseModel } from "./base";
+import type { LocationData } from "./location";
 
 interface ContactData extends BaseModel {
   userId: string;
@@ -22,29 +23,26 @@ interface ContactData extends BaseModel {
   status: ContactStatusType;
   lastInteractionAt: number;
   anniversary?: string | null;
-  tags: Array<string>;
+  tags: string[];
   counts: ContactCounts;
   metadata?: Record<string, any> | null;
 }
-
 interface ContactBadge {
   type: ContactBadgeType;
   points: number;
   updatedAt: number;
 }
-
 interface ContactCounts {
   lifetimeValue: number;
   totalOrders: number;
   messagesSentCount: number;
   messagesRepliedCount: number;
 }
-
 interface ContactPreference {
-  unsubscribedEmailTypes: Array<string>;
+  unsubscribedEmailTypes: string[];
   smsEnabled: boolean;
   emailEnabled: boolean;
   whatsappEnabled: boolean;
 }
 
-export { ContactData, ContactPreference, ContactBadge, ContactCounts, ContactBadgeType, ContactStatusType };
+export { ContactData, ContactPreference, ContactBadge, ContactCounts };

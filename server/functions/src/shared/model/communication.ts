@@ -1,15 +1,8 @@
-import { BaseModel } from "./base";
-
-type CommunicationEventType =
-  | "onboarding"
-  | "birthday_congrats"
-  | "anniversary_milestone"
-  | "badge_upgraded"
-  | "win_back_inactive"
-  | "marketing_broadcast"
-  | "discount_alert";
-
-type CommunicationFrequency = "once" | "daily" | "weekly" | "monthly" | "cron";
+import type {
+  CommunicationEventType,
+  CommunicationFrequency,
+} from "../types/communication.type";
+import type { BaseModel } from "./base";
 
 interface CommunicationData extends BaseModel {
   name: string;
@@ -25,7 +18,6 @@ interface CommunicationData extends BaseModel {
   trigger: CommunicationTrigger;
   targetAudience?: AudienceFilter | null;
 }
-
 interface CommunicationStep {
   channel: CommunicationSchedule;
   identityId?: string | null;
@@ -34,19 +26,16 @@ interface CommunicationStep {
   ctas: CommunicationCTA[];
   template?: CommunicationTemplate | null;
 }
-
 interface CommunicationTemplate {
   providerTemplateId?: string | null;
   name: string;
   language?: string | null;
   variables?: Record<string, string> | null;
 }
-
 interface CommunicationTrigger {
   type: CommunicationEventType;
   schedule?: CommunicationSchedule | null;
 }
-
 interface CommunicationSchedule {
   frequency: CommunicationFrequency;
   dayOfWeek: number;
@@ -55,18 +44,15 @@ interface CommunicationSchedule {
   startDate: number;
   timezone: string;
 }
-
 interface CommunicationMessage {
   subject?: string | null;
   body: string;
 }
-
 interface CommunicationCTA {
   label: string;
   url: string;
   type: string;
 }
-
 interface AudienceFilter {
   targetTags?: string[];
   targetBadgeTypes?: string[];
@@ -76,10 +62,10 @@ interface AudienceFilter {
 export {
   CommunicationData,
   CommunicationStep,
+  CommunicationTemplate,
   CommunicationTrigger,
   CommunicationSchedule,
   CommunicationMessage,
   CommunicationCTA,
-  CommunicationEventType,
-  CommunicationFrequency,
+  AudienceFilter,
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserData } from "../../shared/model/user";
+import type { UserData } from "../../shared/model/user";
 import { createUserSchema, CreateUserBody } from "../../shared/schema/user";
 import { UserService } from "../../shared/services/user.service";
 import {

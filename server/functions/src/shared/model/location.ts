@@ -29,48 +29,25 @@ interface LocationPrediction {
   displayName?: string;
 }
 
+interface LocationArea {
+  circle?: { center: { latitude: number; longitude: number }; radius: number };
+  rectangle?: {
+    low: { latitude: number; longitude: number };
+    high: { latitude: number; longitude: number };
+  };
+}
+
 interface LocationSearchOptions {
-  origin?: {
-    latitude: number;
-    longitude: number;
-  };
-  locationRestriction?: {
-    circle?: {
-      center: {
-        latitude: number;
-        longitude: number;
-      };
-      radius: number;
-    };
-    rectangle?: {
-      low: { latitude: number; longitude: number };
-      high: { latitude: number; longitude: number };
-    };
-  };
-  locationBias?: {
-    circle?: {
-      center: {
-        latitude: number;
-        longitude: number;
-      };
-      radius: number;
-    };
-    rectangle?: {
-      low: { latitude: number; longitude: number };
-      high: { latitude: number; longitude: number };
-    };
-  };
+  origin?: { latitude: number; longitude: number };
+  locationRestriction?: LocationArea;
+  locationBias?: LocationArea;
   includedPrimaryTypes?: ("cities" | "regions" | string)[];
 }
 
 interface LocationServiceRequest {
   input: string;
-  origin?: {
-    latitude: number;
-    longitude: number;
-  };
+  origin?: { latitude: number; longitude: number };
 }
-
 interface LocationDetailRequest {
   placeId: string;
 }
@@ -78,7 +55,6 @@ interface LocationDetailRequest {
 const toMiniLocation = (location: LocationData): MiniLocationData => {
   return {
     formattedAddress: location.address,
-    serviceLocationId: location.serviceLocationId,
     geoPoint: location.geoPoint,
   };
 };
@@ -88,7 +64,7 @@ export {
   GeoPointData,
   LocationPrediction,
   LocationSearchOptions,
-  toMiniLocation,
   LocationServiceRequest,
   LocationDetailRequest,
+  toMiniLocation,
 };

@@ -1,12 +1,5 @@
-import { BaseModel } from "./base";
-
-type ProductType = "physical" | "digital";
-
-type ProductStatusType =
-  | "draft"
-  | "active"
-  | "out_of_stock"
-  | "disabled";
+import type { ProductStatusType, ProductType } from "../types/product.type";
+import type { BaseModel } from "./base";
 
 interface ProductData extends BaseModel {
   businessId: string;
@@ -21,4 +14,4 @@ interface ProductData extends BaseModel {
   tags: string[];
 }
 
-export { ProductData, ProductType, ProductStatusType };
+export { ProductData };

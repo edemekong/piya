@@ -1,4 +1,4 @@
-import type { ImageContentType } from "./types/storage";
+import type { ImageContentType } from "./types/storage.type";
 
 const ALLOWED_IMAGE_TYPES: ReadonlySet<ImageContentType> = new Set([
   "image/jpeg",

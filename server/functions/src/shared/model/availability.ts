@@ -1,12 +1,8 @@
-import { BaseModel } from "./base";
-
-type AvailabilityStatusType =
-  | "active"
-  | "disabled";
-
-type AvailabilityIntervalType =
-  | "available"
-  | "blocked";
+import type {
+  AvailabilityIntervalType,
+  AvailabilityStatusType,
+} from "../types/availability.type";
+import type { BaseModel } from "./base";
 
 interface AvailabilityData extends BaseModel {
   businessId: string;
@@ -18,7 +14,6 @@ interface AvailabilityData extends BaseModel {
   intervalMinutes: number;
   timeslots: Record<string, Record<string, AvailabilityInterval>>;
 }
-
 interface AvailabilityInterval {
   id: string;
   date: DateAt;
@@ -26,24 +21,20 @@ interface AvailabilityInterval {
   endTime: TimeAt;
   type: AvailabilityIntervalType;
 }
-
 interface AvailableEventSlot {
   id: string;
   startAt: number;
   endAt: number;
 }
-
 interface TimeAt {
   hour: number;
   minute: number;
 }
-
 interface DateAt {
   day: number;
   month: number;
   year: number;
 }
-
 interface TimezoneData {
   id: string;
   name: string;
@@ -57,6 +48,4 @@ export {
   TimeAt,
   DateAt,
   TimezoneData,
-  AvailabilityStatusType,
-  AvailabilityIntervalType,
 };

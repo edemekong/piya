@@ -3,7 +3,7 @@ import { storage } from "../../configs/firebase";
 import type {
   DecodedBase64File,
   UploadFileOptions,
-} from "../types/storage";
+} from "../types/storage.type";
 import {
   decodeBase64Image,
   extensionForContentType,

@@ -1,24 +1,11 @@
-const IDType = {
-  nin: "national_identity_number",
-  driver_license: "driver_license",
-  passport: "passport",
-  vehicle: "vehicle_registration",
-  cac: "corporate_affairs_commission",
-  address: "proof_of_address",
-} as const;
-
-type IDType = (typeof IDType)[keyof typeof IDType];
-
-type DocumentStatusType = "processing" | "verified" | "failed";
+import type { DocumentStatusType, IDType } from "../types/document.type";
 
 interface UserDocumentData {
   id: string;
   type: IDType;
   createdBy: string;
   userId?: string;
-  metaData?: {
-    [key: string]: any;
-  };
+  metaData?: { [key: string]: any };
   documentData:
     | NationalIDData
     | DriverLicenseData
@@ -26,14 +13,11 @@ interface UserDocumentData {
     | VehicleRegistrationData
     | ProofOfAddressData;
   status: DocumentStatusType;
-  verificationData: {
-    [key: string]: any;
-  };
+  verificationData: { [key: string]: any };
   verifiedAt?: number;
   createdAt: number;
   updatedAt: number;
 }
-
 interface NationalIDData {
   fullName: string;
   dateOfBirth: string;
@@ -42,7 +26,6 @@ interface NationalIDData {
   frontImageUrl: string;
   backImageUrl?: string | null;
 }
-
 interface DriverLicenseData {
   fullName: string;
   dateOfBirth: string;
@@ -52,7 +35,6 @@ interface DriverLicenseData {
   frontImageUrl: string;
   backImageUrl?: string | null;
 }
-
 interface PassportData {
   fullName: string;
   dateOfBirth: string;
@@ -62,7 +44,6 @@ interface PassportData {
   frontImageUrl: string;
   backImageUrl?: string | null;
 }
-
 interface VehicleRegistrationData {
   vehicleMake: string;
   vehicleModel: string;
@@ -72,7 +53,6 @@ interface VehicleRegistrationData {
   ownerName: string;
   registrationDocument: string | null;
 }
-
 interface ProofOfAddressData {
   addressLine1: string;
   addressLine2?: string;
@@ -87,7 +67,6 @@ interface ProofOfAddressData {
 
 export {
   UserDocumentData,
-  IDType,
   NationalIDData,
   DriverLicenseData,
   PassportData,

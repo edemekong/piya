@@ -14,7 +14,7 @@ import {
   RequestPhoneOTPParams,
   VerifyAuthOTPParams,
   VerifyAuthOTPResult,
-} from "../types/auth";
+} from "../types/auth.type";
 import { COLLECTIONS } from "../utils/collections";
 import {
   OTP_AUTH_TYPE,

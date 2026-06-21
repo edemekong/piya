@@ -5,7 +5,7 @@ import {
 import type {
   DecodedBase64File,
   ImageContentType,
-} from "../types/storage";
+} from "../types/storage.type";
 
 const BASE64_IMAGE_PATTERN =
   /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/;

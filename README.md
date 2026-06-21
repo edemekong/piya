@@ -31,3 +31,29 @@ The data contracts live in [`server/functions/src/shared/model`](server/function
 - Campaign and communication audiences can target contacts by tags and loyalty badge.
 - Communications can react to onboarding, birthdays, anniversaries, badge upgrades, inactivity, broadcasts, and discount alerts.
 - Chats connect a business and contact; messages within them retain their channel and delivery status.
+
+
+
+* Authentication
+- Email 
+- OTP or Password (if password is enabled)
+- Name + Phone number (if register)
+
+* Onboarding
+- Business Profile
+  1. Business name
+  2. Business description
+  3. Business category
+
+- Contact details
+  1. Business email
+  2. Business phone
+  3. Locations
+
+- Branding
+  1. Logo 
+  2. Cover image
+  3. Primary + Secondary color
+  6. website
+  4. Social links
+  5. Privacy + Terms of use links

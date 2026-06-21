@@ -1,11 +1,10 @@
-import { LocationData } from "../types/location";
-import { BaseModel } from "./base";
-
-type ServiceType = "consultation" | "event" | "digital_service";
-
-type ServiceStatusType = "draft" | "active" | "paused" | "disabled";
-
-type ServiceFeatureType = "booking" | "delivery";
+import type {
+  ServiceFeatureType,
+  ServiceStatusType,
+  ServiceType,
+} from "../types/service.type";
+import type { BaseModel } from "./base";
+import type { LocationData } from "./location";
 
 interface ServiceData extends BaseModel {
   businessId: string;
@@ -23,4 +22,4 @@ interface ServiceData extends BaseModel {
   tags: string[];
 }
 
-export { ServiceData, ServiceType, ServiceStatusType };
+export { ServiceData };

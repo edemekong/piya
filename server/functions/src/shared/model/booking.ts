@@ -1,28 +1,12 @@
-import { BaseModel } from "./base";
-import { TimezoneData } from "./availability";
-import { ServiceType } from "./service";
-
-type BookingStatusType =
-  | "pending"
-  | "confirmed"
-  | "cancelled"
-  | "completed"
-  | "no_show";
-
-type BookingParticipantType =
-  | "contact"
-  | "team_member"
-  | "guest";
-
-type BookingParticipantRoleType =
-  | "host"
-  | "attendee";
-
-type BookingParticipantStatusType =
-  | "pending"
-  | "accepted"
-  | "declined"
-  | "cancelled";
+import type {
+  BookingParticipantRoleType,
+  BookingParticipantStatusType,
+  BookingParticipantType,
+  BookingStatusType,
+} from "../types/booking.type";
+import type { ServiceType } from "../types/service.type";
+import type { BaseModel } from "./base";
+import type { TimezoneData } from "./availability";
 
 interface BookingData extends BaseModel {
   businessId: string;
@@ -34,14 +18,12 @@ interface BookingData extends BaseModel {
   when: BookingTimeData;
   metadata?: Record<string, any> | null;
 }
-
 interface MiniServiceData {
   id: string;
   name: string;
   type: ServiceType;
   duration?: number | null;
 }
-
 interface BookingParticipant {
   contactId?: string | null;
   userId?: string | null;
@@ -54,20 +36,10 @@ interface BookingParticipant {
   comment?: string | null;
   timezone?: TimezoneData | null;
 }
-
 interface BookingTimeData {
   startAt: number;
   endAt: number;
   timezone: TimezoneData;
 }
 
-export {
-  BookingData,
-  MiniServiceData,
-  BookingParticipant,
-  BookingTimeData,
-  BookingStatusType,
-  BookingParticipantType,
-  BookingParticipantRoleType,
-  BookingParticipantStatusType,
-};
+export { BookingData, MiniServiceData, BookingParticipant, BookingTimeData };

@@ -1,9 +1,9 @@
-import { BaseModel } from "./base";
-import { LocationData } from "../types/location";
-
-type BusinessStatusType = "verified" | "pending" | "suspended";
-type MemberRoleType = "owner" | "manager";
-type MemberPermissionType = "edit" | "view";
+import type {
+  BusinessStatusType,
+  MemberPermissionType,
+  MemberRoleType,
+} from "../types/business.type";
+import type { BaseModel } from "./base";
 
 interface BusinessData extends BaseModel {
   name: string;
@@ -11,17 +11,12 @@ interface BusinessData extends BaseModel {
   logo?: string;
   domain: string;
   description: string;
-  status: BusinessStatusType;
-  contact: BusinessContactData;
-  branding?: BusinessBranding | null;
-}
-
-interface BusinessContactData {
   email?: string | null;
   phoneNumber?: string | null;
-  location?: LocationData | null;
+  serviceLocations?: string[];
+  status: BusinessStatusType;
+  branding?: BusinessBranding | null;
 }
-
 interface BusinessBranding {
   logo?: string | null;
   favicon?: string | null;
@@ -39,10 +34,4 @@ interface MemberData extends BaseModel {
   permission: MemberPermissionType;
 }
 
-export {
-  BusinessData,
-  MemberData,
-  BusinessStatusType,
-  BusinessContactData,
-  BusinessBranding,
-};
+export { BusinessData, BusinessBranding, MemberData };
