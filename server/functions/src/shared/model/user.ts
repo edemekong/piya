@@ -1,36 +1,18 @@
 import { LocationData } from "../types/location";
 import { BaseModel } from "./base";
 
-type GenderType = "male" | "female" | "other";
-type UserAccountType = "customer" | "rider" | "admin";
-type UserRoleType = "admin" | "manager" | "rider" | "customer";
+type UserRoleType = "admin" | "manager";
 
-interface UserModel extends BaseModel {
+interface UserData extends BaseModel {
   email: string;
   phoneNumber?: string | null;
-  accountType?: UserAccountType | null;
   name: string;
   profileImageUrl?: string;
-  device: DeviceData;
-  dob?: string | null;
-  gender?: GenderType | null;
   business?: UserBusinessData | null;
   verification: VerificationData;
   lastKnownLocation?: LocationData | null;
   settings: UserSettingsData;
 }
-
-interface DeviceData {
-  currentAppVersion: string;
-  locale: string;
-  timezone: TimezoneData;
-}
-
-interface TimezoneData {
-  timezoneId: string;
-  offset: number;
-}
-
 interface UserSettingsData {
   notifications: {
     enabledPushNotification: boolean;
@@ -50,6 +32,6 @@ interface VerificationData {
   authProviders: string[];
 }
 
-type MiniUserModel = Pick<UserModel, "id" | "email" | "profileImageUrl">;
+type MiniUserModel = Pick<UserData, "id" | "email" | "profileImageUrl">;
 
-export { UserModel, MiniUserModel, UserAccountType };
+export { UserData as UserModel, MiniUserModel };

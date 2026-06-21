@@ -5,11 +5,10 @@ type BusinessStatusType = "verified" | "pending" | "suspended";
 type MemberRoleType = "owner" | "manager";
 type MemberPermissionType = "edit" | "view";
 
-interface BusinessModel extends BaseModel {
+interface BusinessData extends BaseModel {
   name: string;
   createdBy: string;
   logoUrl?: string;
-  categoryType: string;
   domain: string;
   description: string;
   status: BusinessStatusType;
@@ -22,7 +21,13 @@ interface BusinessContactData {
   location?: LocationData | null;
 }
 
-interface MemberModel extends BaseModel {
+interface BusinessBranding {
+  primaryColor: string;
+  secondaryColor?: string | null;
+  socialLinks?: Record<string, string> | null;
+}
+
+interface MemberData extends BaseModel {
   businessId: string;
   name: string;
   email: string;
@@ -30,4 +35,10 @@ interface MemberModel extends BaseModel {
   permission: MemberPermissionType;
 }
 
-export { BusinessModel, MemberModel, BusinessStatusType, BusinessContactData };
+export {
+  BusinessData,
+  MemberData,
+  BusinessStatusType,
+  BusinessContactData,
+  BusinessBranding,
+};
