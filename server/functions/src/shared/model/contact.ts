@@ -41,10 +41,10 @@ interface ContactCounts {
 }
 
 interface ContactPreference {
-  unsubscribedEmails: Array<string>;
-  enableEmailNotifications: boolean;
-  enableSMSNotifications: boolean;
-  enableWhatsAppNotifications: boolean;
+  unsubscribedEmailTypes: Array<string>;
+  smsEnabled: boolean;
+  emailEnabled: boolean;
+  whatsappEnabled: boolean;
 }
 
 export { ContactData, ContactPreference, ContactBadge, ContactCounts, ContactBadgeType, ContactStatusType };

@@ -18,7 +18,7 @@ const userBusinessSchema = z.object({
   businessIds: z.array(z.string()),
   businessRoleTypes: z.record(
     z.string(),
-    z.array(z.enum(["admin", "manager", "rider", "customer"])),
+    z.array(z.enum(["admin", "manager"])),
   ),
 });
 

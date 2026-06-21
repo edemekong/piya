@@ -8,11 +8,12 @@ type MemberPermissionType = "edit" | "view";
 interface BusinessData extends BaseModel {
   name: string;
   createdBy: string;
-  logoUrl?: string;
+  logo?: string;
   domain: string;
   description: string;
   status: BusinessStatusType;
   contact: BusinessContactData;
+  branding?: BusinessBranding | null;
 }
 
 interface BusinessContactData {
@@ -22,11 +23,14 @@ interface BusinessContactData {
 }
 
 interface BusinessBranding {
+  logo?: string | null;
+  favicon?: string | null;
+  coverImage?: string | null;
   primaryColor: string;
   secondaryColor?: string | null;
+  accentColor?: string | null;
   socialLinks?: Record<string, string> | null;
 }
-
 interface MemberData extends BaseModel {
   businessId: string;
   name: string;

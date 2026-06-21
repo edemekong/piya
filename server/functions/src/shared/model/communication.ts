@@ -10,7 +10,6 @@ type CommunicationEventType =
   | "discount_alert";
 
 type CommunicationFrequency = "once" | "daily" | "weekly" | "monthly" | "cron";
-type CommunicationChannelType = "whatsapp" | "email" | "sms";
 
 interface CommunicationData extends BaseModel {
   name: string;
@@ -28,10 +27,19 @@ interface CommunicationData extends BaseModel {
 }
 
 interface CommunicationStep {
-  channel: CommunicationChannelType;
+  channel: CommunicationSchedule;
+  identityId?: string | null;
   delay: number;
   message: CommunicationMessage;
   ctas: CommunicationCTA[];
+  template?: CommunicationTemplate | null;
+}
+
+interface CommunicationTemplate {
+  providerTemplateId?: string | null;
+  name: string;
+  language?: string | null;
+  variables?: Record<string, string> | null;
 }
 
 interface CommunicationTrigger {
@@ -74,5 +82,4 @@ export {
   CommunicationCTA,
   CommunicationEventType,
   CommunicationFrequency,
-  CommunicationChannelType
 };

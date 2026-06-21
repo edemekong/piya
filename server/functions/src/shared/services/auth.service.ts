@@ -5,7 +5,7 @@ import { sendEmailTo } from "../utils/helpers/email-notifications";
 import {
   generateOTPCode,
   getOTPExpiryTime,
-  utcTime,
+  getUTCTimeNow,
 } from "../utils/helpers/helper-functions";
 import { sendOTP } from "../utils/helpers/sms";
 import {
@@ -130,7 +130,7 @@ export class AuthService {
       .get();
     const otpCodeData = otpSnapshot.data();
 
-    if (otpSnapshot.exists && utcTime() > otpCodeData?.expiresAt) {
+    if (otpSnapshot.exists && getUTCTimeNow() > otpCodeData?.expiresAt) {
       return { verified: false, reason: VERIFY_AUTH_OTP_REASON.expired };
     }
 

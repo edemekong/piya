@@ -2,7 +2,17 @@ import { BaseModel } from "./base";
 
 type ChatProfileRoleType = "owner" | "manager" | "contact";
 type ChatChannelType = "whatsapp" | "email" | "sms" | "native_app";
-type MessageDeliveryStatusType = "sending" | "sent" | "delivered" | "read" | "failed";
+type MessageDirectionType = "inbound" | "outbound";
+
+type MessageDeliveryStatusType =
+  | "queued"
+  | "sending"
+  | "sent"
+  | "delivered"
+  | "read"
+  | "opened"
+  | "clicked"
+  | "failed";
 
 interface ChatData extends BaseModel {
   chatId: string;
@@ -31,17 +41,19 @@ interface ChatUserProfile {
 
 interface Message extends BaseModel {
   chatId: string;
-
   businessId: string;
   userId: string;
   role: ChatProfileRoleType;
   channel: ChatChannelType;
-  
-  vendorMessageId?: string | null;
-  vendorParentId?: string | null;
+  direction: MessageDirectionType;
+  provider?: "resend" | "whatsapp_cloud" | "link_mobility" | null;
 
+  providerMessageId?: string | null;
+  providerParentId?: string | null;
+  
   content: MessageContent;
   status: MessageDeliveryStatusType;
+  error?: string | null;
 }
 
 interface MessageContent {

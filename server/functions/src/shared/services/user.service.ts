@@ -1,17 +1,18 @@
 import { db } from "../../configs/firebase";
-import { UserModel } from "../model/user";
+import { UserData } from "../model/user";
 import { CustomerAccountSetupBody, UpdateUserBody } from "../schema/user";
 import { COLLECTIONS } from "../utils/collections";
+import { getUTCTimeNow } from "../utils/helpers/helper-functions";
 
 class UserService {
-  static async getUser(userId: string): Promise<UserModel | null> {
+  static async getUser(userId: string): Promise<UserData | null> {
     const snapshot = await db().collection(COLLECTIONS.users).doc(userId).get();
     if (!snapshot.exists) return null;
 
-    return snapshot.data() as UserModel;
+    return snapshot.data() as UserData;
   }
 
-  static async createUser(user: UserModel): Promise<UserModel> {
+  static async createUser(user: UserData): Promise<UserData> {
     await db().collection(COLLECTIONS.users).doc(user.id).set(user, {
       merge: true,
     });
@@ -22,26 +23,17 @@ class UserService {
   static async updateUser(
     userId: string,
     data: UpdateUserBody,
-  ): Promise<UserModel | null> {
+  ): Promise<UserData | null> {
     const docRef = db().collection(COLLECTIONS.users).doc(userId);
     const snapshot = await docRef.get();
 
     if (!snapshot.exists) return null;
 
-    const existingUser = snapshot.data() as UserModel;
-    const now = Date.now();
+    const existingUser = snapshot.data() as UserData;
 
-    const updatedUser: UserModel = {
+    const updatedUser: UserData = {
       ...existingUser,
       ...data,
-      device: {
-        ...existingUser.device,
-        ...data.device,
-        timezone: {
-          ...existingUser.device.timezone,
-          ...data.device?.timezone,
-        },
-      },
       settings: {
         ...existingUser.settings,
         ...data.settings,
@@ -50,7 +42,7 @@ class UserService {
           ...data.settings?.notifications,
         },
       },
-      updatedAt: now,
+      updatedAt: getUTCTimeNow(),
     };
 
     await docRef.set(updatedUser, { merge: true });
@@ -63,21 +55,20 @@ class UserService {
     data: Omit<CustomerAccountSetupBody, "profileImage"> & {
       profileImageUrl?: string;
     },
-  ): Promise<UserModel | null> {
+  ): Promise<UserData | null> {
     const docRef = db().collection(COLLECTIONS.users).doc(userId);
     const snapshot = await docRef.get();
 
     if (!snapshot.exists) return null;
 
-    const existingUser = snapshot.data() as UserModel;
-    const updatedUser: UserModel = {
+    const existingUser = snapshot.data() as UserData;
+    const updatedUser: UserData = {
       ...existingUser,
-      accountType: "customer",
       name: data.name,
       profileImageUrl: data.profileImageUrl ?? existingUser.profileImageUrl,
       dob: data.dob,
       gender: data.gender,
-      updatedAt: Date.now(),
+      updatedAt: getUTCTimeNow(),
     };
 
     await docRef.set(updatedUser, { merge: true });

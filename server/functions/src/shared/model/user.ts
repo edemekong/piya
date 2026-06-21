@@ -2,17 +2,21 @@ import { LocationData } from "../types/location";
 import { BaseModel } from "./base";
 
 type UserRoleType = "admin" | "manager";
+type UserGenderType = 'male' | 'female' | 'other';
 
 interface UserData extends BaseModel {
   email: string;
   phoneNumber?: string | null;
   name: string;
   profileImageUrl?: string;
+  dob?: string| null;
+  gender?: UserGenderType | null;
   business?: UserBusinessData | null;
   verification: VerificationData;
   lastKnownLocation?: LocationData | null;
   settings: UserSettingsData;
 }
+
 interface UserSettingsData {
   notifications: {
     enabledPushNotification: boolean;
@@ -32,6 +36,6 @@ interface VerificationData {
   authProviders: string[];
 }
 
-type MiniUserModel = Pick<UserData, "id" | "email" | "profileImageUrl">;
+type MiniUserData = Pick<UserData, "id" | "email" | "profileImageUrl">;
 
-export { UserData as UserModel, MiniUserModel };
+export { UserData, MiniUserData };

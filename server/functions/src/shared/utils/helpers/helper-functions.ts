@@ -54,7 +54,7 @@ export const uniqueItemList = (originalList: Array<any>) => {
   return unique;
 };
 
-export const utcTime = () => {
+export const getUTCTimeNow = () => {
   return Date.now();
 };
 
@@ -164,7 +164,7 @@ export function generateOTPCode() {
 
 
 export function getOTPExpiryTime() {
-  return utcTime() + OTP_EXPIRY_MINUTES * 60 * 1000;
+  return getUTCTimeNow() + OTP_EXPIRY_MINUTES * 60 * 1000;
 }
 
 export function isValidOTPRequestType(
