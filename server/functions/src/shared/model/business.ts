@@ -1,4 +1,5 @@
 import type {
+  BusinessCategoryTypes,
   BusinessStatusType,
   MemberPermissionType,
   MemberRoleType,
@@ -7,6 +8,7 @@ import type { BaseModel } from "./base";
 
 interface BusinessData extends BaseModel {
   name: string;
+  category?: BusinessCategoryTypes;
   createdBy: string;
   logo?: string;
   domain: string;
