@@ -1,5 +1,5 @@
 import { ArrowRight, PackageCheck, Truck, Users } from "lucide-react";
-import { Badge, Button } from "@1bee/ui";
+import { Badge, Button } from "@yinapp/ui";
 
 const modules = [
   { title: "Contacts", detail: "Keep customers, leads, and vendors organized.", icon: Users },
@@ -17,7 +17,7 @@ export default function PortalIndex() {
               1B
             </div>
             <div>
-              <p className="text-sm font-medium">1Bee</p>
+              <p className="text-sm font-medium">Yinapp</p>
               <p className="text-xs text-muted-foreground">Business portal</p>
             </div>
           </div>

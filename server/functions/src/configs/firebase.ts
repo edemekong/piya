@@ -6,8 +6,8 @@ import { getMessaging } from "firebase-admin/messaging";
 import { credential } from "firebase-admin";
 import { finalConfiguration } from "./configurations";
 
-import service_account_dev = require("../../1bee-dev-adminsdk.json");
-import service_account_prod = require("../../1bee-prod-adminsdk.json");
+import service_account_dev = require("../../yinapp-dev-adminsdk.json");
+import service_account_prod = require("../../yinapp-prod-adminsdk.json");
 
 let app: ReturnType<typeof initializeApp> | null = null;
 

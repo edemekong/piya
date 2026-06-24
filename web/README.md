@@ -1,4 +1,4 @@
-# 1Bee Web
+# Yinapp Web
 
 PNPM workspace for the Remix admin and portal apps.
 

@@ -1,6 +1,6 @@
-# 1bee.online
+# Yinapp
 
-1bee.online provides businesses with contact management, campaign and loyalty tooling, scheduled customer communications, and an multi-channel conversation history.
+Yinapp provides businesses with contact management, campaign and loyalty tooling, scheduled customer communications, and multi-channel conversation history.
 
 ## Core capabilities
 

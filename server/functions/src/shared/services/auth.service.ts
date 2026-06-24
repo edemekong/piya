@@ -62,7 +62,7 @@ export class AuthService {
 
     await sendEmailTo({
       emails: [email],
-      subject: "Your 1Bee Online Verification Code",
+      subject: "Your Yinapp Verification Code",
       html: renderOTPVerificationEmail({
         userName: userRecord?.displayName || "there",
         otpCode,

@@ -58,7 +58,7 @@ async function sendOTP(params: {
   otpCode: string;
   channel?: "generic" | "dnd" | "whatsapp";
 }): Promise<SendSMSResponse> {
-  const message = `Your 1Bee Online verification code is ${params.otpCode}. This code expires in 30 minutes.`;
+  const message = `Your Yinapp verification code is ${params.otpCode}. This code expires in 30 minutes.`;
 
   return sendSMS({
     to: params.to,

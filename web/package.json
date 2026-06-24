@@ -1,17 +1,17 @@
 {
-  "name": "1bee-web",
+  "name": "yinapp-web",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.32.1",
   "scripts": {
-    "dev": "pnpm --parallel --filter @1bee/admin --filter @1bee/portal dev",
-    "dev:admin": "pnpm --filter @1bee/admin dev",
-    "dev:portal": "pnpm --filter @1bee/portal dev",
+    "dev": "pnpm --parallel --filter @yinapp/admin --filter @yinapp/portal dev",
+    "dev:admin": "pnpm --filter @yinapp/admin dev",
+    "dev:portal": "pnpm --filter @yinapp/portal dev",
     "build": "pnpm -r build",
-    "build:admin": "pnpm --filter @1bee/admin build",
-    "build:portal": "pnpm --filter @1bee/portal build",
-    "start:admin": "pnpm --filter @1bee/admin start",
-    "start:portal": "pnpm --filter @1bee/portal start",
+    "build:admin": "pnpm --filter @yinapp/admin build",
+    "build:portal": "pnpm --filter @yinapp/portal build",
+    "start:admin": "pnpm --filter @yinapp/admin start",
+    "start:portal": "pnpm --filter @yinapp/portal start",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {

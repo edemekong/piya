@@ -5,8 +5,8 @@ export async function sendEmailTo({
   emails,
   subject,
   html,
-  from = "1Bee Online App",
-  fromEmailUserID = "1bee",
+  from = "Yinapp App",
+  fromEmailUserID = "yinapp",
 }: {
   emails: string[];
   subject: string;

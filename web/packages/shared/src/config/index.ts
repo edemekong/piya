@@ -1,5 +1,5 @@
 export const appConfig = {
-  name: "1Bee",
-  adminName: "1Bee Admin",
-  portalName: "1Bee Portal",
+  name: "Yinapp",
+  adminName: "Yinapp Admin",
+  portalName: "Yinapp Portal",
 };

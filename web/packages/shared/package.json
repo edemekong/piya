@@ -1,5 +1,5 @@
 {
-  "name": "@1bee/shared",
+  "name": "@yinapp/shared",
   "private": true,
   "type": "module",
   "exports": {
@@ -11,6 +11,9 @@
     "./utils": "./src/utils/index.ts"
   },
   "types": "./src/index.ts",
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1"
+  },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc"

@@ -165,7 +165,7 @@ const OTP_DELIVERY_CHANNELS: Record<OTPRequestType, OTPDeliveryChannel> = {
   whatsapp: "whatsapp",
 };
 
-const ZOLT_TEST_EMAIL_SUFFIX = "@test.1bee.online.com";
+const ZOLT_TEST_EMAIL_SUFFIX = "@test.yinapp.co";
 
 export {
   API_RESPONSE,

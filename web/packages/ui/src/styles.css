@@ -1,0 +1,184 @@
+:root {
+  color-scheme: light;
+
+  --app-web-width: 1080px;
+  --app-screen-padding: 28px;
+  --app-card-padding: 22.4px;
+  --app-element-spacing: 11.2px;
+  --app-element-spacing-small: 5.6px;
+  --app-radius: 5px;
+  --app-radius-default: 12.5px;
+  --app-radius-text-field: 7.5px;
+  --app-radius-large: 15px;
+  --app-radius-pill: 999px;
+  --app-outline-width: 0.5px;
+
+  --color-primary: 46 75 78;
+  --color-primary-light: 225 239 240;
+  --color-primary-lighter: 244 250 250;
+  --color-primary-dark: 44 76 73;
+  --color-primary-darker: 16 42 45;
+  --color-primary-foreground: 255 255 255;
+
+  --color-secondary: 237 244 3;
+  --color-secondary-light: 246 250 114;
+  --color-secondary-lighter: 250 250 225;
+  --color-secondary-dark: 201 208 2;
+  --color-secondary-darker: 46 75 78;
+  --color-secondary-foreground: 16 42 45;
+
+  --color-accent: 108 166 170;
+  --color-success: 52 168 83;
+  --color-warning: 237 244 3;
+  --color-error: 217 45 32;
+  --color-info: 108 166 170;
+
+  --color-background: 244 245 228;
+  --color-background-elevated: 255 255 255;
+  --color-surface: 255 255 255;
+  --color-surface-secondary: 225 239 240;
+  --color-surface-tertiary: 244 250 250;
+  --color-foreground: 47 75 79;
+  --color-text-body: 47 75 79;
+  --color-text-secondary: 47 75 79;
+  --color-text-tertiary: 108 166 170;
+  --color-text-quaternary: 155 191 193;
+  --color-border: 207 226 228;
+  --color-border-opaque: 215 232 233;
+  --color-divider: 215 232 233;
+  --color-fill: 244 250 250;
+  --color-fill-secondary: 232 243 244;
+  --color-unselected: 108 166 170;
+  --color-overlay: 0 0 0;
+
+  --font-app: Figtree, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-background: 16 42 45;
+  --color-background-elevated: 46 75 78;
+  --color-surface: 46 75 78;
+  --color-surface-secondary: 44 76 73;
+  --color-surface-tertiary: 108 166 170;
+  --color-foreground: 255 255 255;
+  --color-text-body: 245 245 245;
+  --color-text-secondary: 245 245 245;
+  --color-text-tertiary: 224 224 224;
+  --color-text-quaternary: 155 191 193;
+  --color-border: 108 166 170;
+  --color-border-opaque: 155 191 193;
+  --color-divider: 44 76 73;
+  --color-fill: 44 76 73;
+  --color-fill-secondary: 46 75 78;
+  --color-unselected: 108 166 170;
+  --color-overlay: 255 255 255;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-app);
+  font-size: 17px;
+  line-height: 1.29;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  border-color: rgb(var(--color-border));
+}
+
+.text-large-title {
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.21;
+  letter-spacing: 0;
+}
+
+.text-title-1 {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.21;
+  letter-spacing: 0;
+}
+
+.text-title-2 {
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.27;
+  letter-spacing: 0;
+}
+
+.text-title-3 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.text-headline {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.29;
+  letter-spacing: 0;
+}
+
+.text-body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.29;
+  letter-spacing: 0;
+}
+
+.text-callout {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.31;
+  letter-spacing: 0;
+}
+
+.text-subheadline {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+.text-footnote {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: 0;
+}
+
+.text-caption-1 {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+.text-caption-2 {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.text-micro {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0;
+}

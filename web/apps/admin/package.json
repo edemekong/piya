@@ -1,5 +1,5 @@
 {
-  "name": "@1bee/admin",
+  "name": "@yinapp/admin",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,15 +9,17 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@1bee/shared": "workspace:*",
-    "@1bee/ui": "workspace:*",
     "@remix-run/node": "^2.17.0",
     "@remix-run/react": "^2.17.0",
     "@remix-run/serve": "^2.17.0",
+    "@yinapp/shared": "workspace:*",
+    "@yinapp/ui": "workspace:*",
     "isbot": "^5.1.31",
     "lucide-react": "^0.475.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
+    "recharts": "^3.9.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.17.0",

@@ -7,17 +7,19 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { ThemeScript } from "@yinapp/ui";
 import stylesheet from "./styles.css?url";
+import { ReduxProvider } from "./providers/redux-provider";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
 export const meta: MetaFunction = () => [
-  { title: "1Bee Admin" },
+  { title: "Yinapp Admin" },
   {
     name: "description",
-    content: "Internal admin workspace for 1Bee.",
+    content: "Internal admin workspace for Yinapp.",
   },
 ];
 
@@ -27,6 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <ThemeScript />
         <Meta />
         <Links />
       </head>
@@ -40,5 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ReduxProvider>
+      <Outlet />
+    </ReduxProvider>
+  );
 }
