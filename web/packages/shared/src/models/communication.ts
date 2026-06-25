@@ -1,3 +1,5 @@
+import type { BaseModel } from "./base";
+
 export type CommunicationEventType =
   | "onboarding"
   | "birthday_congrats"
@@ -65,10 +67,7 @@ export type AudienceFilter = {
   segmentQuery?: Record<string, unknown>;
 };
 
-export type CommunicationData = {
-  id: string;
-  createdAt: number;
-  updatedAt: number;
+export interface CommunicationData extends BaseModel {
   name: string;
   businessId: string;
   createdBy: string;
@@ -88,7 +87,7 @@ export type CommunicationData = {
     failed: number;
     pending: number;
   };
-};
+}
 
 export type CommunicationRecipient = {
   id: string;

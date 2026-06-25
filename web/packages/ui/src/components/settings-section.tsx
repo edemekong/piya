@@ -1,8 +1,8 @@
 import type * as React from "react";
-import { SectionHeader } from "@piya/ui";
 import type { LucideIcon } from "lucide-react";
+import { SectionHeader } from "./section-header";
 
-type ProfileSectionShellProps = {
+export type SettingsSectionProps = {
   actions?: React.ReactNode;
   children: React.ReactNode;
   description: string;
@@ -10,13 +10,13 @@ type ProfileSectionShellProps = {
   title: string;
 };
 
-export function ProfileSectionShell({
+export function SettingsSection({
   actions,
   children,
   description,
   icon: Icon,
   title,
-}: ProfileSectionShellProps) {
+}: SettingsSectionProps) {
   return (
     <section className="rounded-md bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

@@ -1,5 +1,5 @@
 import { AppSheet, Badge } from "@piya/ui";
-import type { OfferingData } from "@/services/offerings.service";
+import type { OfferingData } from "@piya/shared/services";
 import { formatOfferingLabel } from "./offeringForm";
 
 type OfferingViewSheetProps = {

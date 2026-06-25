@@ -1,6 +1,6 @@
 import { Megaphone, Send, TrendingUp, Users } from "lucide-react";
 import { StatCard } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 import { formatMoney } from "@piya/shared/utils";
 import {
   communicationPerformance,

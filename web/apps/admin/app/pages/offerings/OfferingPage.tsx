@@ -8,9 +8,9 @@ import {
   TicketPercent,
 } from "lucide-react";
 import { Button, SegmentedTabs } from "@piya/ui";
-import { getDiscounts, type DiscountData } from "@/services/discounts.service";
-import { getGifts, type GiftData } from "@/services/gifts.service";
-import { getOfferings, type OfferingData } from "@/services/offerings.service";
+import { getDiscounts, type DiscountData } from "@piya/shared/services";
+import { getGifts, type GiftData } from "@piya/shared/services";
+import { getOfferings, type OfferingData } from "@piya/shared/services";
 import {
   DiscountEditorSheet,
   DiscountsTable,

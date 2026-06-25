@@ -6,8 +6,7 @@ import {
   ProfileField,
   ProfileSelect,
 } from "../components/ProfileFields";
-import { ProfileSectionShell } from "../components/ProfileSectionShell";
-import { SettingsCard } from "../components/SettingsCard";
+import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
 
 const section = profileMenuItems.find((item) => item.value === "members")!;
 

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { cn } from "@piya/ui";
+import { cn } from "../lib/cn";
 
-type MultiSelectDropdownProps = {
+export type MultiSelectDropdownProps = {
   formatOption?: (option: string) => string;
   label: string;
   onChange: (selected: string[]) => void;

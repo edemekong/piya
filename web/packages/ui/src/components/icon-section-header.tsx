@@ -1,16 +1,16 @@
 import type * as React from "react";
 
-type CommunicationSectionHeaderProps = {
+export type IconSectionHeaderProps = {
   caption?: string;
   icon: React.ReactNode;
   title: string;
 };
 
-export function CommunicationSectionHeader({
+export function IconSectionHeader({
   caption,
   icon,
   title,
-}: CommunicationSectionHeaderProps) {
+}: IconSectionHeaderProps) {
   return (
     <div className={`flex gap-3 ${caption ? "items-start" : "items-center"}`}>
       <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-secondary text-primary">

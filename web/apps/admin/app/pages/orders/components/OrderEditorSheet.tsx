@@ -14,11 +14,11 @@ import type {
   OrderPaymentStatus,
   OrderStatus,
 } from "@piya/shared/models";
-import type { OrderDraft } from "@/services/orders.service";
+import type { OrderDraft } from "@piya/shared/services";
 import {
   createEmptyOrderDraft,
   draftToOrder,
-} from "@/services/orders.service";
+} from "@piya/shared/services";
 import { formatOrderLabel } from "./orderUtils";
 
 type OrderEditorSheetProps = {

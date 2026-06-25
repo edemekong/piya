@@ -6,71 +6,102 @@ export type Business = {
   type: BusinessType;
 };
 
-export type ContactStatus = "active" | "inactive" | "lead" | "blocked";
-export type ContactBadgeType =
-  | "regular"
-  | "bronze"
-  | "silver"
-  | "gold"
-  | "platinum";
+export type {
+  AvailabilityData,
+  AvailabilityInterval,
+  AvailabilityIntervalType,
+  AvailabilityStatusType,
+  AvailableEventSlot,
+  BookingData,
+  BookingParticipant,
+  BookingParticipantRoleType,
+  BookingParticipantStatusType,
+  BookingParticipantType,
+  BookingStatusType,
+  BusinessBranding,
+  BusinessCategoryTypes,
+  BusinessData,
+  BusinessStatusType,
+  CampaignData,
+  CampaignReward,
+  CampaignRewardMetadata,
+  CampaignRules,
+  CampaignStatusType,
+  CampaignType,
+  ChannelProviderStatusType,
+  ChannelSettingsData,
+  ChatChannelType,
+  ChatData,
+  ChatProfileRoleType,
+  Contact,
+  ContactBadge,
+  ContactBadgeType,
+  ContactCounts,
+  ContactData,
+  ContactPreference,
+  ContactStatus,
+  ContactStatusType,
+  DateAt,
+  DeliveryData,
+  DeliveryModel,
+  DeliveryStatusType,
+  DocumentStatusType,
+  DomainData,
+  DomainStatusType,
+  DomainType,
+  EmailChannelSettings,
+  GeoPointData,
+  IDType,
+  LocationData,
+  LocationDetailRequest,
+  LocationPrediction,
+  LocationSearchOptions,
+  LocationServiceRequest,
+  MemberData,
+  MemberPermissionType,
+  MemberRoleType,
+  Message,
+  MessageContent,
+  MessageDeliveryStatusType,
+  MessageDirectionType,
+  MiniLocationData,
+  MiniServiceData,
+  MiniUserData,
+  Providers,
+  ServiceLocationData,
+  SiteData,
+  SiteSections,
+  SiteSeo,
+  SiteStatusType,
+  SMSChannelSettings,
+  SMSRegistrationStatusType,
+  SMSSenderType,
+  TimeAt,
+  TimezoneData,
+  UserBusinessData,
+  UserData,
+  UserGenderType,
+  UserRoleType,
+  UserSettingsData,
+  VerificationData,
+  WhatsAppChannelSettings,
+} from "../models";
 
-export type ContactAddress = {
-  address: string;
-  city: string;
-  state: string;
-  serviceLocationId?: string | null;
-  country: string;
-  postalCode?: string;
-  geoPoint?: {
-    lat: number;
-    lng: number;
-  };
-};
+export type {
+  DecodedBase64File,
+  ImageContentType,
+  UploadFileOptions,
+} from "./storage";
 
-export type ContactBadge = {
-  type: ContactBadgeType;
-  points: number;
-  updatedAt: number;
-};
-
-export type ContactCounts = {
-  lifetimeValue: number;
-  totalOrders: number;
-  messagesSentCount: number;
-  messagesRepliedCount: number;
-};
-
-export type ContactPreference = {
-  unsubscribedEmailTypes: string[];
-  smsEnabled: boolean;
-  emailEnabled: boolean;
-  whatsappEnabled: boolean;
-};
-
-export type ContactData = {
-  id: string;
-  createdAt: number;
-  updatedAt: number;
-  userId: string;
-  code: string;
-  createdBy: string;
-  businessId: string;
-  name: string;
-  profileImageUrl?: string | null;
-  email?: string | null;
-  phoneNumber?: string | null;
-  countryCode: string;
-  address?: ContactAddress | null;
-  badge: ContactBadge;
-  dob?: string | null;
-  bmd?: string | null;
-  preference: ContactPreference;
-  status: ContactStatus;
-  lastInteractionAt: number;
-  anniversary?: string | null;
-  tags: string[];
-  counts: ContactCounts;
-  metadata?: Record<string, unknown> | null;
-};
-
-export type Contact = ContactData;
+export type {
+  OTPDeliveryChannel,
+  OTPRequestType,
+  RequestEmailOTPParams,
+  RequestOTPResult,
+  RequestPhoneOTPParams,
+  SendSMSParams,
+  SendSMSResponse,
+  VerifyAuthOTPParams,
+  VerifyAuthOTPReason,
+  VerifyAuthOTPResult,
+} from "./auth";

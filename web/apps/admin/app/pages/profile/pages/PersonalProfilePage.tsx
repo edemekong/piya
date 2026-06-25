@@ -2,8 +2,7 @@ import { Upload, UserRound } from "lucide-react";
 import { Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import { FieldGrid, ProfileField } from "../components/ProfileFields";
-import { ProfileSectionShell } from "../components/ProfileSectionShell";
-import { SettingsCard } from "../components/SettingsCard";
+import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
 
 const section = profileMenuItems.find((item) => item.value === "personal")!;
 

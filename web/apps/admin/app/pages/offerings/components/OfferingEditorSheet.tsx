@@ -19,7 +19,7 @@ import type {
   OfferingData,
   OfferingSubType,
   OfferingType,
-} from "@/services/offerings.service";
+} from "@piya/shared/services";
 import {
   createEmptyOfferingDraft,
   createOfferingDraft,

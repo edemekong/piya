@@ -4,7 +4,7 @@ import type {
   OfferingStatusType,
   OfferingSubType,
   OfferingType,
-} from "@/services/offerings.service";
+} from "@piya/shared/services";
 
 export type OfferingFormDraft = {
   currency: string;

@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { AppAvatar, cn } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 
 function statusClassName(status: ContactData["status"]) {
   if (status === "active") {

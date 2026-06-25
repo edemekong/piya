@@ -1,7 +1,7 @@
 import type * as React from "react";
-import { cn } from "@piya/ui";
+import { cn } from "../lib/cn";
 
-type SettingsCardProps = {
+export type SettingsCardProps = {
   actions?: React.ReactNode;
   children: React.ReactNode;
   className?: string;

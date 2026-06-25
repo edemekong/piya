@@ -4,11 +4,11 @@ import { Button } from "@piya/ui";
 import {
   getCommunicationRecipients,
   getCommunications,
-} from "@/services/communications.service";
+} from "@piya/shared/services";
 import type {
   CommunicationData,
   CommunicationEditorMode,
-} from "./types";
+} from "@piya/shared/models";
 import {
   CommunicationCardsList,
   CommunicationEditorSheet,

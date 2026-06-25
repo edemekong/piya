@@ -4,7 +4,7 @@ import type {
   CommunicationEventType,
   CommunicationFrequency,
   CommunicationStatus,
-} from "./types";
+} from "@piya/shared/models";
 
 export const CHANNEL_OPTIONS: CommunicationChannel[] = [
   "email",

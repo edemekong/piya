@@ -8,7 +8,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Button, cn } from "@piya/ui";
-import type { CommunicationData } from "../types";
+import type { CommunicationData } from "@piya/shared/models";
 import {
   formatDate,
   formatLabel,

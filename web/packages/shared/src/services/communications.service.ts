@@ -1,7 +1,7 @@
 import type {
   CommunicationData,
   CommunicationRecipient,
-} from "@/pages/communications/types";
+} from "../models";
 
 const now = new Date("2026-06-24T09:00:00.000Z").getTime();
 const day = 1000 * 60 * 60 * 24;

@@ -18,7 +18,7 @@ import {
   StatCard,
   cn,
 } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 import { formatMoney } from "@piya/shared/utils";
 
 export type ContactOverviewTab =

@@ -1,6 +1,6 @@
 import { Send, Target, X } from "lucide-react";
-import { cn } from "@piya/ui";
-import type { CommunicationData } from "../types";
+import { IconSectionHeader as CommunicationSectionHeader, cn } from "@piya/ui";
+import type { CommunicationData } from "@piya/shared/models";
 import {
   formatDate,
   formatLabel,
@@ -9,7 +9,6 @@ import {
   statusClassName,
 } from "../communicationUtils";
 import { CommunicationChannelIcon } from "./CommunicationChannelIcon";
-import { CommunicationSectionHeader } from "./CommunicationSectionHeader";
 
 type CommunicationViewSheetProps = {
   communication: CommunicationData | null;

@@ -24,8 +24,12 @@ export {
   AppTextField,
 } from "./components/form-field";
 export { InfoCard } from "./components/info-card";
+export { IconSectionHeader } from "./components/icon-section-header";
+export { MultiSelectDropdown } from "./components/multi-select";
 export { SectionHeader } from "./components/section-header";
 export { SegmentedTabs } from "./components/segmented-tabs";
+export { SettingsCard } from "./components/settings-card";
+export { SettingsSection } from "./components/settings-section";
 export { StatCard } from "./components/stat-card";
 export { cn } from "./lib/cn";
 export { appColors } from "./theme/colors";
@@ -58,9 +62,13 @@ export type {
   AppTextFieldProps,
 } from "./components/form-field";
 export type { InfoCardProps } from "./components/info-card";
+export type { IconSectionHeaderProps } from "./components/icon-section-header";
+export type { MultiSelectDropdownProps } from "./components/multi-select";
 export type { SectionHeaderProps } from "./components/section-header";
 export type {
   SegmentedTabItem,
   SegmentedTabsProps,
 } from "./components/segmented-tabs";
+export type { SettingsCardProps } from "./components/settings-card";
+export type { SettingsSectionProps } from "./components/settings-section";
 export type { StatCardProps } from "./components/stat-card";

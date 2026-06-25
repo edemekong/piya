@@ -1,5 +1,5 @@
 import { Badge, SectionHeader } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 
 export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
   const preferences = [

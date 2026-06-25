@@ -1,6 +1,6 @@
 import { Badge, cn } from "@piya/ui";
 import type { OrderStatus } from "@piya/shared/models";
-import { getOrders } from "@/services/orders.service";
+import { getOrders } from "@piya/shared/services";
 import {
   formatMoney,
   formatOrderLabel,

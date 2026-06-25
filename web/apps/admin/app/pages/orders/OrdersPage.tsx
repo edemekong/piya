@@ -1,14 +1,14 @@
 import * as React from "react";
 import { ListFilter, Plus, Search } from "lucide-react";
 import { Button } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 import type { OrderData } from "@piya/shared/models";
-import { getContacts } from "@/services/contacts.service";
+import { getContacts } from "@piya/shared/services";
 import {
   getOfferings,
   type OfferingData,
-} from "@/services/offerings.service";
-import { getOrders } from "@/services/orders.service";
+} from "@piya/shared/services";
+import { getOrders } from "@piya/shared/services";
 import {
   ContactViewSheet,
   type ContactViewParentTab,

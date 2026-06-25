@@ -13,8 +13,7 @@ import { AddDomainSheet } from "../components/AddDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
 import { profileMenuItems } from "../profileSections";
-import { ProfileSectionShell } from "../components/ProfileSectionShell";
-import { SettingsCard } from "../components/SettingsCard";
+import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
 
 const section = profileMenuItems.find((item) => item.value === "channels")!;
 

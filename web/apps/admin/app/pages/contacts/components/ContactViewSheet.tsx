@@ -1,7 +1,7 @@
 import * as React from "react";
 import { MessageCircle, SlidersHorizontal, UserRound, X } from "lucide-react";
 import { SegmentedTabs } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 import { ContactConversationsPanel } from "./ContactConversationsPanel";
 import {
   ContactOverviewPanel,

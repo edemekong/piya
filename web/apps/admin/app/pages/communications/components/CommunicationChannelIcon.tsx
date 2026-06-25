@@ -1,6 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import { ADMIN_ASSETS } from "@/utils/assets";
-import type { CommunicationChannel } from "../types";
+import type { CommunicationChannel } from "@piya/shared/models";
 
 type CommunicationChannelIconProps = {
   channel: CommunicationChannel;

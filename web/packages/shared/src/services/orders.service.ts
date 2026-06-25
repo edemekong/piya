@@ -5,7 +5,7 @@ import type {
   OrderItemType,
   OrderPaymentStatus,
   OrderStatus,
-} from "@piya/shared/models";
+} from "../models";
 
 export type {
   OrderData,

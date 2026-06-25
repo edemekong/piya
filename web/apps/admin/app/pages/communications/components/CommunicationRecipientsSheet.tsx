@@ -1,6 +1,6 @@
 import { Mail, Phone, X } from "lucide-react";
 import { cn } from "@piya/ui";
-import type { CommunicationData, CommunicationRecipient } from "../types";
+import type { CommunicationData, CommunicationRecipient } from "@piya/shared/models";
 import { formatDate, formatLabel } from "../communicationUtils";
 import { CommunicationChannelIcon } from "./CommunicationChannelIcon";
 

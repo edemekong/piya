@@ -19,14 +19,20 @@ import {
 } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
-import { AppAvatar, Badge, Button, SegmentedTabs, cn } from "@piya/ui";
+import {
+  AppAvatar,
+  Badge,
+  Button,
+  SegmentedTabs,
+  SettingsCard,
+  cn,
+} from "@piya/ui";
 import {
   FieldGrid,
   ProfileField,
   ProfileSelect,
   ProfileTextarea,
 } from "@/pages/profile/components/ProfileFields";
-import { SettingsCard } from "@/pages/profile/components/SettingsCard";
 
 type SetupStep = {
   id: string;

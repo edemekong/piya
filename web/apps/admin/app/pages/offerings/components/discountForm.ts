@@ -2,7 +2,7 @@ import type {
   DiscountData,
   DiscountStatusType,
   RewardType,
-} from "@/services/discounts.service";
+} from "@piya/shared/services";
 
 export type DiscountFormDraft = {
   buyQuantity: string;

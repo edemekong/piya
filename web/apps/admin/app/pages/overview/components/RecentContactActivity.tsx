@@ -1,5 +1,5 @@
 import { Badge } from "@piya/ui";
-import type { ContactData } from "@piya/shared/types";
+import type { ContactData } from "@piya/shared/models";
 
 export function RecentContactActivity({ contacts }: { contacts: ContactData[] }) {
   return (

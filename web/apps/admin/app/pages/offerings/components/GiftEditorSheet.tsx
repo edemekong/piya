@@ -7,13 +7,13 @@ import {
   Button,
   cn,
 } from "@piya/ui";
-import type { GiftData, GiftDraft } from "@/services/gifts.service";
+import type { GiftData, GiftDraft } from "@piya/shared/services";
 import {
   createEmptyGiftDraft,
   createGiftDraft,
   draftToGift,
-} from "@/services/gifts.service";
-import { getOfferings } from "@/services/offerings.service";
+} from "@piya/shared/services";
+import { getOfferings } from "@piya/shared/services";
 
 type EditorMode = "create" | "edit";
 

@@ -17,13 +17,13 @@ import type {
   DiscountData,
   DiscountStatusType,
   RewardType,
-} from "@/services/discounts.service";
-import type { GiftData, GiftDraft } from "@/services/gifts.service";
+} from "@piya/shared/services";
+import type { GiftData, GiftDraft } from "@piya/shared/services";
 import {
   createEmptyGiftDraft,
   draftToGift,
-} from "@/services/gifts.service";
-import { getOfferings } from "@/services/offerings.service";
+} from "@piya/shared/services";
+import { getOfferings } from "@piya/shared/services";
 import {
   createDiscountDraft,
   createEmptyDiscountDraft,

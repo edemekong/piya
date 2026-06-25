@@ -7,14 +7,21 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { AppDatePicker, AppSelectField, AppTextField, Button } from "@piya/ui";
+import {
+  AppDatePicker,
+  AppSelectField,
+  AppTextField,
+  Button,
+  IconSectionHeader as CommunicationSectionHeader,
+  MultiSelectDropdown,
+} from "@piya/ui";
 import type {
   CommunicationData,
   CommunicationEditorMode,
   CommunicationEventType,
   CommunicationFrequency,
   CommunicationStep,
-} from "../types";
+} from "@piya/shared/models";
 import {
   DEFAULT_BADGE_OPTIONS,
   DEFAULT_TAG_OPTIONS,
@@ -23,9 +30,7 @@ import {
   TRIGGER_OPTIONS,
   formatLabel,
 } from "../communicationUtils";
-import { CommunicationSectionHeader } from "./CommunicationSectionHeader";
 import { CommunicationStepCard } from "./CommunicationStepCard";
-import { MultiSelectDropdown } from "./MultiSelectDropdown";
 
 const DAY_OF_WEEK_OPTIONS = [
   { label: "Sunday", value: 0 },

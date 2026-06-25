@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CalendarDays, MoreVertical, Pencil, TicketPercent, Trash2 } from "lucide-react";
 import { cn } from "@piya/ui";
-import type { DiscountData } from "@/services/discounts.service";
+import type { DiscountData } from "@piya/shared/services";
 import {
   formatDiscountDate,
   formatDiscountLabel,
