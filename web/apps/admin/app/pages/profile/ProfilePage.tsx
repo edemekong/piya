@@ -3,7 +3,7 @@ import { ProfileSidebar } from "./components";
 import {
   BrandingProfilePage,
   BusinessProfilePage,
-  ChannelsProfilePage,
+  IntegrationProfilePage,
   MembersProfilePage,
   NotificationsProfilePage,
   PersonalProfilePage,
@@ -44,7 +44,7 @@ function ProfileSectionContent({ section }: { section: ProfileSection }) {
     case "members":
       return <MembersProfilePage />;
     case "channels":
-      return <ChannelsProfilePage />;
+      return <IntegrationProfilePage />;
     case "security":
       return <SecurityProfilePage />;
     case "notifications":

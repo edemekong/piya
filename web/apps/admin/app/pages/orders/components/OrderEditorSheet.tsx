@@ -1,6 +1,13 @@
 import * as React from "react";
 import { CheckCircle2, ChevronDown } from "lucide-react";
-import { AppDatePicker, AppSheet, Button } from "@piya/ui";
+import {
+  AppDatePicker,
+  AppSelectField,
+  AppSheet,
+  AppTextareaField,
+  AppTextField,
+  Button,
+} from "@piya/ui";
 import type {
   OrderData,
   OrderItemType,
@@ -258,7 +265,7 @@ export function OrderEditorSheet({
                 value={draft.fulfillmentStatus}
               />
               <label className="grid gap-2">
-                <span className="text-footnote font-semibold text-[#2F4B4F]">
+                <span className="text-footnote font-normal text-[#2F4B4F]">
                   Estimated delivery
                 </span>
                 <AppDatePicker
@@ -314,16 +321,13 @@ function TextField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <input
-        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        type={type}
-        value={value}
-      />
-    </label>
+    <AppTextField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      type={type}
+      value={value}
+    />
   );
 }
 
@@ -339,15 +343,12 @@ function TextAreaField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <textarea
-        className="min-h-28 rounded-sm border border-border bg-fill px-3 py-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        value={value}
-      />
-    </label>
+    <AppTextareaField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      value={value}
+    />
   );
 }
 
@@ -363,23 +364,15 @@ function SelectField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <span className="relative">
-        <select
-          className="h-12 w-full appearance-none rounded-sm border border-border bg-fill px-3 pr-10 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-          onChange={(event) => onChange(event.target.value)}
-          value={value}
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {formatOrderLabel(option)}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/65" />
-      </span>
-    </label>
+    <AppSelectField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      options={options.map((option) => ({
+        label: formatOrderLabel(option),
+        value: option,
+      }))}
+      value={value}
+    />
   );
 }
 
@@ -398,7 +391,7 @@ function MoneyField({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <div className="relative flex w-20 shrink-0 items-center border-r border-border">
           <select

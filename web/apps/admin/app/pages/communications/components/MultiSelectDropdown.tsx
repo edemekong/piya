@@ -50,7 +50,7 @@ export function MultiSelectDropdown({
 
   return (
     <div className="grid gap-2" ref={dropdownRef}>
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="relative">
         <button
           aria-expanded={open}

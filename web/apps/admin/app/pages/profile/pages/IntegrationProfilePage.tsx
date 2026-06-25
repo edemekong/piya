@@ -121,7 +121,7 @@ const integrationsByTab: Record<
   },
 };
 
-export function ChannelsProfilePage() {
+export function IntegrationProfilePage() {
   const [activeTab, setActiveTab] = React.useState<IntegrationTab>("domain");
   const [isDomainSheetOpen, setIsDomainSheetOpen] = React.useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = React.useState(false);

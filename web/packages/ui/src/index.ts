@@ -17,6 +17,12 @@ export {
 } from "./components/button";
 export { AppDatePicker } from "./components/date-picker";
 export { EmptyState } from "./components/empty-state";
+export {
+  AppFieldGrid,
+  AppSelectField,
+  AppTextareaField,
+  AppTextField,
+} from "./components/form-field";
 export { InfoCard } from "./components/info-card";
 export { SectionHeader } from "./components/section-header";
 export { SegmentedTabs } from "./components/segmented-tabs";
@@ -46,6 +52,11 @@ export type { AppAvatarProps } from "./components/avatar";
 export type { AppDatePickerProps } from "./components/date-picker";
 export type { AppSheetProps } from "./components/app-sheet";
 export type { EmptyStateProps } from "./components/empty-state";
+export type {
+  AppSelectFieldProps,
+  AppTextareaFieldProps,
+  AppTextFieldProps,
+} from "./components/form-field";
 export type { InfoCardProps } from "./components/info-card";
 export type { SectionHeaderProps } from "./components/section-header";
 export type {

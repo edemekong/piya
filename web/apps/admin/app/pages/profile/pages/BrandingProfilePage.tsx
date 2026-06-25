@@ -93,7 +93,7 @@ export function BrandingProfilePage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {colors.map((color) => (
             <label className="grid min-w-0 gap-2" key={color.label}>
-              <span className="text-footnote font-semibold text-[#2F4B4F]">
+              <span className="text-footnote font-normal text-[#2F4B4F]">
                 {color.label}
               </span>
               <span className="flex h-12 min-w-0 items-center gap-3 rounded-sm border border-border bg-fill px-3">

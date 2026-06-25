@@ -123,7 +123,7 @@ export function CommunicationStepCard({
 
       <div className="mt-4 grid gap-4">
         <label className="grid gap-2">
-          <span className="text-footnote font-semibold text-[#2F4B4F]">
+          <span className="text-footnote font-normal text-[#2F4B4F]">
             Channel
           </span>
           <div className="grid gap-2 sm:grid-cols-3">
@@ -149,7 +149,7 @@ export function CommunicationStepCard({
         <div className="grid gap-4">
           {step.channel === "email" ? (
             <label className="grid gap-2">
-              <span className="text-footnote font-semibold text-[#2F4B4F]">
+              <span className="text-footnote font-normal text-[#2F4B4F]">
                 Subject
               </span>
               <span className="relative block">
@@ -175,7 +175,7 @@ export function CommunicationStepCard({
         </div>
 
         <label className="grid gap-2">
-          <span className="text-footnote font-semibold text-[#2F4B4F]">
+          <span className="text-footnote font-normal text-[#2F4B4F]">
             Message
           </span>
           <span className="relative block">
@@ -199,7 +199,7 @@ export function CommunicationStepCard({
         </label>
 
         <div className="rounded-md border border-dashed border-border bg-fill p-3">
-          <div className="flex items-center gap-2 text-footnote font-semibold text-[#2F4B4F]">
+          <div className="flex items-center gap-2 text-footnote font-normal text-[#2F4B4F]">
             <Link2 className="size-4 text-[#2F4B4F]/60" />
             CTA
           </div>

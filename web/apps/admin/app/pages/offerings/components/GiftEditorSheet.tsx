@@ -1,6 +1,12 @@
 import * as React from "react";
 import { CheckCircle2, ChevronDown, Plus } from "lucide-react";
-import { AppSheet, Button, cn } from "@piya/ui";
+import {
+  AppSheet,
+  AppTextareaField,
+  AppTextField,
+  Button,
+  cn,
+} from "@piya/ui";
 import type { GiftData, GiftDraft } from "@/services/gifts.service";
 import {
   createEmptyGiftDraft,
@@ -159,7 +165,7 @@ function MoneyField({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <div className="relative flex w-20 shrink-0 items-center border-r border-border">
           <select
@@ -203,16 +209,13 @@ function TextField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <input
-        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        type={type}
-        value={value}
-      />
-    </label>
+    <AppTextField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      type={type}
+      value={value}
+    />
   );
 }
 
@@ -228,15 +231,12 @@ function TextAreaField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <textarea
-        className="min-h-28 rounded-sm border border-border bg-fill px-3 py-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        value={value}
-      />
-    </label>
+    <AppTextareaField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      value={value}
+    />
   );
 }
 
@@ -264,7 +264,7 @@ function TagPicker({
 
   return (
     <fieldset className="relative grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">Tags</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">Tags</span>
       <button
         className="flex h-12 items-center justify-between gap-3 rounded-sm border border-border bg-fill px-3 text-left text-callout text-[#2F4B4F] outline-none transition hover:bg-secondary/30 focus:border-primary focus:bg-white"
         onClick={() => setOpen((current) => !current)}
@@ -338,7 +338,7 @@ function ImageUploadBox({
 
   return (
     <div className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex flex-wrap gap-3">
         {value ? (
           <div

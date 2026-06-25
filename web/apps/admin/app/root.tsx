@@ -16,7 +16,7 @@ export const links: LinksFunction = () => [
 ];
 
 export const meta: MetaFunction = () => [
-  { title: "Piya Admin" },
+  { title: "Piya" },
   {
     name: "description",
     content: "Internal admin workspace for Piya.",

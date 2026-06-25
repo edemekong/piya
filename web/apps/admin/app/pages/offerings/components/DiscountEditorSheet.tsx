@@ -1,6 +1,14 @@
 import * as React from "react";
 import { CheckCircle2, ChevronDown, Plus, Sparkles, X } from "lucide-react";
-import { AppDatePicker, AppSheet, Button, cn } from "@piya/ui";
+import {
+  AppDatePicker,
+  AppSelectField,
+  AppSheet,
+  AppTextareaField,
+  AppTextField,
+  Button,
+  cn,
+} from "@piya/ui";
 import {
   DEFAULT_BADGE_OPTIONS,
   formatLabel,
@@ -256,7 +264,7 @@ export function DiscountEditorSheet({
             <h3 className="text-callout font-semibold text-[#2F4B4F]">Schedule</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="grid gap-2">
-                <span className="text-footnote font-semibold text-[#2F4B4F]">
+                <span className="text-footnote font-normal text-[#2F4B4F]">
                   Starts at
                 </span>
                 <AppDatePicker
@@ -266,7 +274,7 @@ export function DiscountEditorSheet({
                 />
               </label>
               <label className="grid gap-2">
-                <span className="text-footnote font-semibold text-[#2F4B4F]">
+                <span className="text-footnote font-normal text-[#2F4B4F]">
                   Ends at
                 </span>
                 <AppDatePicker
@@ -312,7 +320,7 @@ function CodeField({
   return (
     <div className="grid gap-2 sm:col-span-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+        <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
         <label className="inline-flex items-center gap-2 text-caption-1 font-semibold text-[#2F4B4F]/70">
           <input
             checked={autoEnabled}
@@ -460,7 +468,7 @@ function GiftPicker({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <select
           className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none"
@@ -572,7 +580,7 @@ function PercentField({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <input
           className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
@@ -607,7 +615,7 @@ function MoneyField({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <div className="relative flex w-20 shrink-0 items-center border-r border-border">
           <select
@@ -640,7 +648,7 @@ function MoneyField({
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 items-center rounded-sm border border-border bg-fill px-3 text-callout font-semibold text-[#2F4B4F]/70">
         {value}
       </div>
@@ -677,7 +685,7 @@ function OptionPicker({
 
   return (
     <fieldset className="relative grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <button
         aria-expanded={open}
         className="flex h-12 items-center justify-between gap-3 rounded-sm border border-border bg-fill px-3 text-left text-callout text-[#2F4B4F] outline-none transition hover:bg-secondary/30 focus:border-primary focus:bg-white"
@@ -739,16 +747,13 @@ function TextField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <input
-        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        type={type}
-        value={value}
-      />
-    </label>
+    <AppTextField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      type={type}
+      value={value}
+    />
   );
 }
 
@@ -764,15 +769,12 @@ function TextAreaField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <textarea
-        className="min-h-28 rounded-sm border border-border bg-fill px-3 py-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        value={value}
-      />
-    </label>
+    <AppTextareaField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      value={value}
+    />
   );
 }
 
@@ -788,20 +790,12 @@ function SelectField({
   value: string;
 }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">{label}</span>
-      <select
-        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-        onChange={(event) => onChange(event.target.value)}
-        value={value}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <AppSelectField
+      label={label}
+      onChange={(event) => onChange(event.target.value)}
+      options={options}
+      value={value}
+    />
   );
 }
 

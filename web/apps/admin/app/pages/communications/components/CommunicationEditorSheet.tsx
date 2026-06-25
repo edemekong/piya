@@ -7,7 +7,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { AppDatePicker, Button } from "@piya/ui";
+import { AppDatePicker, AppSelectField, AppTextField, Button } from "@piya/ui";
 import type {
   CommunicationData,
   CommunicationEditorMode,
@@ -155,83 +155,64 @@ export function CommunicationEditorSheet({
                 title="Communication"
               />
               <div className="mt-4 grid gap-4">
-                <label className="grid gap-2">
-                  <span className="text-footnote font-semibold text-[#2F4B4F]">
-                    Name
-                  </span>
-                  <input
-                    className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
+                <AppTextField
+                  label="Name"
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
+                  placeholder="e.g. June discount alert"
+                  value={draft.name}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <AppSelectField
+                    label="Trigger"
+                    onChange={(event) => {
+                      const triggerType = event.target
+                        .value as CommunicationEventType;
+                      const shouldSchedule =
+                        SCHEDULED_TRIGGER_TYPES.includes(triggerType);
+
+                      setDraft((current) => ({
+                        ...current,
+                        type: triggerType,
+                        trigger: {
+                          type: triggerType,
+                          schedule: shouldSchedule
+                            ? (current.trigger.schedule ?? createSchedule())
+                            : null,
+                        },
+                      }));
+                    }}
+                    options={TRIGGER_OPTIONS.map((option) => ({
+                      label: formatLabel(option),
+                      value: option,
+                    }))}
+                    value={draft.trigger.type}
+                  />
+                  <AppSelectField
+                    disabled={!hasSchedule}
+                    label="Frequency"
                     onChange={(event) =>
                       setDraft((current) => ({
                         ...current,
-                        name: event.target.value,
+                        trigger: {
+                          ...current.trigger,
+                          schedule: {
+                            ...(current.trigger.schedule ?? createSchedule()),
+                            frequency: event.target.value as CommunicationFrequency,
+                          },
+                        },
                       }))
                     }
-                    placeholder="e.g. June discount alert"
-                    value={draft.name}
+                    options={FREQUENCY_OPTIONS.map((option) => ({
+                      label: formatLabel(option),
+                      value: option,
+                    }))}
+                    value={draft.trigger.schedule?.frequency ?? "once"}
                   />
-                </label>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="grid gap-2">
-                    <span className="text-footnote font-semibold text-[#2F4B4F]">
-                      Trigger
-                    </span>
-                    <select
-                      className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-                      onChange={(event) => {
-                        const triggerType = event.target
-                          .value as CommunicationEventType;
-                        const shouldSchedule =
-                          SCHEDULED_TRIGGER_TYPES.includes(triggerType);
-
-                        setDraft((current) => ({
-                          ...current,
-                          type: triggerType,
-                          trigger: {
-                            type: triggerType,
-                            schedule: shouldSchedule
-                              ? (current.trigger.schedule ?? createSchedule())
-                              : null,
-                          },
-                        }));
-                      }}
-                      value={draft.trigger.type}
-                    >
-                      {TRIGGER_OPTIONS.map((option) => (
-                        <option key={option} value={option}>
-                          {formatLabel(option)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="grid gap-2">
-                    <span className="text-footnote font-semibold text-[#2F4B4F]">
-                      Frequency
-                    </span>
-                    <select
-                      className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-                      disabled={!hasSchedule}
-                      onChange={(event) =>
-                        setDraft((current) => ({
-                          ...current,
-                          trigger: {
-                            ...current.trigger,
-                            schedule: {
-                              ...(current.trigger.schedule ?? createSchedule()),
-                              frequency: event.target.value as CommunicationFrequency,
-                            },
-                          },
-                        }))
-                      }
-                      value={draft.trigger.schedule?.frequency ?? "once"}
-                    >
-                      {FREQUENCY_OPTIONS.map((option) => (
-                        <option key={option} value={option}>
-                          {formatLabel(option)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
                 </div>
                 {hasSchedule ? (
                   <div className="grid gap-4 sm:grid-cols-3">
@@ -252,26 +233,19 @@ export function CommunicationEditorSheet({
                         }));
                       }}
                     />
+                    <AppSelectField
+                      label="Day of week"
+                      onChange={(event) =>
+                        updateSchedule("dayOfWeek", Number(event.target.value))
+                      }
+                      options={DAY_OF_WEEK_OPTIONS.map((option) => ({
+                        label: option.label,
+                        value: String(option.value),
+                      }))}
+                      value={String(schedule.dayOfWeek)}
+                    />
                     <label className="grid gap-2">
-                      <span className="text-footnote font-semibold text-[#2F4B4F]">
-                        Day of week
-                      </span>
-                      <select
-                        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-                        onChange={(event) =>
-                          updateSchedule("dayOfWeek", Number(event.target.value))
-                        }
-                        value={schedule.dayOfWeek}
-                      >
-                        {DAY_OF_WEEK_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="grid gap-2">
-                      <span className="text-footnote font-semibold text-[#2F4B4F]">
+                      <span className="text-footnote font-normal text-[#2F4B4F]">
                         Start date
                       </span>
                       <AppDatePicker
@@ -406,7 +380,7 @@ function ScheduleTimeField({
 
   return (
     <label className="grid gap-2">
-      <span className="text-footnote font-semibold text-[#2F4B4F]">Time</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">Time</span>
       <span className="flex h-12 items-center overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
         <input
           className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
