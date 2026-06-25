@@ -1,3 +1,4 @@
+import * as React from "react";
 import {
   CartesianGrid,
   Line,
@@ -7,31 +8,36 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatMoney } from "@yinapp/shared/utils";
+import type { OverviewRange } from "../overview.mock";
 import { overviewTrend } from "../overview.mock";
+import { OverviewRangeSelect } from "./OverviewRangeSelect";
 
 export function OverviewTrendChart() {
+  const [range, setRange] = React.useState<OverviewRange>("last_7_days");
+
   return (
-    <section className="rounded-md bg-white p-6 shadow-sm">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+    <section className="h-full min-h-[360px] rounded-md bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="grid gap-2">
           <h2 className="text-title-3 font-semibold text-[#2F4B4F]">
             Sales trend
           </h2>
-          <p className="mt-1 text-callout text-[#2F4B4F]/70">
-            Weekly sales and new contact movement.
-          </p>
+          <OverviewRangeSelect onChange={setRange} value={range} />
         </div>
-        <p className="text-footnote font-semibold text-primary">Last 7 days</p>
       </div>
 
       <div className="mt-6">
-        <div className="h-64 w-full">
+        <div className="h-56 w-full">
           <ResponsiveContainer height="100%" width="100%">
             <LineChart
               data={overviewTrend}
               margin={{ bottom: 0, left: 0, right: 8, top: 8 }}
             >
-              <CartesianGrid stroke="rgb(var(--color-border))" vertical={false} />
+              <CartesianGrid
+                stroke="rgb(var(--color-border))"
+                vertical={false}
+              />
               <XAxis
                 axisLine={false}
                 dataKey="label"
@@ -56,7 +62,9 @@ export function OverviewTrendChart() {
                   const dataKey = String(name);
 
                   return [
-                    dataKey === "revenue" ? formatMoney(numericValue) : numericValue,
+                    dataKey === "revenue"
+                      ? formatMoney(numericValue)
+                      : numericValue,
                     dataKey === "revenue" ? "Sales" : "Contacts",
                   ];
                 }}
@@ -80,23 +88,17 @@ export function OverviewTrendChart() {
           </ResponsiveContainer>
         </div>
 
-        <div className="mt-4 grid grid-cols-7 gap-2 text-center text-caption-1 text-[#2F4B4F]/60">
+        <div className="mt-3 grid grid-cols-7 gap-2 text-center text-caption-1 text-[#2F4B4F]/60">
           {overviewTrend.map((item) => (
             <div key={item.label}>
               <p>{item.label}</p>
-              <p className="mt-1 font-semibold text-[#2F4B4F]">{item.contacts}</p>
+              <p className="mt-1 font-semibold text-[#2F4B4F]">
+                {item.contacts}
+              </p>
             </div>
           ))}
         </div>
       </div>
     </section>
   );
-}
-
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("en-NG", {
-    currency: "NGN",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(value);
 }

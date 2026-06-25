@@ -74,7 +74,7 @@ const profileMenuItems: ProfileMenuItem[] = [
     value: "security",
   },
   {
-    description: "Product, campaign, and chat alerts.",
+    description: "Offerings, communications, and chat alerts.",
     icon: Bell,
     label: "Notifications",
     value: "notifications",

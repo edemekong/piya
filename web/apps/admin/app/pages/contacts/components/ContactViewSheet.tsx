@@ -9,10 +9,11 @@ import {
 } from "./ContactOverviewPanel";
 import { ContactPreferencePanel } from "./ContactPreferencePanel";
 
-type ParentTab = "overview" | "preference" | "conversations";
+export type ContactViewParentTab = "overview" | "preference" | "conversations";
 
 type ContactViewSheetProps = {
   contact: ContactData | null;
+  initialTab?: ContactViewParentTab;
   onClose: () => void;
   open: boolean;
 };
@@ -36,25 +37,26 @@ const parentTabs = [
 ] satisfies {
   icon: React.ReactNode;
   label: string;
-  value: ParentTab;
+  value: ContactViewParentTab;
 }[];
 
 export function ContactViewSheet({
   contact,
+  initialTab = "overview",
   onClose,
   open,
 }: ContactViewSheetProps) {
   const [activeParentTab, setActiveParentTab] =
-    React.useState<ParentTab>("overview");
+    React.useState<ContactViewParentTab>("overview");
   const [activeOverviewTab, setActiveOverviewTab] =
     React.useState<ContactOverviewTab>("events");
 
   React.useEffect(() => {
     if (open) {
-      setActiveParentTab("overview");
+      setActiveParentTab(initialTab);
       setActiveOverviewTab("events");
     }
-  }, [contact?.id, open]);
+  }, [contact?.id, initialTab, open]);
 
   if (!open || !contact) return null;
 

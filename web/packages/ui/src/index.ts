@@ -1,5 +1,6 @@
 export { AppText } from "./components/app-text";
 export { AppAvatar } from "./components/avatar";
+export { AppSheet } from "./components/app-sheet";
 export { Badge } from "./components/badge";
 export {
   AppBackButton,
@@ -14,6 +15,7 @@ export {
   LinkedText,
   buttonVariants,
 } from "./components/button";
+export { AppDatePicker } from "./components/date-picker";
 export { EmptyState } from "./components/empty-state";
 export { InfoCard } from "./components/info-card";
 export { SectionHeader } from "./components/section-header";
@@ -41,6 +43,8 @@ export type {
   LinkedTextProps,
 } from "./components/button";
 export type { AppAvatarProps } from "./components/avatar";
+export type { AppDatePickerProps } from "./components/date-picker";
+export type { AppSheetProps } from "./components/app-sheet";
 export type { EmptyStateProps } from "./components/empty-state";
 export type { InfoCardProps } from "./components/info-card";
 export type { SectionHeaderProps } from "./components/section-header";

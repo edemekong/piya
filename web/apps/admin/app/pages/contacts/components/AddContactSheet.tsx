@@ -29,10 +29,7 @@ export function AddContactSheet({
       <aside className="relative flex h-full w-full max-w-xl flex-col bg-white text-[#2F4B4F] shadow-xl">
         <div className="flex items-start justify-between border-b border-border p-6">
           <div>
-            <p className="text-footnote font-semibold uppercase text-primary">
-              Contacts
-            </p>
-            <h2 className="mt-2 text-title-2 font-semibold text-[#2F4B4F]">
+            <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
               Add contact
             </h2>
             <p className="mt-1 text-callout text-[#2F4B4F]/70">

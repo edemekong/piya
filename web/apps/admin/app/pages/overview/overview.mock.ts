@@ -8,7 +8,29 @@ export const overviewTrend = [
   { label: "Sun", revenue: 820000, contacts: 41 },
 ];
 
-export const campaignPerformance = [
+export const overviewRangeOptions = [
+  { label: "Today", value: "today" },
+  { label: "Yesterday", value: "yesterday" },
+  { label: "Last 3 days", value: "last_3_days" },
+  { label: "Last 7 days", value: "last_7_days" },
+  { label: "Last 30 days", value: "last_30_days" },
+  { label: "Last 90 days", value: "last_90_days" },
+  { label: "Lifetime", value: "lifetime" },
+] as const;
+
+export type OverviewRange = (typeof overviewRangeOptions)[number]["value"];
+
+export const communicationTrend = [
+  { failed: 12, label: "Mon", opened: 310, received: 560, unsubscribed: 4 },
+  { failed: 9, label: "Tue", opened: 382, received: 620, unsubscribed: 6 },
+  { failed: 16, label: "Wed", opened: 344, received: 590, unsubscribed: 5 },
+  { failed: 11, label: "Thu", opened: 438, received: 760, unsubscribed: 7 },
+  { failed: 20, label: "Fri", opened: 512, received: 840, unsubscribed: 8 },
+  { failed: 15, label: "Sat", opened: 461, received: 720, unsubscribed: 5 },
+  { failed: 18, label: "Sun", opened: 590, received: 910, unsubscribed: 9 },
+];
+
+export const communicationPerformance = [
   {
     audience: "VIP customers",
     name: "June VIP Rewards",

@@ -1,11 +1,20 @@
-import { Megaphone, TrendingUp, Users } from "lucide-react";
+import { Megaphone, Send, TrendingUp, Users } from "lucide-react";
 import { StatCard } from "@yinapp/ui";
 import type { ContactData } from "@yinapp/shared/types";
-import { campaignPerformance, productPerformance } from "../overview.mock";
+import { formatMoney } from "@yinapp/shared/utils";
+import {
+  communicationPerformance,
+  communicationTrend,
+  productPerformance,
+} from "../overview.mock";
 
 export function OverviewStatsGrid({ contacts }: { contacts: ContactData[] }) {
   const revenue = productPerformance.reduce(
     (total, product) => total + product.revenue,
+    0,
+  );
+  const messagesSent = communicationTrend.reduce(
+    (total, item) => total + item.received + item.failed,
     0,
   );
 
@@ -17,10 +26,15 @@ export function OverviewStatsGrid({ contacts }: { contacts: ContactData[] }) {
     },
     {
       icon: Megaphone,
-      label: "Active campaigns",
-      value: campaignPerformance
-        .filter((campaign) => campaign.status === "Active")
+      label: "Active communications",
+      value: communicationPerformance
+        .filter((communication) => communication.status === "Active")
         .length.toString(),
+    },
+    {
+      icon: Send,
+      label: "Messages sent",
+      value: messagesSent.toLocaleString(),
     },
     {
       icon: TrendingUp,
@@ -30,7 +44,7 @@ export function OverviewStatsGrid({ contacts }: { contacts: ContactData[] }) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {overviewStats.map((stat) => {
         const Icon = stat.icon;
         return (
@@ -45,12 +59,4 @@ export function OverviewStatsGrid({ contacts }: { contacts: ContactData[] }) {
       })}
     </div>
   );
-}
-
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("en-NG", {
-    currency: "NGN",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(value);
 }

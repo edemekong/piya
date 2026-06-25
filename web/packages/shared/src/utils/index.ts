@@ -12,3 +12,24 @@ export function formatInitials(name: string) {
     .map((part) => part[0]?.toUpperCase())
     .join("");
 }
+
+export function formatMoney(
+  value: number,
+  options: {
+    currency?: string;
+    locale?: string;
+    maximumFractionDigits?: number;
+  } = {},
+) {
+  const {
+    currency = "NGN",
+    locale = "en-NG",
+    maximumFractionDigits = 0,
+  } = options;
+
+  return new Intl.NumberFormat(locale, {
+    currency,
+    maximumFractionDigits,
+    style: "currency",
+  }).format(value);
+}

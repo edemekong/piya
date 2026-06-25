@@ -19,8 +19,8 @@ const sidebarItems: SidebarItem[] = [
   { label: "Overview", to: "/overview", icon: LayoutDashboard },
   { label: "Contacts", to: "/contacts", icon: Users },
   { label: "Orders", to: "/orders", icon: ShoppingCart },
-  { label: "Products", to: "/products", icon: Package },
-  { label: "Campaign", to: "/campaign", icon: Megaphone },
+  { label: "Offerings", to: "/offerings", icon: Package },
+  { label: "Communications", to: "/communications", icon: Megaphone },
 ];
 
 export function Sidebar() {

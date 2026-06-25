@@ -19,6 +19,7 @@ import {
   cn,
 } from "@yinapp/ui";
 import type { ContactData } from "@yinapp/shared/types";
+import { formatMoney } from "@yinapp/shared/utils";
 
 export type ContactOverviewTab =
   | "events"
@@ -188,14 +189,6 @@ function ContactInfoPanel({ contact }: { contact: ContactData }) {
 
 function NotesPanel() {
   return <EmptyState>No notes yet.</EmptyState>;
-}
-
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("en-NG", {
-    currency: "NGN",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(value);
 }
 
 function formatDate(timestamp: number) {

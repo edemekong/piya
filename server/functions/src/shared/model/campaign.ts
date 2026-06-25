@@ -28,11 +28,11 @@ interface CampaignReward {
 interface RewardMetadata {
   buyQuantity?: number;
   getQuantity?: number;
-  applicableIds?: string[];
   giftId?: string;
   customPerkDescription?: string;
 }
 interface CampaignRules {
+  
   minimumOrderValue?: number | null;
   targetBadgeTypes?: ContactBadgeType[] | null;
   targetTags?: string[] | null;
