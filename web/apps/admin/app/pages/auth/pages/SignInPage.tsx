@@ -2,13 +2,33 @@ import { OnboadingSection, SignInForm } from "../components";
 
 export function SignInPage() {
   return (
-    <main className="h-screen overflow-hidden bg-primary text-foreground">
-      <section className="grid h-full w-screen grid-cols-2">
+    <main className="h-screen overflow-hidden bg-background text-foreground">
+      <section className="grid h-full w-screen grid-cols-[65%_35%]">
         <OnboadingSection />
 
-        <aside className="h-full p-4">
-          <div className="flex h-full w-full items-center justify-start rounded-[32px] border border-secondary bg-white px-12 py-10 shadow-sm">
-            <SignInForm />
+        <aside className="h-full p-screen">
+          <div className="flex h-full w-full flex-col rounded-lg bg-white p-screen shadow-sm">
+            <div className="flex flex-1 items-center justify-start">
+              <SignInForm />
+            </div>
+
+            <p className="text-footnote leading-relaxed text-text-secondary">
+              By signing in, you accept our{" "}
+              <a
+                className="font-semibold text-primary underline underline-offset-4"
+                href="/privacy-policy"
+              >
+                Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a
+                className="font-semibold text-primary underline underline-offset-4"
+                href="/terms-of-use"
+              >
+                Terms of Use
+              </a>
+              .
+            </p>
           </div>
         </aside>
       </section>
