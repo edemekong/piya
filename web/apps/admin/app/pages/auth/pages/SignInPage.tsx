@@ -8,7 +8,7 @@ export function SignInPage() {
 
         <aside className="h-full p-screen">
           <div className="flex h-full w-full flex-col rounded-lg bg-white p-screen shadow-sm">
-            <div className="flex flex-1 items-center justify-start">
+            <div className="flex flex-1 items-center justify-center">
               <SignInForm />
             </div>
 
