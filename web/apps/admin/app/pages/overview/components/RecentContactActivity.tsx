@@ -1,5 +1,5 @@
-import { Badge } from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
+import { Badge } from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
 
 export function RecentContactActivity({ contacts }: { contacts: ContactData[] }) {
   return (

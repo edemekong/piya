@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { ThemeScript } from "@yinapp/ui";
+import { ThemeScript } from "@piya/ui";
 import stylesheet from "./styles.css?url";
 import { ReduxProvider } from "./providers/redux-provider";
 
@@ -16,10 +16,10 @@ export const links: LinksFunction = () => [
 ];
 
 export const meta: MetaFunction = () => [
-  { title: "Yinapp Admin" },
+  { title: "Piya Admin" },
   {
     name: "description",
-    content: "Internal admin workspace for Yinapp.",
+    content: "Internal admin workspace for Piya.",
   },
 ];
 

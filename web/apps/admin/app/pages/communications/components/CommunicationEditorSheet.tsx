@@ -7,7 +7,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { AppDatePicker, Button } from "@yinapp/ui";
+import { AppDatePicker, Button } from "@piya/ui";
 import type {
   CommunicationData,
   CommunicationEditorMode,

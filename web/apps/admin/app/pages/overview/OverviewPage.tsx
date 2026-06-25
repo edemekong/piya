@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Megaphone } from "lucide-react";
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import { getContacts } from "@/services/contacts.service";
 import { CommunicationEditorSheet } from "@/pages/communications/components";
 import {

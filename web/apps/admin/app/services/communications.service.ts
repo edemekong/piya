@@ -35,13 +35,13 @@ const communications: CommunicationData[] = [
         delay: 0,
         identityId: "email_resend_default",
         message: {
-          subject: "Welcome to Yinapp",
+          subject: "Welcome to Piya",
           body: "Hi {{firstName}}, your rewards profile is ready. Explore your perks and start earning today.",
         },
         ctas: [
           {
             label: "View rewards",
-            url: "https://yinapp.com/rewards",
+            url: "https://piya.store/rewards",
             type: "primary",
           },
         ],
@@ -107,7 +107,7 @@ const communications: CommunicationData[] = [
         delay: 0,
         identityId: "sms_link_mobility_ng",
         message: {
-          body: "YINAPP: Your VIP discount is live. Use code JUNE20 before Sunday.",
+          body: "Piya App: Your VIP discount is live. Use code JUNE20 before Sunday.",
         },
         ctas: [],
         template: null,
@@ -161,7 +161,7 @@ const communications: CommunicationData[] = [
         ctas: [
           {
             label: "Claim reward",
-            url: "https://yinapp.com/offers/winback",
+            url: "https://piya.store/offers/winback",
             type: "primary",
           },
         ],

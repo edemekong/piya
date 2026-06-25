@@ -1,6 +1,6 @@
 import { CheckCircle2, Clock3, PackageCheck, ReceiptText } from "lucide-react";
-import { StatCard } from "@yinapp/ui";
-import type { OrderData } from "@yinapp/shared/models";
+import { StatCard } from "@piya/ui";
+import type { OrderData } from "@piya/shared/models";
 
 type OrdersStatsProps = {
   orders: OrderData[];

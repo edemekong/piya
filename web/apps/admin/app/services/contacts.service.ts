@@ -1,4 +1,4 @@
-import type { ContactData } from "@yinapp/shared/types";
+import type { ContactData } from "@piya/shared/types";
 
 const now = new Date("2026-06-24T09:00:00.000Z").getTime();
 

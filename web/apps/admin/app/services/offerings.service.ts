@@ -107,7 +107,7 @@ const offerings: OfferingData[] = [
     createdAt: Date.now() - 1000 * 60 * 60 * 24 * 40,
     updatedAt: Date.now() - 1000 * 60 * 60 * 48,
     name: "In-store Launch Workshop",
-    description: "A hands-on event for retail teams adopting Yinapp.",
+    description: "A hands-on event for retail teams adopting Piya.",
     type: "service",
     subType: "event",
     status: "paused",

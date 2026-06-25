@@ -1,5 +1,5 @@
 import { CheckCircle2, Upload, X } from "lucide-react";
-import { Button, cn } from "@yinapp/ui";
+import { Button, cn } from "@piya/ui";
 import { Field } from "@/components/inputs";
 import type { AddContactMode } from "../types";
 

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { ListFilter, Plus, Search } from "lucide-react";
-import { Button } from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
-import type { OrderData } from "@yinapp/shared/models";
+import { Button } from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
+import type { OrderData } from "@piya/shared/models";
 import { getContacts } from "@/services/contacts.service";
 import {
   getOfferings,

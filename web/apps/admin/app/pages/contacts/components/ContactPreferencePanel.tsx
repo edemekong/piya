@@ -1,5 +1,5 @@
-import { Badge, SectionHeader } from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
+import { Badge, SectionHeader } from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
 
 export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
   const preferences = [

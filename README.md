@@ -1,6 +1,6 @@
-# Yinapp
+# Piya
 
-Yinapp provides businesses with contact management, campaign and loyalty tooling, scheduled customer communications, and multi-channel conversation history.
+Piya provides businesses with contact management, campaign and loyalty tooling, scheduled customer communications, and multi-channel conversation history.
 
 ## Core capabilities
 

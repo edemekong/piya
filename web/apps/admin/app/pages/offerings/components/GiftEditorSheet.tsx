@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CheckCircle2, ChevronDown, Plus } from "lucide-react";
-import { AppSheet, Button, cn } from "@yinapp/ui";
+import { AppSheet, Button, cn } from "@piya/ui";
 import type { GiftData, GiftDraft } from "@/services/gifts.service";
 import {
   createEmptyGiftDraft,

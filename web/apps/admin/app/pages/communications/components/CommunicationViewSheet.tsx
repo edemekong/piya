@@ -1,5 +1,5 @@
 import { Send, Target, X } from "lucide-react";
-import { cn } from "@yinapp/ui";
+import { cn } from "@piya/ui";
 import type { CommunicationData } from "../types";
 import {
   formatDate,

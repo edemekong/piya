@@ -1,5 +1,5 @@
 {
-  "name": "@yinapp/portal",
+  "name": "@piya/portal",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,8 +9,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@yinapp/shared": "workspace:*",
-    "@yinapp/ui": "workspace:*",
+    "@piya/shared": "workspace:*",
+    "@piya/ui": "workspace:*",
     "@remix-run/node": "^2.17.0",
     "@remix-run/react": "^2.17.0",
     "@remix-run/serve": "^2.17.0",

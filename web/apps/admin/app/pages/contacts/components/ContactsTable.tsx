@@ -10,8 +10,8 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
-import { AppAvatar, cn } from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
+import { AppAvatar, cn } from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
 
 function statusClassName(status: ContactData["status"]) {
   if (status === "active") {

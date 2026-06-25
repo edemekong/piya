@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AppSheet, Button } from "@yinapp/ui";
+import { AppSheet, Button } from "@piya/ui";
 
 type AddDomainSheetProps = {
   onClose: () => void;
@@ -15,7 +15,7 @@ function AddDomainSheet({ onClose, open }: AddDomainSheetProps) {
   return (
     <AppSheet
       ariaLabel="add domain"
-      description="Use your own domain for your customer portal, so customers can open your business at your website instead of a Yinapp link."
+      description="Use your own domain for your customer portal, so customers can open your business at your website instead of a Piya link."
       footer={
         <>
           <Button onClick={onClose} type="button" variant="secondary">
@@ -58,7 +58,7 @@ function AddDomainSheet({ onClose, open }: AddDomainSheetProps) {
             </span>{" "}
             instead of{" "}
             <span className="font-semibold text-[#2F4B4F]">
-              https://yinapp.co/your-business
+              https://piya.store/your-business
             </span>
           </p>
         </div>

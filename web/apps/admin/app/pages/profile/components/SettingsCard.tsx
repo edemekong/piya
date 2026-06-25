@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { cn } from "@yinapp/ui";
+import { cn } from "@piya/ui";
 
 type SettingsCardProps = {
   actions?: React.ReactNode;

@@ -4,7 +4,7 @@ export type ThemeScriptProps = {
   storageKey?: string;
 };
 
-export function ThemeScript({ storageKey = "yinapp.theme" }: ThemeScriptProps) {
+export function ThemeScript({ storageKey = "piya.theme" }: ThemeScriptProps) {
   const script = `
 (function () {
   try {

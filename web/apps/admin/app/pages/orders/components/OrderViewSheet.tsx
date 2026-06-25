@@ -1,6 +1,6 @@
 import { Mail, MapPin, Phone, Route } from "lucide-react";
-import { AppSheet, Badge, cn } from "@yinapp/ui";
-import type { OrderData } from "@yinapp/shared/models";
+import { AppSheet, Badge, cn } from "@piya/ui";
+import type { OrderData } from "@piya/shared/models";
 import {
   formatDate,
   formatMoney,

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Upload } from "lucide-react";
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import { FieldGrid, ProfileField } from "../components/ProfileFields";
 import { ProfileSectionShell } from "../components/ProfileSectionShell";
@@ -79,12 +79,12 @@ export function BrandingProfilePage() {
 
       <SettingsCard title="Social links">
         <FieldGrid>
-          <ProfileField label="Instagram" value="@yinapp" />
-          <ProfileField label="X / Twitter" value="@yinapp" />
-          <ProfileField label="Facebook" value="https://facebook.com/yinapp" />
+          <ProfileField label="Instagram" value="@piya" />
+          <ProfileField label="X / Twitter" value="@piya" />
+          <ProfileField label="Facebook" value="https://facebook.com/piya" />
           <ProfileField
             label="LinkedIn"
-            value="https://linkedin.com/company/yinapp"
+            value="https://linkedin.com/company/piya"
           />
         </FieldGrid>
       </SettingsCard>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import {
   getCommunicationRecipients,
   getCommunications,

@@ -1,4 +1,4 @@
-import { cn } from "@yinapp/ui";
+import { cn } from "@piya/ui";
 import type { ProfileSection } from "../profileSections";
 import { profileMenuItems } from "../profileSections";
 

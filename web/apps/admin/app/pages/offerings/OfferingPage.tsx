@@ -7,7 +7,7 @@ import {
   Search,
   TicketPercent,
 } from "lucide-react";
-import { Button, SegmentedTabs } from "@yinapp/ui";
+import { Button, SegmentedTabs } from "@piya/ui";
 import { getDiscounts, type DiscountData } from "@/services/discounts.service";
 import { getGifts, type GiftData } from "@/services/gifts.service";
 import { getOfferings, type OfferingData } from "@/services/offerings.service";

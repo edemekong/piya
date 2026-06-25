@@ -2,8 +2,8 @@ import { defineString } from "firebase-functions/params";
 import { onInit } from "firebase-functions/v2/core";
 import { algoliasearch, SearchClient } from "algoliasearch";
 
-import service_account_dev = require("../../yinapp-dev-adminsdk.json");
-import service_account_prod = require("../../yinapp-prod-adminsdk.json");
+import service_account_dev = require("../../piya-dev-adminsdk.json");
+import service_account_prod = require("../../piya-prod-adminsdk.json");
 
 const ENV = defineString("ENV");
 const STORAGE_BUCKET = defineString("STORAGE_BUCKET");
@@ -22,12 +22,12 @@ const TERMII_API_KEY = defineString("TERMII_API_KEY");
 const TERMII_SENDER_ID = defineString("TERMII_SENDER_ID");
 
 const defaultAppBranding = {
-  name: "Yinapp",
+  name: "Piya",
   logos: {
-    primary: "https://yinapp.co/logo.png",
+    primary: "https://piya.store/logo.png",
   },
   socials: {
-    website: "https://yinapp.co",
+    website: "https://piya.store",
   },
 };
 

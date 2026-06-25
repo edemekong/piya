@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { SectionHeader } from "@yinapp/ui";
+import { SectionHeader } from "@piya/ui";
 import type { LucideIcon } from "lucide-react";
 
 type ProfileSectionShellProps = {

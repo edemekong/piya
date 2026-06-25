@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CheckCircle2, ChevronDown, Plus, Sparkles, X } from "lucide-react";
-import { AppDatePicker, AppSheet, Button, cn } from "@yinapp/ui";
+import { AppDatePicker, AppSheet, Button, cn } from "@piya/ui";
 import {
   DEFAULT_BADGE_OPTIONS,
   formatLabel,

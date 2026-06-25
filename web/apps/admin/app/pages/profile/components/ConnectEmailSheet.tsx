@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AppSheet, Button } from "@yinapp/ui";
+import { AppSheet, Button } from "@piya/ui";
 
 type ConnectEmailSheetProps = {
   onClose: () => void;
@@ -18,7 +18,7 @@ function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
   return (
     <AppSheet
       ariaLabel="connect email"
-      description="Add the email domain Yinapp should use when sending customer emails for your business."
+      description="Add the email domain Piya should use when sending customer emails for your business."
       footer={
         <>
           <Button onClick={onClose} type="button" variant="secondary">

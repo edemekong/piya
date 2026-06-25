@@ -6,12 +6,12 @@ import {
   MoreVertical,
   Route,
 } from "lucide-react";
-import { AppAvatar, Badge, cn } from "@yinapp/ui";
+import { AppAvatar, Badge, cn } from "@piya/ui";
 import type {
   OrderData,
   OrderItem,
   OrderStatus,
-} from "@yinapp/shared/models";
+} from "@piya/shared/models";
 import {
   formatDate,
   formatMoney,

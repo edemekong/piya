@@ -5,11 +5,11 @@ import {
   type AppStore,
   type RootState,
   type ThemeMode,
-} from "@yinapp/shared";
+} from "@piya/shared";
 import * as React from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 
-const themeStorageKey = "yinapp.theme";
+const themeStorageKey = "piya.theme";
 
 function getAppliedTheme(mode: ThemeMode): "light" | "dark" {
   if (mode === "dark" || mode === "light") {

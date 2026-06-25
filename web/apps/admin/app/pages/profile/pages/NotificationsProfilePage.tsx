@@ -1,4 +1,4 @@
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import { ProfileSectionShell } from "../components/ProfileSectionShell";
 import { SettingsCard } from "../components/SettingsCard";

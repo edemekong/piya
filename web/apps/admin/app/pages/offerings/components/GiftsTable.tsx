@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Gift, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { cn } from "@yinapp/ui";
+import { cn } from "@piya/ui";
 import type { GiftData } from "@/services/gifts.service";
 
 type GiftsTableProps = {

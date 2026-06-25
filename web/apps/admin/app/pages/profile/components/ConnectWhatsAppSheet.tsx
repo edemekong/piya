@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import { AppSheet, Button } from "@yinapp/ui";
+import { AppSheet, Button } from "@piya/ui";
 
 type ConnectWhatsAppSheetProps = {
   onClose: () => void;
@@ -54,7 +54,7 @@ function ConnectWhatsAppSheet({ onClose, open }: ConnectWhatsAppSheetProps) {
             </span>
             <p className="font-semibold text-[#2F4B4F]">After connection</p>
             <p className="mt-1 text-callout text-[#2F4B4F]/65">
-              Yinapp will save the approved business account, phone number, and
+              Piya will save the approved business account, phone number, and
               secure connection details so customer replies can come back into
               the app.
             </p>

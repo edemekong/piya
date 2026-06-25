@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Code2, Link2, Mail, Timer, Trash2 } from "lucide-react";
-import { Button, cn } from "@yinapp/ui";
+import { Button, cn } from "@piya/ui";
 import type { CommunicationChannel, CommunicationStep } from "../types";
 import {
   CHANNEL_OPTIONS,

@@ -17,9 +17,9 @@ import {
   InfoCard,
   StatCard,
   cn,
-} from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
-import { formatMoney } from "@yinapp/shared/utils";
+} from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
+import { formatMoney } from "@piya/shared/utils";
 
 export type ContactOverviewTab =
   | "events"

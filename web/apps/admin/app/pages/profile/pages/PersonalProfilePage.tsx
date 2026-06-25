@@ -1,5 +1,5 @@
 import { Upload, UserRound } from "lucide-react";
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import { FieldGrid, ProfileField } from "../components/ProfileFields";
 import { ProfileSectionShell } from "../components/ProfileSectionShell";
@@ -41,7 +41,7 @@ export function PersonalProfilePage() {
           <ProfileField
             label="Email address"
             type="email"
-            value="paul@yinapp.com"
+            value="paul@piya.store"
           />
           <ProfileField
             label="Phone number"

@@ -1,5 +1,5 @@
-import { Badge, cn } from "@yinapp/ui";
-import type { OrderStatus } from "@yinapp/shared/models";
+import { Badge, cn } from "@piya/ui";
+import type { OrderStatus } from "@piya/shared/models";
 import { getOrders } from "@/services/orders.service";
 import {
   formatMoney,

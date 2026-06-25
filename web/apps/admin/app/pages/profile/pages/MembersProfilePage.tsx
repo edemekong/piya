@@ -1,5 +1,5 @@
 import { MoreVertical, Send } from "lucide-react";
-import { AppAvatar, Badge, Button } from "@yinapp/ui";
+import { AppAvatar, Badge, Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import {
   FieldGrid,

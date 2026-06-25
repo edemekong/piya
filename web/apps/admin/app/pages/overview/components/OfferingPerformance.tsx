@@ -1,5 +1,5 @@
-import { Badge } from "@yinapp/ui";
-import { formatMoney } from "@yinapp/shared/utils";
+import { Badge } from "@piya/ui";
+import { formatMoney } from "@piya/shared/utils";
 import { productPerformance } from "../overview.mock";
 
 const topOfferings = productPerformance.slice(0, 4);

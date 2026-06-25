@@ -1,4 +1,4 @@
-import { Button } from "@yinapp/ui";
+import { Button } from "@piya/ui";
 import { profileMenuItems } from "../profileSections";
 import {
   FieldGrid,
@@ -43,14 +43,14 @@ export function BusinessProfilePage() {
     >
       <SettingsCard title="Business identity">
         <FieldGrid>
-          <ProfileField label="Business name" value="Yinapp Store" />
+          <ProfileField label="Business name" value="Piya Store" />
           <ProfileSelect
             label="Business category"
             options={businessCategories}
             value="fashion_store"
           />
           <div className="md:col-span-2">
-            <ProfileField label="Public domain" value="yinapp.store" />
+            <ProfileField label="Public domain" value="piya.store" />
           </div>
         </FieldGrid>
         <ProfileTextarea
@@ -64,7 +64,7 @@ export function BusinessProfilePage() {
           <ProfileField
             label="Business email"
             type="email"
-            value="hello@yinapp.com"
+            value="hello@piya.store"
           />
           <ProfileField
             label="Business phone"

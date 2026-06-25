@@ -7,7 +7,7 @@ import {
   Percent,
   Trash2,
 } from "lucide-react";
-import { Badge, cn } from "@yinapp/ui";
+import { Badge, cn } from "@piya/ui";
 import type { OfferingData } from "@/services/offerings.service";
 import { formatOfferingLabel } from "./offeringForm";
 

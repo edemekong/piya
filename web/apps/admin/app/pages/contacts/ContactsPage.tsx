@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@yinapp/ui";
-import type { ContactData } from "@yinapp/shared/types";
+import { Button } from "@piya/ui";
+import type { ContactData } from "@piya/shared/types";
 import { getContacts } from "@/services/contacts.service";
 import { AddContactSheet, ContactsTable, ContactViewSheet } from "./components";
 import type { AddContactMode } from "./types";

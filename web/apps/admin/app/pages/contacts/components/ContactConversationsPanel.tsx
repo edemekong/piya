@@ -1,5 +1,5 @@
 import { MessageCircle, Send } from "lucide-react";
-import { Button, EmptyState } from "@yinapp/ui";
+import { Button, EmptyState } from "@piya/ui";
 
 export function ContactConversationsPanel() {
   return (

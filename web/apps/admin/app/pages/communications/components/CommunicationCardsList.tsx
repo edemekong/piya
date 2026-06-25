@@ -7,7 +7,7 @@ import {
   Trash2,
   UsersRound,
 } from "lucide-react";
-import { Button, cn } from "@yinapp/ui";
+import { Button, cn } from "@piya/ui";
 import type { CommunicationData } from "../types";
 import {
   formatDate,

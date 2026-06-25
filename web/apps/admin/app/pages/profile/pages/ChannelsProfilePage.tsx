@@ -8,7 +8,7 @@ import {
   MessageCircle,
   Truck,
 } from "lucide-react";
-import { SegmentedTabs } from "@yinapp/ui";
+import { SegmentedTabs } from "@piya/ui";
 import { AddDomainSheet } from "../components/AddDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
@@ -70,7 +70,7 @@ const integrationsByTab: Record<
         connected: true,
         name: "Connect your domain",
         subtitle:
-          "Let customers visit your business at your own website address instead of a Yinapp link.",
+          "Let customers visit your business at your own website address instead of a Piya link.",
       },
     ],
   },

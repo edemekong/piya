@@ -1,4 +1,4 @@
-# Yinapp Web
+# Piya Web
 
 PNPM workspace for the Remix admin and portal apps.
 

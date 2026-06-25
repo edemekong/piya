@@ -1,4 +1,4 @@
-import { AppSheet, Badge } from "@yinapp/ui";
+import { AppSheet, Badge } from "@piya/ui";
 import type { OfferingData } from "@/services/offerings.service";
 import { formatOfferingLabel } from "./offeringForm";
 

@@ -2,7 +2,7 @@ import type {
   OrderData,
   OrderFulfillmentDetails,
   OrderItem,
-} from "@yinapp/shared/models";
+} from "@piya/shared/models";
 
 export function formatOrderLabel(value: string) {
   return value

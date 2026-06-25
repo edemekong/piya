@@ -23,10 +23,10 @@ importers:
       '@remix-run/serve':
         specifier: ^2.17.0
         version: 2.17.5(typescript@5.9.3)
-      '@yinapp/shared':
+      '@piya/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@yinapp/ui':
+      '@piya/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       isbot:
@@ -87,10 +87,10 @@ importers:
       '@remix-run/serve':
         specifier: ^2.17.0
         version: 2.17.5(typescript@5.9.3)
-      '@yinapp/shared':
+      '@piya/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@yinapp/ui':
+      '@piya/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       isbot:

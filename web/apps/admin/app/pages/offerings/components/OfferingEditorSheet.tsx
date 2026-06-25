@@ -6,7 +6,7 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
-import { AppSheet, Button, SegmentedTabs, cn } from "@yinapp/ui";
+import { AppSheet, Button, SegmentedTabs, cn } from "@piya/ui";
 import type {
   OfferingData,
   OfferingSubType,

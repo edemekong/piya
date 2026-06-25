@@ -1,5 +1,5 @@
 export const appConfig = {
-  name: "Yinapp",
-  adminName: "Yinapp Admin",
-  portalName: "Yinapp Portal",
+  name: "Piya",
+  adminName: "Piya Admin",
+  portalName: "Piya Portal",
 };

@@ -62,7 +62,7 @@ export class AuthService {
 
     await sendEmailTo({
       emails: [email],
-      subject: "Your Yinapp Verification Code",
+      subject: "Your Piya Verification Code",
       html: renderOTPVerificationEmail({
         userName: userRecord?.displayName || "there",
         otpCode,

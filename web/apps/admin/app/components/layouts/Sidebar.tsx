@@ -7,7 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { NavLink } from "@remix-run/react";
-import { AppAvatar, cn } from "@yinapp/ui";
+import { AppAvatar, cn } from "@piya/ui";
 
 type SidebarItem = {
   label: string;
@@ -27,7 +27,7 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 flex h-screen w-24 shrink-0 flex-col items-center border-r border-primary/20 bg-secondary py-6">
       <img
-        alt="Yinapp"
+        alt="Piya"
         className="size-12 rounded-md object-contain"
         src="/assets/logo.png"
       />
