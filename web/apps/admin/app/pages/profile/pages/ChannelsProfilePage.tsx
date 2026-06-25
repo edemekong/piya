@@ -4,11 +4,14 @@ import {
   Check,
   ChevronRight,
   Circle,
-  Truck,
   Globe2,
   MessageCircle,
+  Truck,
 } from "lucide-react";
-import { SegmentedTabs, cn } from "@yinapp/ui";
+import { SegmentedTabs } from "@yinapp/ui";
+import { AddDomainSheet } from "../components/AddDomainSheet";
+import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
+import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
 import { profileMenuItems } from "../profileSections";
 import { ProfileSectionShell } from "../components/ProfileSectionShell";
 import { SettingsCard } from "../components/SettingsCard";
@@ -22,6 +25,7 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
+  action?: "domain" | "email" | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -62,10 +66,11 @@ const integrationsByTab: Record<
     title: "Domain",
     connections: [
       {
+        action: "domain",
         connected: true,
         name: "Connect your domain",
         subtitle:
-          "Use a custom domain for your booking pages and client portal.",
+          "Let customers visit your business at your own website address instead of a Yinapp link.",
       },
     ],
   },
@@ -73,16 +78,19 @@ const integrationsByTab: Record<
     title: "Message channel",
     connections: [
       {
+        action: "email",
         connected: true,
         name: "Connect email",
-        subtitle: "Send branded confirmations, reminders, and broadcasts.",
+        subtitle:
+          "Send customer emails from your business address for orders, replies, and updates.",
       },
       {
         name: "Connect SMS",
         subtitle: "Deliver short updates and reminders by text message.",
       },
       {
-        name: "Contact WhatsApp",
+        action: "whatsapp",
+        name: "Connect WhatsApp",
         subtitle: "Reach clients through WhatsApp conversations and alerts.",
       },
     ],
@@ -115,35 +123,72 @@ const integrationsByTab: Record<
 
 export function ChannelsProfilePage() {
   const [activeTab, setActiveTab] = React.useState<IntegrationTab>("domain");
+  const [isDomainSheetOpen, setIsDomainSheetOpen] = React.useState(false);
+  const [isEmailSheetOpen, setIsEmailSheetOpen] = React.useState(false);
+  const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = React.useState(false);
   const activeIntegration = integrationsByTab[activeTab];
 
   return (
-    <ProfileSectionShell
-      description={section.description}
-      icon={section.icon}
-      title={section.label}
-    >
-      <SegmentedTabs
-        items={integrationTabs}
-        onValueChange={setActiveTab}
-        value={activeTab}
-      />
+    <>
+      <ProfileSectionShell
+        description={section.description}
+        icon={section.icon}
+        title={section.label}
+      >
+        <SegmentedTabs
+          items={integrationTabs}
+          onValueChange={setActiveTab}
+          value={activeTab}
+        />
 
-      <SettingsCard title={activeIntegration.title}>
-        <div className="grid gap-3">
-          {activeIntegration.connections.map((connection) => (
-            <ConnectionCard connection={connection} key={connection.name} />
-          ))}
-        </div>
-      </SettingsCard>
-    </ProfileSectionShell>
+        <SettingsCard title={activeIntegration.title}>
+          <div className="grid gap-3">
+            {activeIntegration.connections.map((connection) => (
+              <ConnectionCard
+                connection={connection}
+                key={connection.name}
+                onClick={
+                  connection.action === "domain"
+                    ? () => setIsDomainSheetOpen(true)
+                    : connection.action === "email"
+                      ? () => setIsEmailSheetOpen(true)
+                      : connection.action === "whatsapp"
+                        ? () => setIsWhatsAppSheetOpen(true)
+                        : undefined
+                }
+              />
+            ))}
+          </div>
+        </SettingsCard>
+      </ProfileSectionShell>
+
+      <AddDomainSheet
+        onClose={() => setIsDomainSheetOpen(false)}
+        open={isDomainSheetOpen}
+      />
+      <ConnectEmailSheet
+        onClose={() => setIsEmailSheetOpen(false)}
+        open={isEmailSheetOpen}
+      />
+      <ConnectWhatsAppSheet
+        onClose={() => setIsWhatsAppSheetOpen(false)}
+        open={isWhatsAppSheetOpen}
+      />
+    </>
   );
 }
 
-function ConnectionCard({ connection }: { connection: IntegrationConnection }) {
+function ConnectionCard({
+  connection,
+  onClick,
+}: {
+  connection: IntegrationConnection;
+  onClick?: () => void;
+}) {
   return (
     <button
       className="flex w-full items-center gap-3 rounded-md border border-border bg-fill px-4 py-4 text-left transition hover:border-primary/30 hover:bg-secondary/25"
+      onClick={onClick}
       type="button"
     >
       {connection.connected ? (

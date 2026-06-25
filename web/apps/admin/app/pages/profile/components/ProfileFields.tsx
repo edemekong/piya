@@ -3,7 +3,9 @@ import { cn } from "@yinapp/ui";
 
 type ProfileFieldProps = {
   label: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
   placeholder?: string;
+  suffix?: React.ReactNode;
   type?: React.HTMLInputTypeAttribute;
   value?: string;
 };
@@ -29,7 +31,9 @@ type ProfileSelectProps = {
 
 export function ProfileField({
   label,
+  onChange,
   placeholder,
+  suffix,
   type = "text",
   value,
 }: ProfileFieldProps) {
@@ -38,12 +42,28 @@ export function ProfileField({
       <span className="text-footnote font-semibold text-[#2F4B4F]">
         {label}
       </span>
-      <input
-        className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-        defaultValue={value}
-        placeholder={placeholder}
-        type={type}
-      />
+      {suffix ? (
+        <span className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
+          <input
+            className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
+            defaultValue={onChange ? undefined : value}
+            onChange={onChange}
+            placeholder={placeholder}
+            type={type}
+            value={onChange ? value : undefined}
+          />
+          {suffix}
+        </span>
+      ) : (
+        <input
+          className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
+          defaultValue={onChange ? undefined : value}
+          onChange={onChange}
+          placeholder={placeholder}
+          type={type}
+          value={onChange ? value : undefined}
+        />
+      )}
     </label>
   );
 }

@@ -20,7 +20,6 @@ interface DomainData extends BaseModel {
   provider: Extract<Providers, "cloudflare">;
   status: DomainStatusType;
   records: DNSRecord[];
-  externalId?: string | null;
   verifiedAt?: number | null;
   lastError?: string | null;
 }
