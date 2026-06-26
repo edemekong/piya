@@ -18,7 +18,7 @@ export type SendSMSResponse = {
   error?: string;
 };
 
-export type OTPRequestType = "sms" | "whatsapp";
+export type OTPRequestType = "email" | "sms" | "whatsapp";
 
 export type RequestEmailOTPParams = {
   email: string;
@@ -26,7 +26,7 @@ export type RequestEmailOTPParams = {
 
 export type RequestPhoneOTPParams = {
   phone: string;
-  type: OTPRequestType;
+  type: Exclude<OTPRequestType, "email">;
 };
 
 export type RequestOTPBody = {

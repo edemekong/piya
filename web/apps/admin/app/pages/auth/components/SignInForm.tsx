@@ -16,10 +16,10 @@ export function SignInForm() {
   const [formError, setFormError] = useState("");
   const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const otpCode = otp.join("");
-  const normalizedEmail = email.trim().toLowerCase();
+  const newEmail = email.trim().toLowerCase();
   const canSubmit = showOtp
     ? otpCode.length === otpLength && !isSubmitting
-    : normalizedEmail.length > 0 && !isSubmitting;
+    : newEmail.length > 0 && !isSubmitting;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,7 +28,10 @@ export function SignInForm() {
 
     try {
       if (!showOtp) {
-        await authService.requestOTP({ phoneOrEmail: normalizedEmail });
+        await authService.requestOTP({
+          phoneOrEmail: newEmail,
+          type: "email",
+        });
         setShowOtp(true);
         window.setTimeout(() => otpInputRefs.current[0]?.focus(), 0);
         return;
@@ -37,7 +40,7 @@ export function SignInForm() {
       await authService.verifyOTP({
         code: otpCode,
         isPhone: false,
-        phoneOrEmail: normalizedEmail,
+        phoneOrEmail: newEmail,
       });
 
       const uid = authService.currentFirebaseUser?.uid;

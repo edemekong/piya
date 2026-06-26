@@ -165,7 +165,7 @@ const OTP_DELIVERY_CHANNELS: Record<OTPRequestType, OTPDeliveryChannel> = {
   whatsapp: "whatsapp",
 };
 
-const ZOLT_TEST_EMAIL_SUFFIX = "@test.piya.store";
+const TEST_EMAIL_SUFFIX = "@test.piya.store";
 
 export {
   API_RESPONSE,
@@ -176,5 +176,5 @@ export {
   STATUS_CODES,
   VERIFY_AUTH_OTP_REASON,
   VerifyAuthOTPReason,
-  ZOLT_TEST_EMAIL_SUFFIX,
+  TEST_EMAIL_SUFFIX,
 };

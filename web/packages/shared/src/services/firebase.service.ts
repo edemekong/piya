@@ -12,7 +12,7 @@ import {
 } from "firebase/storage";
 import { appConfig, requireConfigValue } from "../config";
 
-const FIREBASE_EMULATOR_HOST = "127.0.0.1";
+const FIREBASE_EMULATOR_HOST = "localhost";
 const AUTH_EMULATOR_URL = `http://${FIREBASE_EMULATOR_HOST}:9099`;
 const FIRESTORE_EMULATOR_PORT = 8080;
 const STORAGE_EMULATOR_PORT = 9199;

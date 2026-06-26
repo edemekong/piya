@@ -5,7 +5,7 @@ export const RATE_LIMIT_MAX = 200;
 
 export const WHITELIST_URLS: Array<string> = [
   "dps.iso.apple.com",
-  "http://localhost:3000",
+  "http://localhost:3001",
 ];
 
 export const CORSSettings = cors({

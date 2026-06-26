@@ -47,7 +47,7 @@ export class AuthService extends BaseAPIService {
   async requestOTP({
     phoneOrEmail,
     dialCode,
-    type = "sms",
+    type = "email",
   }: RequestOTPBody): Promise<RequestOTPResult> {
     await this.post<null, RequestOTPBody>(this.urlController.requestAuthOTP, {
       body: { dialCode, phoneOrEmail, type },

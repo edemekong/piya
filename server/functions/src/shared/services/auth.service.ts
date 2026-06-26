@@ -1,4 +1,5 @@
 import { auth, db } from "../../configs/firebase";
+import { finalConfiguration } from "../../configs/configurations";
 import { renderOTPVerificationEmail } from "../email_templates/email-template-functions";
 
 import { sendEmailTo } from "../utils/helpers/email-notifications";
@@ -23,7 +24,7 @@ import {
   OTP_DELIVERY_CHANNELS,
   OTP_EXPIRY_MINUTES,
   VERIFY_AUTH_OTP_REASON,
-  ZOLT_TEST_EMAIL_SUFFIX,
+  TEST_EMAIL_SUFFIX,
 } from "../utils/constants";
 
 export class AuthService {
@@ -45,11 +46,15 @@ export class AuthService {
       }
     }
 
-    if (email.endsWith(ZOLT_TEST_EMAIL_SUFFIX)) {
+    if (email.endsWith(TEST_EMAIL_SUFFIX)) {
       return { sent: true };
     }
 
-    const otpCode = generateOTPCode();
+    const { RESEND_API_KEY } = finalConfiguration();
+    const isFunctionsEmulator = process.env.FUNCTIONS_EMULATOR === "true";
+    const shouldSendEmail =
+      !isFunctionsEmulator || Boolean(RESEND_API_KEY?.trim());
+    const otpCode = shouldSendEmail ? generateOTPCode() : "000000";
     const uid = userRecord?.uid ?? email;
 
     await db()
@@ -63,15 +68,17 @@ export class AuthService {
         type: OTP_AUTH_TYPE,
       });
 
-    await sendEmailTo({
-      emails: [email],
-      subject: "Your Piya Verification Code",
-      html: renderOTPVerificationEmail({
-        userName: userRecord?.displayName || "there",
-        otpCode,
-        expiresIn: OTP_EXPIRY_MINUTES,
-      }),
-    });
+    if (shouldSendEmail) {
+      await sendEmailTo({
+        emails: [email],
+        subject: "Your Piya Verification Code",
+        html: renderOTPVerificationEmail({
+          userName: userRecord?.displayName || "there",
+          otpCode,
+          expiresIn: OTP_EXPIRY_MINUTES,
+        }),
+      });
+    }
 
     return { sent: true };
   }
@@ -208,7 +215,7 @@ export class AuthService {
       expiresAt: otpCodeData?.expiresAt,
     });
 
-    if (!authIdentifier.endsWith(ZOLT_TEST_EMAIL_SUFFIX)) {
+    if (!authIdentifier.endsWith(TEST_EMAIL_SUFFIX)) {
       await otpSnapshot.ref.delete();
     }
 
