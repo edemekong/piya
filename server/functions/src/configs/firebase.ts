@@ -3,23 +3,15 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { getMessaging } from "firebase-admin/messaging";
-import { credential } from "firebase-admin";
 import { finalConfiguration } from "./configurations";
-
-import service_account_dev = require("../../piya-dev-adminsdk.json");
-import service_account_prod = require("../../piya-prod-adminsdk.json");
 
 let app: ReturnType<typeof initializeApp> | null = null;
 
 function getApp() {
   if (!app) {
-    const { STORAGE_BUCKET, ENV } = finalConfiguration();
-    const isProd = ENV === "prod";
-
-    const serviceAccount = isProd ? service_account_prod : service_account_dev;
+    const { STORAGE_BUCKET } = finalConfiguration();
 
     app = initializeApp({
-      credential: credential.cert(serviceAccount as any),
       storageBucket: STORAGE_BUCKET,
     });
   }

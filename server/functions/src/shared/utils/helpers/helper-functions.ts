@@ -1,4 +1,5 @@
 import admin = require("firebase-admin");
+import { createHash } from "crypto";
 import base64url from "base64url";
 import jwt from "jsonwebtoken";
 import { finalConfiguration } from "../../../configs/configurations";
@@ -162,6 +163,15 @@ export function generateOTPCode() {
   return randomstring.generate({ length: 4, charset: "numeric" });
 }
 
+export function getValidEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+export function hashOTP(uid: string, email: string, code: string) {
+  return createHash("sha256")
+    .update(`${uid}:${getValidEmail(email)}:${code}`)
+    .digest("hex");
+}
 
 export function getOTPExpiryTime() {
   return getUTCTimeNow() + OTP_EXPIRY_MINUTES * 60 * 1000;

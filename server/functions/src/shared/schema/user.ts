@@ -45,9 +45,9 @@ const locationSchema = z.object({
 
 const userSettingsSchema = z.object({
   notifications: z.object({
-    enabledPushNotification: z.boolean(),
-    enabledEmailNotification: z.boolean(),
-    enabledSmsNotification: z.boolean(),
+    pushEnabled: z.boolean(),
+    emailEnabled: z.boolean(),
+    smsEnabled: z.boolean(),
   }),
 });
 

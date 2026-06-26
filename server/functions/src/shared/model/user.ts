@@ -4,6 +4,7 @@ import type {
   MiniUserData,
 } from "../types/user.type";
 import type { BaseModel } from "./base";
+import type { LocationData } from "./location";
 
 interface UserData extends BaseModel {
   email: string;
@@ -14,6 +15,7 @@ interface UserData extends BaseModel {
   gender?: UserGenderType | null;
   business?: UserBusinessData | null;
   verification: VerificationData;
+  lastKnownLocation?: LocationData | null;
   settings: UserSettingsData;
 }
 interface UserSettingsData {

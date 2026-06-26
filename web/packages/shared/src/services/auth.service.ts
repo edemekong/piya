@@ -62,7 +62,9 @@ export class AuthService extends BaseAPIService {
     dialCode,
     isPhone,
     linkToUid,
-  }: VerifyAuthOTPParams & { dialCode?: string }): Promise<VerifyAuthOTPResult> {
+  }: VerifyAuthOTPParams & {
+    dialCode?: string;
+  }): Promise<VerifyAuthOTPResult> {
     const data = await this.post<AuthTokenPayload, Record<string, unknown>>(
       this.urlController.verifyAuthOTP,
       {

@@ -50,9 +50,9 @@ createUserRouter.post(
       lastKnownLocation: body.lastKnownLocation ?? null,
       settings: body.settings ?? {
         notifications: {
-          enabledPushNotification: true,
-          enabledEmailNotification: true,
-          enabledSmsNotification: true,
+          pushEnabled: true,
+          emailEnabled: true,
+          smsEnabled: true,
         },
       },
       createdAt: existingUser?.createdAt ?? now,

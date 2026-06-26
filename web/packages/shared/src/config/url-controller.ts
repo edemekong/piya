@@ -1,4 +1,5 @@
-import { appConfig, assertConfigured } from "./app-config";
+import { appConfig } from "./app-config";
+import { requireConfigValue } from "./env-config";
 
 export class URLController {
   private readonly urlPrefix: string;
@@ -36,6 +37,6 @@ export class URLController {
   }
 
   private path(pathname: string) {
-    return `${assertConfigured(this.urlPrefix, "VITE_API_BASE_URL")}${pathname}`;
+    return `${requireConfigValue(this.urlPrefix, "VITE_API_BASE_URL")}${pathname}`;
   }
 }

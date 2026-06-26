@@ -1,4 +1,6 @@
-import { BusinessBrand } from "../types/business-brand";
+type BusinessBrand = {
+  businessId: string;
+};
 
 export class BusinessService {
   static async getBrandConfig(hostname: string): 

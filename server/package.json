@@ -1,0 +1,8 @@
+{
+  "name": "piya-server",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix functions run build && PATH=\"/opt/homebrew/opt/openjdk/bin:$PATH\" firebase emulators:start --only functions,auth,firestore,storage",
+    "emulators": "npm run dev"
+  }
+}

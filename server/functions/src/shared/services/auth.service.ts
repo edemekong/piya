@@ -4,8 +4,10 @@ import { renderOTPVerificationEmail } from "../email_templates/email-template-fu
 import { sendEmailTo } from "../utils/helpers/email-notifications";
 import {
   generateOTPCode,
+  getValidEmail,
   getOTPExpiryTime,
   getUTCTimeNow,
+  hashOTP,
 } from "../utils/helpers/helper-functions";
 import { sendOTP } from "../utils/helpers/sms";
 import {
@@ -32,7 +34,7 @@ export class AuthService {
   static async requestEmailOTP(
     params: RequestEmailOTPParams,
   ): Promise<RequestOTPResult> {
-    const { email } = params;
+    const email = getValidEmail(params.email);
     let userRecord;
 
     try {
@@ -48,15 +50,16 @@ export class AuthService {
     }
 
     const otpCode = generateOTPCode();
+    const uid = userRecord?.uid ?? email;
 
     await db()
       .collection(COLLECTIONS.auth_otp_codes)
       .doc(email)
       .set({
         email,
-        code: otpCode,
+        codeHash: hashOTP(uid, email, otpCode),
         expiresAt: getOTPExpiryTime(),
-        uid: userRecord?.uid ?? email,
+        uid,
         type: OTP_AUTH_TYPE,
       });
 
@@ -88,15 +91,16 @@ export class AuthService {
     }
 
     const otpCode = generateOTPCode();
+    const uid = userRecord?.uid ?? phone;
 
     await db()
       .collection(COLLECTIONS.auth_otp_codes)
       .doc(phone)
       .set({
         phone,
-        code: otpCode,
+        codeHash: hashOTP(uid, phone, otpCode),
         expiresAt: getOTPExpiryTime(),
-        uid: userRecord?.uid ?? phone,
+        uid,
         type: OTP_AUTH_TYPE,
       });
 
@@ -124,9 +128,12 @@ export class AuthService {
     params: VerifyAuthOTPParams,
   ): Promise<VerifyAuthOTPResult> {
     const { phoneOrEmail, code, isPhone, linkToUid } = params;
+    const authIdentifier = isPhone
+      ? phoneOrEmail
+      : getValidEmail(phoneOrEmail);
     const otpSnapshot = await db()
       .collection(COLLECTIONS.auth_otp_codes)
-      .doc(phoneOrEmail)
+      .doc(authIdentifier)
       .get();
     const otpCodeData = otpSnapshot.data();
 
@@ -134,7 +141,13 @@ export class AuthService {
       return { verified: false, reason: VERIFY_AUTH_OTP_REASON.expired };
     }
 
-    if (!otpSnapshot.exists || otpCodeData?.code !== code) {
+    const otpUid =
+      typeof otpCodeData?.uid === "string" ? otpCodeData.uid : null;
+    const isValidCode =
+      otpUid !== null &&
+      otpCodeData?.codeHash === hashOTP(otpUid, authIdentifier, code);
+
+    if (!otpSnapshot.exists || !isValidCode) {
       return { verified: false, reason: VERIFY_AUTH_OTP_REASON.invalid };
     }
 
@@ -143,8 +156,8 @@ export class AuthService {
     if (linkToUid) {
       try {
         const existingUser = isPhone
-          ? await auth().getUserByPhoneNumber(phoneOrEmail)
-          : await auth().getUserByEmail(phoneOrEmail);
+          ? await auth().getUserByPhoneNumber(authIdentifier)
+          : await auth().getUserByEmail(authIdentifier);
 
         if (existingUser.uid !== linkToUid) {
           return {
@@ -164,14 +177,14 @@ export class AuthService {
       userRecord = await auth().updateUser(
         linkToUid,
         isPhone
-          ? { phoneNumber: phoneOrEmail }
-          : { email: phoneOrEmail, emailVerified: true },
+          ? { phoneNumber: authIdentifier }
+          : { email: authIdentifier, emailVerified: true },
       );
     } else {
       try {
         userRecord = isPhone
-          ? await auth().getUserByPhoneNumber(phoneOrEmail)
-          : await auth().getUserByEmail(phoneOrEmail);
+          ? await auth().getUserByPhoneNumber(authIdentifier)
+          : await auth().getUserByEmail(authIdentifier);
       } catch (error) {
         if (!AuthService.isFirebaseUserNotFound(error)) {
           console.warn(error);
@@ -180,8 +193,8 @@ export class AuthService {
 
       if (!userRecord) {
         userRecord = isPhone
-          ? await auth().createUser({ phoneNumber: phoneOrEmail })
-          : await auth().createUser({ email: phoneOrEmail });
+          ? await auth().createUser({ phoneNumber: authIdentifier })
+          : await auth().createUser({ email: authIdentifier });
       }
     }
 
@@ -192,11 +205,10 @@ export class AuthService {
     }
 
     const authToken = await auth().createCustomToken(userRecord.uid, {
-      code,
       expiresAt: otpCodeData?.expiresAt,
     });
 
-    if (!phoneOrEmail.endsWith(ZOLT_TEST_EMAIL_SUFFIX)) {
+    if (!authIdentifier.endsWith(ZOLT_TEST_EMAIL_SUFFIX)) {
       await otpSnapshot.ref.delete();
     }
 
