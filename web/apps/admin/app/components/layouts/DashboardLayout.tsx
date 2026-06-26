@@ -1,7 +1,12 @@
 import { Outlet } from "@remix-run/react";
+import { useAdminAuthRedirect } from "@/utils/use-admin-auth-redirect";
 import { Sidebar } from "./Sidebar";
 
 export function DashboardLayout() {
+  const authStatus = useAdminAuthRedirect("require-auth");
+
+  if (authStatus !== "ready") return null;
+
   return (
     <main className="min-h-screen bg-background text-[#2F4B4F]">
       <div className="flex min-h-screen">

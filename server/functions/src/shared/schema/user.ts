@@ -68,6 +68,7 @@ const userSchema = z.object({
   accountType: userAccountTypeSchema.nullable().optional(),
   name: z.string().trim().min(1),
   profileImageUrl: z.string().optional(),
+  accountSetupCompleted: z.boolean(),
   device: deviceSchema,
   dob: z.string().nullable().optional(),
   gender: genderSchema.nullable().optional(),
@@ -91,6 +92,7 @@ const updateUserSchema = z
   .object({
     name: z.string().trim().min(1).optional(),
     profileImageUrl: z.string().optional(),
+    accountSetupCompleted: z.boolean().optional(),
     dob: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected date format YYYY-MM-DD")

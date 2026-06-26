@@ -1,6 +1,11 @@
 import { OnboadingSection, SignInForm } from "../components";
+import { useAdminAuthRedirect } from "@/utils/use-admin-auth-redirect";
 
 export function SignInPage() {
+  const authStatus = useAdminAuthRedirect("guest");
+
+  if (authStatus !== "ready") return null;
+
   return (
     <main className="h-screen overflow-hidden bg-background text-foreground">
       <section className="grid h-full w-screen grid-cols-[65%_35%]">

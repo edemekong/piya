@@ -35,6 +35,7 @@ createUserRouter.post(
       phoneNumber: body.phoneNumber ?? currentUser.phoneNumber ?? null,
       name: body.name ?? currentUser.displayName ?? "",
       profileImageUrl: body.profileImageUrl ?? currentUser.photoURL ?? "",
+      accountSetupCompleted: body.accountSetupCompleted ?? false,
       dob: body.dob ?? null,
       gender: body.gender ?? null,
       business: body.business ?? null,

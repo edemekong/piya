@@ -66,6 +66,7 @@ class UserService {
       ...existingUser,
       name: data.name,
       profileImageUrl: data.profileImageUrl ?? existingUser.profileImageUrl,
+      accountSetupCompleted: true,
       dob: data.dob,
       gender: data.gender,
       updatedAt: getUTCTimeNow(),

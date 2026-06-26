@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { useRef, useState } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import {
   ApiServiceError,
   authService,
@@ -10,10 +10,16 @@ import {
 } from "@piya/shared";
 import { AppTextField, Button } from "@piya/ui";
 import { useDispatch } from "react-redux";
+import {
+  getAccountSetupPathWithReturnTo,
+  getReturnToFromSearch,
+  getSafeReturnTo,
+} from "@/utils/auth-routing";
 
 const otpLength = 6;
 
 export function SignInForm() {
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState("");
@@ -72,14 +78,17 @@ export function SignInForm() {
         throw new Error("Unable to confirm your signed-in session.");
       }
 
-      const hasUserProfile = await currentUserProfileExists(uid);
-      if (!hasUserProfile) {
-        await userService.createUser({});
-      }
+      const currentUserProfile = await getCurrentUserProfile(uid);
+      const userProfile =
+        currentUserProfile ?? (await userService.createUser({}));
+      const returnTo = getSafeReturnTo(getReturnToFromSearch(location.search));
 
-      navigate(hasUserProfile ? "/overview" : "/account-setup", {
-        replace: true,
-      });
+      navigate(
+        userProfile.accountSetupCompleted
+          ? returnTo
+          : getAccountSetupPathWithReturnTo(returnTo),
+        { replace: true },
+      );
     } catch (error) {
       const message = getAuthErrorMessage(error);
       showToast(dispatch, {
@@ -239,13 +248,12 @@ export function SignInForm() {
   );
 }
 
-async function currentUserProfileExists(uid: string) {
+async function getCurrentUserProfile(uid: string) {
   try {
-    await userService.getUser(uid);
-    return true;
+    return await userService.getUser(uid);
   } catch (error) {
     if (error instanceof ApiServiceError && error.code === "USER_NOT_FOUND") {
-      return false;
+      return null;
     }
 
     throw error;

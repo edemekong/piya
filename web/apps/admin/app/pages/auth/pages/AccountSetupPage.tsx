@@ -19,6 +19,12 @@ import {
 } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
+import { useLocation, useNavigate } from "@remix-run/react";
+import {
+  showToast,
+  type AppDispatch,
+  userService,
+} from "@piya/shared";
 import {
   AppAvatar,
   Badge,
@@ -27,12 +33,19 @@ import {
   SettingsCard,
   cn,
 } from "@piya/ui";
+import { useDispatch } from "react-redux";
 import {
   FieldGrid,
   ProfileField,
   ProfileSelect,
   ProfileTextarea,
 } from "@/pages/profile/components/ProfileFields";
+import {
+  DEFAULT_AUTHENTICATED_PATH,
+  getReturnToFromSearch,
+  getSafeReturnTo,
+} from "@/utils/auth-routing";
+import { useAdminAuthRedirect } from "@/utils/use-admin-auth-redirect";
 
 type SetupStep = {
   id: string;
@@ -212,7 +225,12 @@ const integrationsByTab: Record<
 };
 
 export function AccountSetupPage() {
+  const authStatus = useAdminAuthRedirect("account-setup");
+  const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
+  const [isFinishingSetup, setIsFinishingSetup] = useState(false);
   const currentStep = setupSteps[activeStep];
   const isFirstStep = activeStep === 0;
   const isLastStep = activeStep === setupSteps.length - 1;
@@ -225,6 +243,28 @@ export function AccountSetupPage() {
   function showNextStep() {
     setActiveStep((current) => Math.min(current + 1, setupSteps.length - 1));
   }
+
+  async function finishSetup() {
+    setIsFinishingSetup(true);
+
+    try {
+      await userService.updateUser({ accountSetupCompleted: true });
+      const returnTo = getSafeReturnTo(
+        getReturnToFromSearch(location.search),
+        DEFAULT_AUTHENTICATED_PATH,
+      );
+      navigate(returnTo, { replace: true });
+    } catch (error) {
+      showToast(dispatch, {
+        message: getAccountSetupErrorMessage(error),
+        variant: "error",
+      });
+    } finally {
+      setIsFinishingSetup(false);
+    }
+  }
+
+  if (authStatus !== "ready") return null;
 
   return (
     <main className="min-h-screen bg-background px-10 py-10 text-foreground">
@@ -345,11 +385,16 @@ export function AccountSetupPage() {
                   ) : null}
 
                   <Button
-                    onClick={showNextStep}
+                    disabled={isFinishingSetup}
+                    onClick={isLastStep ? finishSetup : showNextStep}
                     trailing={<ArrowRight />}
                     type="button"
                   >
-                    {isLastStep ? "Finish setup" : "Continue"}
+                    {isLastStep
+                      ? isFinishingSetup
+                        ? "Finishing..."
+                        : "Finish setup"
+                      : "Continue"}
                   </Button>
                 </div>
               </div>
@@ -359,6 +404,14 @@ export function AccountSetupPage() {
       </section>
     </main>
   );
+}
+
+function getAccountSetupErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Unable to finish account setup. Please try again.";
 }
 
 function StepContent({ activeStep }: { activeStep: number }) {

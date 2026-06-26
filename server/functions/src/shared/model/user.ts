@@ -11,6 +11,7 @@ interface UserData extends BaseModel {
   phoneNumber?: string | null;
   name: string;
   profileImageUrl?: string;
+  accountSetupCompleted: boolean;
   dob?: string | null;
   gender?: UserGenderType | null;
   business?: UserBusinessData | null;

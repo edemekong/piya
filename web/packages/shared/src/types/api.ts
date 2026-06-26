@@ -47,7 +47,7 @@ export type CreateUserInput = Partial<
 export type UpdateUserInput = Partial<
   Pick<
     import("../models").UserData,
-    "name" | "profileImageUrl" | "dob" | "gender"
+    "name" | "profileImageUrl" | "accountSetupCompleted" | "dob" | "gender"
   > & {
     settings: Partial<import("../models").UserSettingsData>;
   }
