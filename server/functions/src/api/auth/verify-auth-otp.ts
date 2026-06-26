@@ -9,6 +9,7 @@ import {
 import { ValidationsUtils } from "../../shared/utils/validations.utils";
 import {
   API_RESPONSE,
+  OTP_CODE_LENGTH,
   VERIFY_AUTH_OTP_REASON,
 } from "../../shared/utils/constants";
 
@@ -31,7 +32,11 @@ verifyAuthOTPRoute.post(
       return ErrorResult(res, error.statusCode, error.message, error.code);
     }
 
-    if (!code || code.length < 4) {
+    if (
+      typeof code !== "string" ||
+      code.length !== OTP_CODE_LENGTH ||
+      !/^\d+$/.test(code)
+    ) {
       const error = API_RESPONSE.invalidOTP;
       return ErrorResult(res, error.statusCode, error.message, error.code);
     }

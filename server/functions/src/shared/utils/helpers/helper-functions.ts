@@ -6,7 +6,7 @@ import { finalConfiguration } from "../../../configs/configurations";
 import { resendEmailClient } from "../../../configs/resend";
 import randomstring = require("randomstring");
 import { OTPRequestType } from "../../types/auth.type";
-import { OTP_EXPIRY_MINUTES } from "../constants";
+import { OTP_CODE_LENGTH, OTP_EXPIRY_MINUTES } from "../constants";
 import { OTP_REQUEST_TYPE_OPTIONS } from "../constants";
 
 export async function deleteCollection(
@@ -160,7 +160,7 @@ export const removeUserDataFromResend = async (
 };
 
 export function generateOTPCode() {
-  return randomstring.generate({ length: 4, charset: "numeric" });
+  return randomstring.generate({ length: OTP_CODE_LENGTH, charset: "numeric" });
 }
 
 export function getValidEmail(email: string) {

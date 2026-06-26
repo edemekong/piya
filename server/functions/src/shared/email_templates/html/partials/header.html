@@ -8,31 +8,42 @@
     <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
     <title>{{default title brand.name}}</title>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-      body { margin: 0; padding: 0; background-color: #F5F5F5; }
+      @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
+      body { margin: 0; padding: 0; background-color: #F4F5E4; }
       @media only screen and (max-width: 620px) {
         .wrap { padding: 24px 16px !important; }
-        .card { padding: 32px 24px !important; }
+        .header-cell { padding: 14px 20px !important; }
+        .content-cell { padding: 28px 20px 32px !important; }
+        .footer-cell { padding: 22px 20px 24px !important; }
+        .brand-logo { height: 32px !important; max-width: 120px !important; }
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background-color:#F5F5F5;">
+  <body style="margin:0;padding:0;background-color:#F4F5E4;">
     <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
       {{previewText}}
     </div>
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#F5F5F5;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#F4F5E4;">
       <tr>
         <td align="center" class="wrap" style="padding:48px 24px;">
           <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;width:100%;">
             <tr>
               <td>
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" class="card" style="background-color:#FFFFFF;border-radius:14px;padding:44px 44px 40px;">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" class="card" style="background-color:#FFFFFF;border:1px solid #D8E6E7;border-radius:15px;box-shadow:0 10px 30px rgba(16,42,45,0.08);overflow:hidden;">
                   <tr>
-                    <td>
+                    <td class="header-cell" style="background-color:#2E4B4E;padding:16px 40px;border-radius:15px 15px 0 0;">
                       <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                         <tr>
-                          <td style="padding-bottom:36px;">
-                            <img alt="{{brand.name}}" src="{{brand.logos.primary}}" height="48" style="display:block;width:auto;max-width:180px;height:48px;border:none;outline:none;border-radius:14px;" />
+                          <td>
+                            <img class="brand-logo" alt="{{brand.name}}" src="{{brand.logos.primary}}" height="34" style="display:inline-block;width:auto;max-width:128px;height:34px;border:none;outline:none;border-radius:8px;vertical-align:middle;" />
+                            <span style="display:inline-block;width:10px;">&nbsp;</span>
+                            <span style="display:inline-block;vertical-align:middle;font-family:'Figtree',Arial,sans-serif;font-size:20px;font-weight:700;line-height:24px;color:#FFFFFF;">
+                              {{default brand.name 'Piya'}}
+                            </span>
                           </td>
                         </tr>
                       </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="content-cell" style="padding:40px 40px 44px;">

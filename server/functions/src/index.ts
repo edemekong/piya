@@ -14,6 +14,7 @@ import { setGlobalOptions } from "firebase-functions/options";
 import { ApiRouter } from "./api/api-router";
 import { ErrorResult } from "./shared/utils/api-response";
 import { API_RESPONSE } from "./shared/utils/constants";
+import { renderOTPVerificationEmail } from "./shared/email_templates/email-template-functions";
 
 const app = express();
 
@@ -50,6 +51,29 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ limit: "20mb", extended: true }));
+
+if (process.env.FUNCTIONS_EMULATOR === "true") {
+  app.get("/__dev/email-preview/otp", (req, res) => {
+    const userName =
+      typeof req.query.userName === "string" ? req.query.userName : "Paul";
+    const otpCode =
+      typeof req.query.code === "string" ? req.query.code : "123456";
+    const expiresIn =
+      typeof req.query.expiresIn === "string"
+        ? Number(req.query.expiresIn)
+        : undefined;
+
+    res
+      .type("html")
+      .send(
+        renderOTPVerificationEmail({
+          userName,
+          otpCode,
+          expiresIn: Number.isFinite(expiresIn) ? expiresIn : undefined,
+        }),
+      );
+  });
+}
 
 app.use(TenantMiddleware);
 app.use(ApiRouter);

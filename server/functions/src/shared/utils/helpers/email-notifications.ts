@@ -1,5 +1,4 @@
 import { resendEmailClient } from "../../../configs/resend";
-import { finalConfiguration } from "../../../configs/configurations";
 
 export async function sendEmailTo({
   emails,
@@ -15,8 +14,7 @@ export async function sendEmailTo({
   fromEmailUserID?: string;
 }): Promise<boolean> {
   try {
-    const domain = finalConfiguration().DOMAIN?.trim();
-    const mailDomain = `mail.${domain}`;
+    const mailDomain = `resend.dev`;
     const { data: emailData, error } = await resendEmailClient().emails.send({
       from: from
         ? `${from} <${fromEmailUserID}@${mailDomain}>`

@@ -147,6 +147,7 @@ const API_RESPONSE = {
 } as const;
 
 const OTP_AUTH_TYPE = "login-or-register";
+const OTP_CODE_LENGTH = 6;
 const OTP_EXPIRY_MINUTES = 30;
 
 const VERIFY_AUTH_OTP_REASON = {
@@ -170,6 +171,7 @@ const TEST_EMAIL_SUFFIX = "@test.piya.store";
 export {
   API_RESPONSE,
   OTP_AUTH_TYPE,
+  OTP_CODE_LENGTH,
   OTP_EXPIRY_MINUTES,
   OTP_REQUEST_TYPE_OPTIONS,
   OTP_DELIVERY_CHANNELS,

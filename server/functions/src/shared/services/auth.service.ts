@@ -21,6 +21,7 @@ import {
 import { COLLECTIONS } from "../utils/collections";
 import {
   OTP_AUTH_TYPE,
+  OTP_CODE_LENGTH,
   OTP_DELIVERY_CHANNELS,
   OTP_EXPIRY_MINUTES,
   VERIFY_AUTH_OTP_REASON,
@@ -54,7 +55,9 @@ export class AuthService {
     const isFunctionsEmulator = process.env.FUNCTIONS_EMULATOR === "true";
     const shouldSendEmail =
       !isFunctionsEmulator || Boolean(RESEND_API_KEY?.trim());
-    const otpCode = shouldSendEmail ? generateOTPCode() : "000000";
+    const otpCode = shouldSendEmail
+      ? generateOTPCode()
+      : "0".repeat(OTP_CODE_LENGTH);
     const uid = userRecord?.uid ?? email;
 
     await db()

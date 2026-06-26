@@ -16,11 +16,18 @@ const WEB_APP_BASE_URL = defineString("WEB_APP_BASE_URL");
 
 const defaultAppBranding = {
   name: "Piya",
+  description:
+    "Piya helps growing businesses manage customers, orders, offerings, and campaigns from one connected workspace.",
   logos: {
     primary: "https://piya.store/logo.png",
+    textDark: "https://piya.store/assets/logo-text-dark.png",
   },
   socials: {
     website: "https://piya.store",
+    instagram: "https://instagram.com/piya",
+    x: "https://x.com/piya",
+    facebook: "https://facebook.com/piya",
+    linkedin: "https://linkedin.com/company/piya",
   },
 };
 
