@@ -109,16 +109,19 @@ export abstract class BaseAPIService {
       url,
     };
 
-    return this.retry(async () => {
-      try {
-        const response = await this.axios.request<ApiResponseBody<TResponse>>(
-          config,
-        );
-        return this.decodeResponse(response.data);
-      } catch (error) {
-        throw this.onError(error);
-      }
-    });
+    return this.retry(
+      async () => {
+        try {
+          const response = await this.axios.request<ApiResponseBody<TResponse>>(
+            config,
+          );
+          return this.decodeResponse(response.data);
+        } catch (error) {
+          throw this.onError(error);
+        }
+      },
+      options.maxRetries,
+    );
   }
 
   protected async requestHeaders<TBody>(
@@ -184,15 +187,18 @@ export abstract class BaseAPIService {
     });
   }
 
-  private async retry<T>(request: () => Promise<T>): Promise<T> {
+  private async retry<T>(
+    request: () => Promise<T>,
+    maxRetries = this.maxRetries,
+  ): Promise<T> {
     let lastError: unknown;
 
-    for (let attempt = 0; attempt <= this.maxRetries; attempt += 1) {
+    for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
       try {
         return await request();
       } catch (error) {
         lastError = error;
-        if (attempt >= this.maxRetries || !this.shouldRetry(error)) break;
+        if (attempt >= maxRetries || !this.shouldRetry(error)) break;
       }
     }
 

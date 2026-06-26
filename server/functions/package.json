@@ -1,8 +1,9 @@
 {
   "name": "functions",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy:templates",
     "build:watch": "tsc --watch",
+    "copy:templates": "mkdir -p lib/shared/email_templates/html && cp -R src/shared/email_templates/html/. lib/shared/email_templates/html/",
     "serve": "npm run build && firebase emulators:start --only functions",
     "serve:dev": "npm run build && cd .. && PATH=\"/opt/homebrew/opt/openjdk/bin:$PATH\" firebase emulators:start --only functions,auth,firestore,storage",
     "shell": "npm run build && firebase functions:shell",

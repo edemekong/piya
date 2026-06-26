@@ -21,6 +21,7 @@ export type BaseAPIServiceOptions = {
 export type ApiRequestOptions<TBody = unknown> = {
   body?: TBody;
   headers?: Record<string, string>;
+  maxRetries?: number;
   queryParameters?: Record<string, unknown>;
   withToken?: boolean;
   signal?: AbortSignal;

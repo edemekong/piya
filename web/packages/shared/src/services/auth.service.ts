@@ -51,6 +51,7 @@ export class AuthService extends BaseAPIService {
   }: RequestOTPBody): Promise<RequestOTPResult> {
     await this.post<null, RequestOTPBody>(this.urlController.requestAuthOTP, {
       body: { dialCode, phoneOrEmail, type },
+      maxRetries: 0,
     });
 
     return { sent: true };

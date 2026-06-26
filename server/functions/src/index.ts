@@ -1,7 +1,7 @@
 import express = require("express");
 
 import "./configs/firebase";
-import { rateLimit } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 
 import {
   CORSSettings,
@@ -23,6 +23,16 @@ app.set("trust proxy", 1);
 const limiter = rateLimit({
   windowMs: RATE_LIMIT_WINDOW,
   max: RATE_LIMIT_MAX,
+  keyGenerator: (req) => {
+    const requestIp = Reflect.get(req, "ip") as string | undefined;
+    const forwardedFor = req.headers["x-forwarded-for"];
+    const forwardedIp = Array.isArray(forwardedFor)
+      ? forwardedFor[0]
+      : forwardedFor?.split(",")[0]?.trim();
+    const ip = requestIp ?? forwardedIp ?? req.socket.remoteAddress;
+
+    return ip ? ipKeyGenerator(ip) : "local";
+  },
   handler: (req, res) => {
     const error = API_RESPONSE.rateLimited;
     return ErrorResult(
@@ -34,7 +44,7 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false, xForwardedForHeader: false },
+  validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
 });
 
 app.use(limiter);
