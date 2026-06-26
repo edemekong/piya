@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Verification"
+  short_description: "Choose and report correct checks"
+  default_prompt: "Use $piya-verification-gate before finalizing a Piya code change."

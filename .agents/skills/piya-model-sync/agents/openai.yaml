@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Model Sync"
+  short_description: "Align server and web model shapes"
+  default_prompt: "Use $piya-model-sync to align a Piya domain model between server and web."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Remix Features"
+  short_description: "Build admin and portal feature screens"
+  default_prompt: "Use $piya-remix-feature-builder to add a Piya admin feature screen."

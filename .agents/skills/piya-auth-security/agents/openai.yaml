@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Auth Security"
+  short_description: "Handle auth, tokens, OTP, and PII"
+  default_prompt: "Use $piya-auth-security to review a Piya auth or OTP change."

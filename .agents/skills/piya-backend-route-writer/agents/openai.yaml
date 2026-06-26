@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Backend Routes"
+  short_description: "Write thin validated backend routes"
+  default_prompt: "Use $piya-backend-route-writer to add a protected Piya backend route."

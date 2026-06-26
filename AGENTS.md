@@ -7,6 +7,16 @@
 - Make the smallest change that satisfies the request. Do not introduce new frameworks, app-wide abstractions, folders, or architectural concepts unless the current code already points there or the user asks for it.
 - If a pattern is unclear, search for two or three existing examples and copy the dominant pattern.
 
+## Skill Routing
+
+- Use `piya-architecture-navigator` before broad or cross-cutting changes.
+- Use `piya-backend-route-writer` for backend HTTP routes, schemas, responses, and service calls.
+- Use `piya-model-sync` when server models, web models, client-only types, or dummy data shapes change.
+- Use `piya-auth-security` for auth, OTP, Firebase tokens, protected routes, tenant assumptions, or PII.
+- Use `piya-remix-feature-builder` for admin/portal route and page work.
+- Use `shared-data-flow`, `piya-api-service-writer`, `piya-state-management`, and `piya-design-system` for their narrower areas.
+- Use `piya-verification-gate` before final response for any code change.
+
 ## Repository Shape
 
 - `server/functions`: Firebase Functions backend using Express.
@@ -33,6 +43,7 @@
 - Keep Firestore and external service calls in `server/functions/src/shared/services`, not directly inside page-sized route handlers.
 - Use `req.currentUser` only after `AuthMiddleware`; public routes must verify their own auth assumptions.
 - Keep tenant behavior in `TenantMiddleware` and `req.tenant`; do not duplicate tenant lookup in routes.
+- Do not log tokens, OTPs, auth headers, request bodies with PII, or Firebase credentials.
 
 ## Source Of Truth
 
