@@ -1,28 +1,53 @@
 import type * as React from "react";
 import { useRef, useState } from "react";
 import { useNavigate } from "@remix-run/react";
-import { ApiServiceError, authService, userService } from "@piya/shared";
+import {
+  ApiServiceError,
+  authService,
+  showToast,
+  type AppDispatch,
+  userService,
+} from "@piya/shared";
 import { AppTextField, Button } from "@piya/ui";
+import { useDispatch } from "react-redux";
 
 const otpLength = 6;
 
 export function SignInForm() {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState<string[]>(Array(otpLength).fill(""));
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [otpError, setOtpError] = useState("");
   const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const otpCode = otp.join("");
   const newEmail = email.trim().toLowerCase();
-  const canSubmit = showOtp
-    ? otpCode.length === otpLength && !isSubmitting
-    : newEmail.length > 0 && !isSubmitting;
+  const canSubmit = !isSubmitting;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setFormError("");
+    setEmailError("");
+    setOtpError("");
+
+    if (!showOtp) {
+      const nextEmailError = getEmailValidationMessage(newEmail);
+
+      if (nextEmailError) {
+        setEmailError(nextEmailError);
+        return;
+      }
+    } else {
+      const nextOtpError = getOtpValidationMessage(otpCode);
+
+      if (nextOtpError) {
+        setOtpError(nextOtpError);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -56,7 +81,11 @@ export function SignInForm() {
         replace: true,
       });
     } catch (error) {
-      setFormError(getAuthErrorMessage(error));
+      const message = getAuthErrorMessage(error);
+      showToast(dispatch, {
+        message,
+        variant: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -64,6 +93,7 @@ export function SignInForm() {
 
   function handleOtpChange(index: number, value: string) {
     const digit = value.replace(/\D/g, "").slice(-1);
+    setOtpError("");
 
     setOtp((current) => {
       const next = [...current];
@@ -94,6 +124,7 @@ export function SignInForm() {
     if (!digits) return;
 
     event.preventDefault();
+    setOtpError("");
     setOtp(
       Array.from({ length: otpLength }, (_, index) => digits[index] ?? ""),
     );
@@ -106,7 +137,8 @@ export function SignInForm() {
   function handleChangeEmail() {
     setShowOtp(false);
     setOtp(Array(otpLength).fill(""));
-    setFormError("");
+    setEmailError("");
+    setOtpError("");
   }
 
   return (
@@ -130,15 +162,18 @@ export function SignInForm() {
         </div>
       </div>
 
-      <form className="mt-12 space-y-6" onSubmit={handleSubmit}>
+      <form className="mt-12 space-y-6" noValidate onSubmit={handleSubmit}>
         <AppTextField
           disabled={showOtp}
+          error={emailError}
           id="sign-in-email"
           inputClassName="disabled:cursor-not-allowed disabled:opacity-60"
           label="Email"
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            setEmailError("");
+          }}
           placeholder="Enter your email"
-          required
           type="email"
           value={email}
         />
@@ -173,12 +208,12 @@ export function SignInForm() {
               </div>
             </div>
 
-            {formError ? (
+            {otpError ? (
               <p
-                className="text-footnote leading-relaxed text-red-600"
+                className="text-footnote leading-relaxed text-error"
                 role="alert"
               >
-                {formError}
+                {otpError}
               </p>
             ) : null}
 
@@ -195,20 +230,9 @@ export function SignInForm() {
             </button>
           </div>
         ) : (
-          <>
-            {formError ? (
-              <p
-                className="text-footnote leading-relaxed text-red-600"
-                role="alert"
-              >
-                {formError}
-              </p>
-            ) : null}
-
-            <Button className="w-full" disabled={!canSubmit} type="submit">
-              {isSubmitting ? "Please wait..." : "Continue"}
-            </Button>
-          </>
+          <Button className="w-full" disabled={!canSubmit} type="submit">
+            {isSubmitting ? "Please wait..." : "Continue"}
+          </Button>
         )}
       </form>
     </div>
@@ -238,4 +262,28 @@ function getAuthErrorMessage(error: unknown) {
   }
 
   return "Unable to sign in. Please try again.";
+}
+
+function getEmailValidationMessage(email: string) {
+  if (!email) {
+    return "Email is required.";
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return "Enter a valid email address.";
+  }
+
+  return "";
+}
+
+function getOtpValidationMessage(otpCode: string) {
+  if (!otpCode) {
+    return "Enter the 6-digit code.";
+  }
+
+  if (otpCode.length !== otpLength) {
+    return "Enter all 6 digits.";
+  }
+
+  return "";
 }

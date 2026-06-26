@@ -1,11 +1,13 @@
 import {
   makeAppStore,
+  removeToast,
   setThemeMode,
   type AppDispatch,
   type AppStore,
   type RootState,
   type ThemeMode,
 } from "@piya/shared";
+import { ToastViewport } from "@piya/ui";
 import * as React from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 
@@ -64,6 +66,27 @@ function ThemeSync() {
   return null;
 }
 
+function ToastSync() {
+  const dispatch = useDispatch<AppDispatch>();
+  const notifications = useSelector(
+    (state: RootState) => state.toast.notifications,
+  );
+
+  const handleDismiss = React.useCallback(
+    (id: string) => {
+      dispatch(removeToast(id));
+    },
+    [dispatch],
+  );
+
+  return (
+    <ToastViewport
+      notifications={notifications}
+      onDismiss={handleDismiss}
+    />
+  );
+}
+
 export function ReduxProvider({ children }: { children: React.ReactNode }) {
   const storeRef = React.useRef<AppStore | null>(null);
 
@@ -75,6 +98,7 @@ export function ReduxProvider({ children }: { children: React.ReactNode }) {
     <Provider store={storeRef.current}>
       <ThemeSync />
       {children}
+      <ToastSync />
     </Provider>
   );
 }

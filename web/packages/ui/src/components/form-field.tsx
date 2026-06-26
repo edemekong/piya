@@ -19,6 +19,7 @@ export type AppTextFieldProps = Omit<
   "className"
 > & {
   className?: string;
+  error?: React.ReactNode;
   inputClassName?: string;
   label: string;
   suffix?: React.ReactNode;
@@ -28,6 +29,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
   (
     {
       className,
+      error,
       inputClassName: customInputClassName,
       label,
       onChange,
@@ -46,7 +48,12 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
       <label className={cn("grid gap-2", className)}>
         <span className={labelClassName}>{label}</span>
         {suffix ? (
-          <span className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
+          <span
+            className={cn(
+              "flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white",
+              error && "border-error focus-within:border-error",
+            )}
+          >
             <input
               className={cn(
                 "min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40",
@@ -60,12 +67,21 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
           </span>
         ) : (
           <input
-            className={cn(inputClassName, customInputClassName)}
+            className={cn(
+              inputClassName,
+              error && "border-error focus:border-error",
+              customInputClassName,
+            )}
             ref={ref}
             {...valueProps}
             {...props}
           />
         )}
+        {error ? (
+          <span className="text-footnote leading-relaxed text-error">
+            {error}
+          </span>
+        ) : null}
       </label>
     );
   },
