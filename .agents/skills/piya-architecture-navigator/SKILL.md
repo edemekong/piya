@@ -13,6 +13,8 @@ Use this before broad or cross-cutting changes. Let the existing folders decide 
 - Inspect the target feature and two nearby examples before editing.
 - Prefer `rg --files` and `rg -n` to find existing patterns.
 - Keep changes inside the narrowest owner: backend route, backend shared service, shared web package, admin app feature, portal app feature, or UI package.
+- Search for an existing component, utility, hook, service method, or helper before creating one.
+- Keep new code scoped by default; promote to shared only after there is real reuse or an established shared-layer contract.
 
 ## Server Structure
 
@@ -58,6 +60,8 @@ Use this before broad or cross-cutting changes. Let the existing folders decide 
 
 - Do not create new architecture folders just because a task is new.
 - Do not move code across packages unless the same need exists in more than one owner.
+- Do not create shared components/utilities for one caller.
+- Do not create vague helper names like `normalize`, `resolve`, `process`, `transform`, or `handle` when a domain-specific name is available.
 - Do not add a global Redux slice for state used by one screen.
 - Do not add top-level service wrapper functions.
 - Do not invent backend endpoints on the client; add `URLController` paths only when the server route exists or the task is explicitly to wire a planned endpoint.

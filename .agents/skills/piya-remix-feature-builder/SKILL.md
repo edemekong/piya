@@ -16,6 +16,8 @@ Build app features inside the owning Remix app and keep shared packages reserved
 - Feature-only components live in `app/pages/<feature>/components`.
 - Feature-only types can live beside the page, such as `app/pages/<feature>/types.ts`.
 - App-only layout/input components live in `app/components`.
+- Keep new components feature-scoped until they have real reuse across features/apps.
+- Search feature, app, and `@piya/ui` components before creating another component.
 
 ## Data And State
 
@@ -30,6 +32,12 @@ Build app features inside the owning Remix app and keep shared packages reserved
 - Use `lucide-react` icons for app actions.
 - Match nearby page headers, tables, sheets, spacing, and empty/loading/error behavior.
 - Keep admin screens dense and operational.
+
+## Helpers
+
+- Keep one-feature helpers beside the page or component.
+- Promote pure helpers to `web/packages/shared/src/utils` only after cross-feature/app reuse is real.
+- Name helpers by domain behavior, not vague verbs like `normalize`, `resolve`, `process`, or `transform`.
 
 ## Verification
 

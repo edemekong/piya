@@ -18,6 +18,8 @@ Use the existing UI package and app tokens before adding custom styling.
 ## UI Rules
 
 - Prefer components exported from `@piya/ui`: `Button`, `AppIconButton`, `AppText`, `AppSheet`, cards, badges, form fields, tabs, empty states, and section headers.
+- Search `web/packages/ui/src/components`, app-level components, and nearby feature components before creating a new UI component.
+- Keep feature-specific UI in `web/apps/<app>/app/pages/<feature>/components`; promote to `web/packages/ui` only when reused across features/apps and free of feature copy/workflow assumptions.
 - Use semantic Tailwind tokens such as `bg-background`, `bg-white`, `text-[#2F4B4F]` only where current components still use that color directly, `border-border`, `bg-fill`, `text-callout`, `text-title-1`, `gap-element`, `p-card`, and `rounded-md`.
 - Use `AppText` or tokenized text classes for typography. Do not introduce viewport-scaled font sizes or negative letter spacing.
 - Use `Button` with the `icon` prop for primary commands and `AppIconButton` for icon-only commands with an accessible label.

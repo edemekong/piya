@@ -10,6 +10,7 @@
 ## Skill Routing
 
 - Use `piya-architecture-navigator` before broad or cross-cutting changes.
+- Use `piya-reuse-and-naming` before creating new components, hooks, utilities, helpers, or abstractions.
 - Use `piya-backend-route-writer` for backend HTTP routes, schemas, responses, and service calls.
 - Use `piya-model-sync` when server models, web models, client-only types, or dummy data shapes change.
 - Use `piya-auth-security` for auth, OTP, Firebase tokens, protected routes, tenant assumptions, or PII.
@@ -76,6 +77,16 @@
 - Do not put admin-only copy, sheets, table workflows, or route-specific helpers in `packages/ui`.
 - Do not put reusable app data access in `apps/admin/app/services`; prefer `web/packages/shared/src/services` plus RTK Query.
 - Keep package root exports intentional. Export reusable public API from `src/index.ts`; avoid exposing internal helpers only used by one page.
+
+## Reuse And Naming
+
+- Before creating a component, hook, service method, utility, or helper, search for an existing one by behavior and by expected import path.
+- Keep code scoped until it has at least two real callers or clearly belongs to an established shared layer.
+- Put one-screen UI in the feature folder. Promote to `web/packages/ui` only when it is reusable across app features and contains no feature copy or workflow assumptions.
+- Put one-feature utilities beside the feature. Promote to `web/packages/shared/src/utils` only when multiple features or apps need them.
+- Prefer domain-specific names over vague verbs. Use `getUser`, `fetchUser`, `formatCurrency`, `parsePhoneNumber`, or `createOrderDraft` instead of generic names like `normalize`, `resolve`, `handle`, `process`, `mapData`, or `transformData`.
+- Do not rename existing functions to preferred names unless the rename is part of the requested change and all call sites are updated.
+- Do not create wrapper functions that only rename another function without adding domain behavior.
 
 ## Web App Patterns
 

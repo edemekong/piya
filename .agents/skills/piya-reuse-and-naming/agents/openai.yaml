@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Reuse & Naming"
+  short_description: "Search, reuse, scope, and name code"
+  default_prompt: "Use $piya-reuse-and-naming before adding a new Piya component or utility."
