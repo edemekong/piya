@@ -16,12 +16,12 @@ import {
   MultiSelectDropdown,
 } from "@piya/ui";
 import type {
-  CommunicationData,
+  CommunicationAdminData as CommunicationData,
   CommunicationEditorMode,
   CommunicationEventType,
   CommunicationFrequency,
-  CommunicationStep,
-} from "@piya/shared/models";
+  CommunicationAdminStep as CommunicationStep,
+} from "@piya/shared/types";
 import {
   DEFAULT_BADGE_OPTIONS,
   DEFAULT_TAG_OPTIONS,
@@ -29,7 +29,7 @@ import {
   SCHEDULED_TRIGGER_TYPES,
   TRIGGER_OPTIONS,
   formatLabel,
-} from "../communicationUtils";
+} from "@piya/shared/utils";
 import { CommunicationStepCard } from "./CommunicationStepCard";
 
 const DAY_OF_WEEK_OPTIONS = [

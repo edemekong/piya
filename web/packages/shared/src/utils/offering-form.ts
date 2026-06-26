@@ -1,32 +1,8 @@
-import type {
-  OfferingData,
-  OfferingFeatureType,
-  OfferingStatusType,
-  OfferingSubType,
-  OfferingType,
-} from "@piya/shared/services";
-
-export type OfferingFormDraft = {
-  currency: string;
-  description: string;
-  duration: string;
-  features: OfferingFeatureType[];
-  imageUrl: string;
-  imageUrls: string;
-  locationAddress: string;
-  locationCity: string;
-  locationCountry: string;
-  locationPostalCode: string;
-  locationState: string;
-  meetingLink: string;
-  name: string;
-  price: string;
-  quantity: string;
-  status: OfferingStatusType;
-  subType: OfferingSubType | "";
-  tags: string;
-  type: OfferingType | "";
-};
+import type { OfferingData } from "../models";
+import type { OfferingFormDraft, OfferingSubType } from "../types";
+import { splitCommaList } from "./list";
+import { formatEnumLabel } from "./format";
+import { numberOrNull } from "./number";
 
 export function createEmptyOfferingDraft(): OfferingFormDraft {
   return {
@@ -58,7 +34,7 @@ export function createOfferingDraft(offering: OfferingData): OfferingFormDraft {
     description: offering.description ?? "",
     duration: offering.duration?.toString() ?? "",
     features: offering.features ?? [],
-    imageUrl: offering.imageUrl ?? "",
+    imageUrl: offering.imageUrls?.[0] ?? "",
     imageUrls: offering.imageUrls?.join(", ") ?? "",
     locationAddress: offering.location?.address ?? "",
     locationCity: offering.location?.city ?? "",
@@ -93,7 +69,7 @@ export function draftToOffering(
     name: draft.name,
     price: numberOrNull(draft.price),
     status: draft.status,
-    tags: splitList(draft.tags),
+    tags: splitCommaList(draft.tags),
     type: draft.type || "product",
     updatedAt: now,
   };
@@ -122,8 +98,7 @@ export function draftToOffering(
       ...shared,
       duration: numberOrNull(draft.duration),
       features: draft.features,
-      imageUrl: draft.imageUrl || null,
-      imageUrls: null,
+      imageUrls: draft.imageUrl ? [draft.imageUrl] : null,
       location,
       meta: isOnlineService && draft.meetingLink
         ? { meetingLink: draft.meetingLink }
@@ -138,8 +113,7 @@ export function draftToOffering(
     ...shared,
     duration: null,
     features: null,
-    imageUrl: null,
-    imageUrls: splitList(draft.imageUrls),
+    imageUrls: splitCommaList(draft.imageUrls),
     location: null,
     quantity: numberOrNull(draft.quantity),
     subType: draft.subType || null,
@@ -151,20 +125,9 @@ export function formatOfferingLabel(value: string) {
   if (value === "consultation_online") return "Consultation | Online";
   if (value === "event_online") return "Event | Online";
 
-  return value
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  return formatEnumLabel(value);
 }
 
-function numberOrNull(value: string) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && value.trim() !== "" ? parsed : null;
-}
-
-function splitList(value: string) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+export function formatOfferingSubTypeLabel(subType: OfferingSubType) {
+  return formatOfferingLabel(subType);
 }

@@ -1,16 +1,17 @@
 import { Badge, cn } from "@piya/ui";
+import { useGetOrdersQuery } from "@piya/shared";
 import type { OrderStatus } from "@piya/shared/models";
-import { getOrders } from "@piya/shared/services";
 import {
   formatMoney,
   formatOrderLabel,
-} from "@/pages/orders/components/orderUtils";
-
-const recentOrders = [...getOrders()]
-  .sort((left, right) => right.createdAt - left.createdAt)
-  .slice(0, 4);
+} from "@piya/shared/utils";
 
 export function RecentOrders() {
+  const { data: orders = [] } = useGetOrdersQuery();
+  const recentOrders = [...orders]
+    .sort((left, right) => right.createdAt - left.createdAt)
+    .slice(0, 4);
+
   return (
     <section className="flex h-full min-h-[360px] flex-col rounded-md bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between gap-3">

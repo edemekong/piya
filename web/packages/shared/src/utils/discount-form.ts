@@ -1,31 +1,9 @@
-import type {
-  DiscountData,
-  DiscountStatusType,
-  RewardType,
-} from "@piya/shared/services";
-
-export type DiscountFormDraft = {
-  buyQuantity: string;
-  code: string;
-  codeGeneration: "manual" | "unique_per_contact";
-  currency: string;
-  description: string;
-  endsAt: string;
-  freebieGiftId: string;
-  getQuantity: string;
-  maxDiscountAmount: string;
-  maxUsesPerContact: string;
-  minimumOrderValue: string;
-  perkDescription: string;
-  rewardType: RewardType;
-  rewardValue: string;
-  startsAt: string;
-  status: DiscountStatusType;
-  targetBadgeTypes: string;
-  targetTags: string;
-  title: string;
-  totalUsageLimit: string;
-};
+import type { DiscountData } from "../models";
+import type { DiscountFormDraft } from "../types";
+import { dateInputToTimestamp, formatShortDate, timestampToDateInput } from "./date";
+import { formatEnumLabel } from "./format";
+import { nullableCommaList } from "./list";
+import { numberOrNull, numberOrZero } from "./number";
 
 export function createEmptyDiscountDraft(): DiscountFormDraft {
   return {
@@ -43,7 +21,7 @@ export function createEmptyDiscountDraft(): DiscountFormDraft {
     perkDescription: "",
     rewardType: "percentage_discount",
     rewardValue: "",
-    startsAt: formatDateInput(Date.now()),
+    startsAt: timestampToDateInput(Date.now()),
     status: "draft",
     targetBadgeTypes: "",
     targetTags: "",
@@ -59,7 +37,7 @@ export function createDiscountDraft(discount: DiscountData): DiscountFormDraft {
     codeGeneration: discount.codeGeneration ?? "manual",
     currency: "NGN",
     description: discount.description,
-    endsAt: discount.endsAt ? formatDateInput(discount.endsAt) : "",
+    endsAt: discount.endsAt ? timestampToDateInput(discount.endsAt) : "",
     freebieGiftId: discount.reward.metadata?.giftId ?? "",
     getQuantity: discount.reward.metadata?.getQuantity?.toString() ?? "",
     maxDiscountAmount: discount.reward.maxDiscountAmount?.toString() ?? "",
@@ -68,7 +46,7 @@ export function createDiscountDraft(discount: DiscountData): DiscountFormDraft {
     perkDescription: discount.reward.metadata?.customPerkDescription ?? "",
     rewardType: discount.reward.type,
     rewardValue: discount.reward.value.toString(),
-    startsAt: formatDateInput(discount.startsAt),
+    startsAt: timestampToDateInput(discount.startsAt),
     status: discount.status,
     targetBadgeTypes: discount.rules.targetBadgeTypes?.join(", ") ?? "",
     targetTags: discount.rules.targetTags?.join(", ") ?? "",
@@ -90,7 +68,7 @@ export function draftToDiscount(
     createdAt: existing?.createdAt ?? now,
     createdBy: existing?.createdBy ?? "admin_demo",
     description: draft.description,
-    endsAt: dateOrNull(draft.endsAt),
+    endsAt: dateInputToTimestamp(draft.endsAt),
     id: existing?.id ?? `discount_${now}`,
     reward: {
       maxDiscountAmount: numberOrNull(draft.maxDiscountAmount),
@@ -101,11 +79,11 @@ export function draftToDiscount(
     rules: {
       maxUsesPerContact: numberOrZero(draft.maxUsesPerContact) || 1,
       minimumOrderValue: numberOrNull(draft.minimumOrderValue),
-      targetBadgeTypes: nullableList(draft.targetBadgeTypes),
-      targetTags: nullableList(draft.targetTags),
+      targetBadgeTypes: nullableCommaList(draft.targetBadgeTypes),
+      targetTags: nullableCommaList(draft.targetTags),
       totalUsageLimit: numberOrNull(draft.totalUsageLimit),
     },
-    startsAt: dateOrNull(draft.startsAt) ?? now,
+    startsAt: dateInputToTimestamp(draft.startsAt) ?? now,
     status: draft.status,
     title: draft.title,
     type: "discount",
@@ -114,45 +92,11 @@ export function draftToDiscount(
 }
 
 export function formatDiscountLabel(value: string) {
-  return value
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  return formatEnumLabel(value);
 }
 
 export function formatDiscountDate(timestamp?: number | null) {
-  if (!timestamp) return "No end date";
-
-  return new Intl.DateTimeFormat("en-NG", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(timestamp);
-}
-
-function formatDateInput(timestamp: number) {
-  return new Date(timestamp).toISOString().slice(0, 10);
-}
-
-function dateOrNull(value: string) {
-  if (!value) return null;
-
-  const timestamp = new Date(`${value}T00:00:00`).getTime();
-  return Number.isFinite(timestamp) ? timestamp : null;
-}
-
-function nullableList(value: string) {
-  const list = splitList(value);
-  return list.length > 0 ? list : null;
-}
-
-function numberOrNull(value: string) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && value.trim() !== "" ? parsed : null;
-}
-
-function numberOrZero(value: string) {
-  return numberOrNull(value) ?? 0;
+  return formatShortDate(timestamp, "No end date", "en-NG");
 }
 
 function getRewardValue(draft: DiscountFormDraft) {
@@ -192,11 +136,4 @@ function createRewardMetadata(draft: DiscountFormDraft) {
   }
 
   return null;
-}
-
-function splitList(value: string) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
 }

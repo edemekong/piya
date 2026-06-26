@@ -9,28 +9,28 @@ import {
   Button,
   cn,
 } from "@piya/ui";
+import { useGetOfferingsQuery } from "@piya/shared";
 import {
   DEFAULT_BADGE_OPTIONS,
   formatLabel,
-} from "@/pages/communications/communicationUtils";
+} from "@piya/shared/utils";
 import type {
   DiscountData,
   DiscountStatusType,
   RewardType,
-} from "@piya/shared/services";
-import type { GiftData, GiftDraft } from "@piya/shared/services";
+} from "@piya/shared/models";
+import type { DiscountFormDraft, GiftDraft } from "@piya/shared/types";
+import type { GiftData } from "@piya/shared/models";
 import {
   createEmptyGiftDraft,
   draftToGift,
-} from "@piya/shared/services";
-import { getOfferings } from "@piya/shared/services";
+} from "@piya/shared/utils";
 import {
   createDiscountDraft,
   createEmptyDiscountDraft,
   draftToDiscount,
   formatDiscountLabel,
-  type DiscountFormDraft,
-} from "./discountForm";
+} from "@piya/shared/utils";
 import { GiftForm } from "./GiftEditorSheet";
 
 type EditorMode = "create" | "edit";
@@ -62,10 +62,6 @@ const currencies = [
   { code: "KES", label: "Kenya shilling" },
   { code: "ZAR", label: "South African rand" },
 ];
-const offeringTagOptions = Array.from(
-  new Set(getOfferings().flatMap((offering) => offering.tags)),
-).sort();
-
 export function DiscountEditorSheet({
   discount,
   gifts,
@@ -75,6 +71,7 @@ export function DiscountEditorSheet({
   onSave,
   open,
 }: DiscountEditorSheetProps) {
+  const { data: offerings = [] } = useGetOfferingsQuery();
   const [draft, setDraft] = React.useState<DiscountFormDraft>(
     createEmptyDiscountDraft,
   );
@@ -83,6 +80,10 @@ export function DiscountEditorSheet({
   );
   const [isGiftDialogOpen, setIsGiftDialogOpen] = React.useState(false);
   const isEditing = mode === "edit";
+  const offeringTagOptions = React.useMemo(
+    () => Array.from(new Set(offerings.flatMap((offering) => offering.tags))).sort(),
+    [offerings],
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -297,6 +298,7 @@ export function DiscountEditorSheet({
         onClose={() => setIsGiftDialogOpen(false)}
         onSave={handleCreateGift}
         open={isGiftDialogOpen}
+        tagOptions={offeringTagOptions}
       />
     </>
   );
@@ -501,12 +503,14 @@ function GiftQuickCreateDialog({
   onClose,
   onSave,
   open,
+  tagOptions,
 }: {
   draft: GiftDraft;
   onChange: (updates: Partial<GiftDraft>) => void;
   onClose: () => void;
   onSave: () => void;
   open: boolean;
+  tagOptions: string[];
 }) {
   if (!open) return null;
 
@@ -542,7 +546,7 @@ function GiftQuickCreateDialog({
           </button>
         </div>
         <div className="p-6">
-          <GiftForm draft={draft} onChange={onChange} />
+          <GiftForm draft={draft} onChange={onChange} tagOptions={tagOptions} />
         </div>
         <div className="flex items-center justify-end gap-3 border-t border-border p-6">
           <Button

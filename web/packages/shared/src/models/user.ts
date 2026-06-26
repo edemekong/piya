@@ -1,9 +1,11 @@
+import type {
+  UserGenderType,
+  UserRoleType,
+  MiniUserData,
+} from "../types/user.type";
 import type { BaseModel } from "./base";
 
-export type UserRoleType = "admin" | "manager";
-export type UserGenderType = "male" | "female" | "other";
-
-export interface UserData extends BaseModel {
+interface UserData extends BaseModel {
   email: string;
   phoneNumber?: string | null;
   name: string;
@@ -14,24 +16,26 @@ export interface UserData extends BaseModel {
   verification: VerificationData;
   settings: UserSettingsData;
 }
-
-export type UserSettingsData = {
+interface UserSettingsData {
   notifications: {
     pushEnabled: boolean;
     emailEnabled: boolean;
     smsEnabled: boolean;
   };
-};
-
-export type UserBusinessData = {
+}
+interface UserBusinessData {
   businessIds: string[];
   businessRoleTypes: Record<string, UserRoleType[]>;
-};
-
-export type VerificationData = {
+}
+interface VerificationData {
   emailVerified: boolean;
   phoneVerified: boolean;
   authProviders: string[];
+}
+export type {
+  UserData,
+  UserSettingsData,
+  UserBusinessData,
+  VerificationData,
+  MiniUserData,
 };
-
-export type MiniUserData = Pick<UserData, "id" | "email" | "profileImageUrl">;

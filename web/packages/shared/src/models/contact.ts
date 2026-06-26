@@ -1,37 +1,11 @@
+import type {
+  ContactBadgeType,
+  ContactStatusType,
+} from "../types/contact.type";
 import type { BaseModel } from "./base";
 import type { LocationData } from "./location";
 
-export type ContactStatusType = "active" | "inactive" | "lead" | "blocked";
-export type ContactStatus = ContactStatusType;
-
-export type ContactBadgeType =
-  | "regular"
-  | "bronze"
-  | "silver"
-  | "gold"
-  | "platinum";
-
-export type ContactBadge = {
-  type: ContactBadgeType;
-  points: number;
-  updatedAt: number;
-};
-
-export type ContactCounts = {
-  lifetimeValue: number;
-  totalOrders: number;
-  messagesSentCount: number;
-  messagesRepliedCount: number;
-};
-
-export type ContactPreference = {
-  unsubscribedEmailTypes: string[];
-  smsEnabled: boolean;
-  emailEnabled: boolean;
-  whatsappEnabled: boolean;
-};
-
-export interface ContactData extends BaseModel {
+interface ContactData extends BaseModel {
   userId: string;
   code: string;
   createdBy: string;
@@ -51,7 +25,24 @@ export interface ContactData extends BaseModel {
   anniversary?: string | null;
   tags: string[];
   counts: ContactCounts;
-  metadata?: Record<string, unknown> | null;
+  metadata?: Record<string, any> | null;
+}
+interface ContactBadge {
+  type: ContactBadgeType;
+  points: number;
+  updatedAt: number;
+}
+interface ContactCounts {
+  lifetimeValue: number;
+  totalOrders: number;
+  messagesSentCount: number;
+  messagesRepliedCount: number;
+}
+interface ContactPreference {
+  unsubscribedEmailTypes: string[];
+  smsEnabled: boolean;
+  emailEnabled: boolean;
+  whatsappEnabled: boolean;
 }
 
-export type Contact = ContactData;
+export type { ContactData, ContactPreference, ContactBadge, ContactCounts };

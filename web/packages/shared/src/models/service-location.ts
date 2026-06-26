@@ -1,5 +1,5 @@
-import type { BaseModel } from "./base";
-import type { LocationData } from "./location";
+import { BaseModel } from "./base";
+import { LocationData } from "./location";
 
 export interface ServiceLocationData extends BaseModel {
   businessId: string;

@@ -7,13 +7,14 @@ import {
   Button,
   cn,
 } from "@piya/ui";
-import type { GiftData, GiftDraft } from "@piya/shared/services";
+import { useGetOfferingsQuery } from "@piya/shared";
+import type { GiftData } from "@piya/shared/models";
+import type { GiftDraft } from "@piya/shared/types";
 import {
   createEmptyGiftDraft,
   createGiftDraft,
   draftToGift,
-} from "@piya/shared/services";
-import { getOfferings } from "@piya/shared/services";
+} from "@piya/shared/utils";
 
 type EditorMode = "create" | "edit";
 
@@ -32,10 +33,6 @@ const currencies = [
   { code: "KES", label: "Kenya shilling" },
   { code: "ZAR", label: "South African rand" },
 ];
-const offeringTagOptions = Array.from(
-  new Set(getOfferings().flatMap((offering) => offering.tags)),
-).sort();
-
 export function GiftEditorSheet({
   gift,
   mode,
@@ -43,8 +40,13 @@ export function GiftEditorSheet({
   onSave,
   open,
 }: GiftEditorSheetProps) {
+  const { data: offerings = [] } = useGetOfferingsQuery();
   const [draft, setDraft] = React.useState<GiftDraft>(createEmptyGiftDraft);
   const isEditing = mode === "edit";
+  const offeringTagOptions = React.useMemo(
+    () => Array.from(new Set(offerings.flatMap((offering) => offering.tags))).sort(),
+    [offerings],
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -84,7 +86,11 @@ export function GiftEditorSheet({
       open={open}
       title={isEditing ? "Edit gift" : "Create gift"}
     >
-      <GiftForm draft={draft} onChange={updateDraft} />
+      <GiftForm
+        draft={draft}
+        onChange={updateDraft}
+        tagOptions={offeringTagOptions}
+      />
     </AppSheet>
   );
 }
@@ -92,9 +98,11 @@ export function GiftEditorSheet({
 export function GiftForm({
   draft,
   onChange,
+  tagOptions,
 }: {
   draft: GiftDraft;
   onChange: (updates: Partial<GiftDraft>) => void;
+  tagOptions: string[];
 }) {
   return (
     <form className="grid gap-4">
@@ -135,7 +143,7 @@ export function GiftForm({
         />
         <TagPicker
           onChange={(tags) => onChange({ tags })}
-          options={offeringTagOptions}
+          options={tagOptions}
           selected={draft.tags}
         />
       </div>

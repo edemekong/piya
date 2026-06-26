@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Gift, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@piya/ui";
-import type { GiftData } from "@piya/shared/services";
+import type { GiftData } from "@piya/shared/models";
 
 type GiftsTableProps = {
   gifts: GiftData[];

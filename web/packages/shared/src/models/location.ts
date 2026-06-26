@@ -1,9 +1,4 @@
-export type GeoPointData = {
-  lat: number;
-  lng: number;
-};
-
-export type LocationData = {
+interface LocationData {
   address: string;
   city: string;
   state: string;
@@ -11,15 +6,20 @@ export type LocationData = {
   country: string;
   postalCode?: string;
   geoPoint?: GeoPointData;
-};
+}
 
-export type MiniLocationData = {
+interface MiniLocationData {
   formattedAddress: string;
   serviceLocationId?: string | null;
   geoPoint?: GeoPointData;
-};
+}
 
-export type LocationPrediction = {
+interface GeoPointData {
+  lat: number;
+  lng: number;
+}
+
+interface LocationPrediction {
   placeId: string;
   fullText: string;
   mainText: string;
@@ -27,36 +27,47 @@ export type LocationPrediction = {
   types: string[];
   distanceMeters?: number;
   displayName?: string;
-};
+}
 
-export type LocationArea = {
+interface LocationArea {
   circle?: { center: { latitude: number; longitude: number }; radius: number };
   rectangle?: {
     low: { latitude: number; longitude: number };
     high: { latitude: number; longitude: number };
   };
-};
+}
 
-export type LocationSearchOptions = {
+interface LocationSearchOptions {
   origin?: { latitude: number; longitude: number };
   locationRestriction?: LocationArea;
   locationBias?: LocationArea;
   includedPrimaryTypes?: ("cities" | "regions" | string)[];
-};
+}
 
-export type LocationServiceRequest = {
+interface LocationServiceRequest {
   input: string;
   origin?: { latitude: number; longitude: number };
-};
-
-export type LocationDetailRequest = {
+}
+interface LocationDetailRequest {
   placeId: string;
-};
+}
 
-export function toMiniLocation(location: LocationData): MiniLocationData {
+const toMiniLocation = (location: LocationData): MiniLocationData => {
   return {
     formattedAddress: location.address,
     geoPoint: location.geoPoint,
-    serviceLocationId: location.serviceLocationId,
   };
-}
+};
+export type {
+  LocationData,
+  MiniLocationData,
+  GeoPointData,
+  LocationPrediction,
+  LocationSearchOptions,
+  LocationServiceRequest,
+  LocationDetailRequest,
+};
+
+export {
+  toMiniLocation,
+};

@@ -27,15 +27,14 @@ requestOTPRoute.post(
     const isEmail =
       typeof phoneOrEmail === "string" &&
       ValidationsUtils.isValidEmail(phoneOrEmail);
-    const normalizedPhone =
+    const newPhone =
       typeof phoneOrEmail === "string"
         ? ValidationsUtils.getValidPhoneNumber(
             phoneOrEmail,
             String(dialCode ?? ""),
           )
         : null;
-    const isPhone =
-      typeof phoneOrEmail === "string" && normalizedPhone !== null;
+    const isPhone = typeof phoneOrEmail === "string" && newPhone !== null;
 
     if (!phoneOrEmail || (!isEmail && !isPhone)) {
       const error = API_RESPONSE.invalidAuthIdentifier;
@@ -61,7 +60,7 @@ requestOTPRoute.post(
     }
 
     const result = await AuthService.requestPhoneOTP({
-      phone: normalizedPhone!,
+      phone: newPhone!,
       type,
     });
 

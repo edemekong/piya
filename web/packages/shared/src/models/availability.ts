@@ -1,40 +1,10 @@
+import type {
+  AvailabilityIntervalType,
+  AvailabilityStatusType,
+} from "../types/availability.type";
 import type { BaseModel } from "./base";
 
-export type AvailabilityStatusType = "active" | "disabled";
-export type AvailabilityIntervalType = "available" | "blocked";
-
-export type TimeAt = {
-  hour: number;
-  minute: number;
-};
-
-export type DateAt = {
-  day: number;
-  month: number;
-  year: number;
-};
-
-export type TimezoneData = {
-  id: string;
-  name: string;
-  offsetInMilliseconds: number;
-};
-
-export type AvailabilityInterval = {
-  id: string;
-  date: DateAt;
-  startTime: TimeAt;
-  endTime: TimeAt;
-  type: AvailabilityIntervalType;
-};
-
-export type AvailableEventSlot = {
-  id: string;
-  startAt: number;
-  endAt: number;
-};
-
-export interface AvailabilityData extends BaseModel {
+interface AvailabilityData extends BaseModel {
   businessId: string;
   createdBy: string;
   name: string;
@@ -44,3 +14,38 @@ export interface AvailabilityData extends BaseModel {
   intervalMinutes: number;
   timeslots: Record<string, Record<string, AvailabilityInterval>>;
 }
+interface AvailabilityInterval {
+  id: string;
+  date: DateAt;
+  startTime: TimeAt;
+  endTime: TimeAt;
+  type: AvailabilityIntervalType;
+}
+interface AvailableEventSlot {
+  id: string;
+  startAt: number;
+  endAt: number;
+}
+interface TimeAt {
+  hour: number;
+  minute: number;
+}
+interface DateAt {
+  day: number;
+  month: number;
+  year: number;
+}
+interface TimezoneData {
+  id: string;
+  name: string;
+  offsetInMilliseconds: number;
+}
+
+export type {
+  AvailabilityData,
+  AvailabilityInterval,
+  AvailableEventSlot,
+  TimeAt,
+  DateAt,
+  TimezoneData,
+};

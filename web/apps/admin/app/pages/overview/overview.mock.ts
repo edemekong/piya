@@ -1,3 +1,5 @@
+import type { OverviewRange } from "@piya/shared/types";
+
 export const overviewTrend = [
   { label: "Mon", revenue: 420000, contacts: 18 },
   { label: "Tue", revenue: 520000, contacts: 24 },
@@ -16,9 +18,7 @@ export const overviewRangeOptions = [
   { label: "Last 30 days", value: "last_30_days" },
   { label: "Last 90 days", value: "last_90_days" },
   { label: "Lifetime", value: "lifetime" },
-] as const;
-
-export type OverviewRange = (typeof overviewRangeOptions)[number]["value"];
+] as const satisfies readonly { label: string; value: OverviewRange }[];
 
 export const communicationTrend = [
   { failed: 12, label: "Mon", opened: 310, received: 560, unsubscribed: 4 },

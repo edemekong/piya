@@ -2,13 +2,12 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@piya/ui";
 import type { ContactData } from "@piya/shared/models";
-import { getContacts } from "@piya/shared/services";
+import { useGetContactsQuery } from "@piya/shared";
 import { AddContactSheet, ContactsTable, ContactViewSheet } from "./components";
 import type { AddContactMode } from "./types";
 
-const contacts = getContacts();
-
 export function ContactsPage() {
+  const { data: contacts = [] } = useGetContactsQuery();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [contactMode, setContactMode] = React.useState<AddContactMode>("manual");
   const [selectedContact, setSelectedContact] = React.useState<ContactData | null>(null);

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya Architecture"
+  short_description: "Navigate Piya repo structure safely"
+  default_prompt: "Use $piya-architecture-navigator to choose where a Piya feature change belongs before editing."

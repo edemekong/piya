@@ -1,26 +1,18 @@
+import type {
+  ChannelProviderStatusType,
+  SMSRegistrationStatusType,
+  SMSSenderType,
+} from "../types/channel-settings.type";
+import type { Providers } from "../types/domain.type";
 import type { BaseModel } from "./base";
-import type { Providers } from "./domain";
 
-export type ChannelProviderStatusType =
-  | "not_connected"
-  | "pending"
-  | "active"
-  | "failed"
-  | "disabled";
-
-export type SMSSenderType =
-  | "shared"
-  | "alphanumeric"
-  | "phone_number"
-  | "short_code";
-
-export type SMSRegistrationStatusType =
-  | "not_required"
-  | "pending"
-  | "approved"
-  | "rejected";
-
-export type EmailChannelSettings = {
+interface ChannelSettingsData extends BaseModel {
+  businessId: string;
+  email?: EmailChannelSettings | null;
+  whatsapp?: WhatsAppChannelSettings | null;
+  sms?: SMSChannelSettings | null;
+}
+interface EmailChannelSettings {
   provider: Extract<Providers, "resend">;
   status: ChannelProviderStatusType;
   fromName: string;
@@ -30,9 +22,8 @@ export type EmailChannelSettings = {
   providerDomainId?: string | null;
   credentialReference?: string | null;
   lastError?: string | null;
-};
-
-export type WhatsAppChannelSettings = {
+}
+interface WhatsAppChannelSettings {
   provider: Extract<Providers, "whatsapp_cloud">;
   status: ChannelProviderStatusType;
   businessAccountId?: string | null;
@@ -43,9 +34,8 @@ export type WhatsAppChannelSettings = {
   qualityRating?: string | null;
   credentialReference?: string | null;
   lastError?: string | null;
-};
-
-export type SMSChannelSettings = {
+}
+interface SMSChannelSettings {
   provider: Extract<Providers, "link_mobility">;
   status: ChannelProviderStatusType;
   senderId: string;
@@ -54,11 +44,11 @@ export type SMSChannelSettings = {
   registrationStatus: SMSRegistrationStatusType;
   credentialReference?: string | null;
   lastError?: string | null;
-};
-
-export interface ChannelSettingsData extends BaseModel {
-  businessId: string;
-  email?: EmailChannelSettings | null;
-  whatsapp?: WhatsAppChannelSettings | null;
-  sms?: SMSChannelSettings | null;
 }
+
+export type {
+  ChannelSettingsData,
+  EmailChannelSettings,
+  WhatsAppChannelSettings,
+  SMSChannelSettings,
+};

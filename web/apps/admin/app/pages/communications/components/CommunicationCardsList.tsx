@@ -8,14 +8,14 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Button, cn } from "@piya/ui";
-import type { CommunicationData } from "@piya/shared/models";
+import type { CommunicationAdminData as CommunicationData } from "@piya/shared/types";
 import {
   formatDate,
   formatLabel,
   formatNumber,
   getCommunicationChannels,
   statusClassName,
-} from "../communicationUtils";
+} from "@piya/shared/utils";
 import { CommunicationChannelIcon } from "./CommunicationChannelIcon";
 
 type CommunicationCardsListProps = {

@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import type { OverviewRange } from "../overview.mock";
+import type { OverviewRange } from "@piya/shared/types";
 import { overviewRangeOptions } from "../overview.mock";
 
 type OverviewRangeSelectProps = {

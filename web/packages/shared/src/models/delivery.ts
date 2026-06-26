@@ -1,19 +1,20 @@
+import type { DeliveryStatusType } from "../types/delivery.type";
 import type { BaseModel } from "./base";
 import type { LocationData } from "./location";
 import type { MiniUserData } from "./user";
 
-export type DeliveryStatusType =
-  | "pending"
-  | "assigned"
-  | "accepted"
-  | "picked_up"
-  | "in_transit"
-  | "delivered"
-  | "cancelled"
-  | "rejected"
-  | "expired";
-
-export type LogisticsData = {
+interface DeliveryData extends BaseModel {
+  shareId?: string;
+  createdBy: MiniUserData;
+  contacts: string[];
+  assignedRider?: AssignedRider | null;
+  userLocation: LocationData;
+  logistics: LogisticsData;
+  lastDeliveryPackageId?: string;
+  deliveryPackages?: Record<string, DeliveryPackageData>;
+  metadata?: Record<string, any>;
+}
+interface LogisticsData {
   vehicleType: string;
   distanceInMeters: number;
   durationInMinutes: number;
@@ -23,25 +24,12 @@ export type LogisticsData = {
   subdeliveryTotalAmount: number;
   estimatedDeliveryAt?: number;
   chargePerKm: number;
-};
-
-export type AssignedRider = {
+}
+interface AssignedRider {
   riderId: string;
   assignedAt: number;
-};
-
-export type DeliveryStatusTypeData = {
-  current: DeliveryStatusType;
-  updatedAt: number;
-  history: Record<string, DeliveryStatusHistory>;
-};
-
-export type DeliveryStatusHistory = {
-  status: DeliveryStatusType;
-  timestamp: number;
-};
-
-export type DeliveryContactData = {
+}
+interface DeliveryContactData {
   userId?: string;
   name: string;
   phoneNumber: string;
@@ -49,33 +37,28 @@ export type DeliveryContactData = {
   note?: string;
   status: DeliveryStatusTypeData;
   location?: LocationData;
-};
-
-export type DeliveryItem = {
+}
+interface DeliveryStatusTypeData {
+  current: DeliveryStatusType;
+  updatedAt: number;
+  history: Record<string, DeliveryStatusHistory>;
+}
+interface DeliveryStatusHistory {
+  status: DeliveryStatusType;
+  timestamp: number;
+}
+interface DeliveryItem {
   itemId: string;
   category: string;
   attachmentUrls: string[];
   quantity: number;
   amount: number;
   fragile: boolean;
-};
-
-export type DeliveryPackageData = {
+}
+interface DeliveryPackageData {
   packageId: string;
   items: DeliveryItem[];
   contact?: DeliveryContactData;
-};
-
-export interface DeliveryData extends BaseModel {
-  shareId?: string;
-  createdBy: MiniUserData;
-  contacts: string[];
-  assignedRider?: AssignedRider | null;
-  userLocation: LocationData;
-  logistics: LogisticsData;
-  lastDeliveryPackageId?: string;
-  deliveryPackages?: Record<string, DeliveryPackageData>;
-  metadata?: Record<string, unknown>;
 }
 
-export type DeliveryModel = DeliveryData;
+export type { DeliveryData as DeliveryModel, LogisticsData };

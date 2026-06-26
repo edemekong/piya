@@ -8,9 +8,12 @@ import {
   TicketPercent,
 } from "lucide-react";
 import { Button, SegmentedTabs } from "@piya/ui";
-import { getDiscounts, type DiscountData } from "@piya/shared/services";
-import { getGifts, type GiftData } from "@piya/shared/services";
-import { getOfferings, type OfferingData } from "@piya/shared/services";
+import {
+  useGetDiscountsQuery,
+  useGetGiftsQuery,
+  useGetOfferingsQuery,
+} from "@piya/shared";
+import type { DiscountData, GiftData, OfferingData } from "@piya/shared/models";
 import {
   DiscountEditorSheet,
   DiscountsTable,
@@ -22,10 +25,6 @@ import {
 
 type MainTab = "offerings" | "discounts" | "gifts";
 type EditorMode = "create" | "edit";
-
-const initialOfferings = getOfferings();
-const initialDiscounts = getDiscounts();
-const initialGifts = getGifts();
 
 const mainTabs = [
   {
@@ -46,12 +45,15 @@ const mainTabs = [
 ] satisfies { icon: React.ReactNode; label: string; value: MainTab }[];
 
 export function OfferingPage() {
+  const { data: queriedDiscounts = [] } = useGetDiscountsQuery();
+  const { data: queriedGifts = [] } = useGetGiftsQuery();
+  const { data: queriedOfferings = [] } = useGetOfferingsQuery();
   const [activeTab, setActiveTab] = React.useState<MainTab>("offerings");
   const [offerings, setOfferings] =
-    React.useState<OfferingData[]>(initialOfferings);
+    React.useState<OfferingData[]>([]);
   const [discounts, setDiscounts] =
-    React.useState<DiscountData[]>(initialDiscounts);
-  const [gifts, setGifts] = React.useState<GiftData[]>(initialGifts);
+    React.useState<DiscountData[]>([]);
+  const [gifts, setGifts] = React.useState<GiftData[]>([]);
   const [offeringEditorMode, setOfferingEditorMode] =
     React.useState<EditorMode>("create");
   const [discountEditorMode, setDiscountEditorMode] =
@@ -66,6 +68,18 @@ export function OfferingPage() {
   const [selectedDiscount, setSelectedDiscount] =
     React.useState<DiscountData | null>(null);
   const [selectedGift, setSelectedGift] = React.useState<GiftData | null>(null);
+
+  React.useEffect(() => {
+    setOfferings(queriedOfferings);
+  }, [queriedOfferings]);
+
+  React.useEffect(() => {
+    setDiscounts(queriedDiscounts);
+  }, [queriedDiscounts]);
+
+  React.useEffect(() => {
+    setGifts(queriedGifts);
+  }, [queriedGifts]);
 
   function openCreateSheet() {
     if (activeTab === "discounts") {

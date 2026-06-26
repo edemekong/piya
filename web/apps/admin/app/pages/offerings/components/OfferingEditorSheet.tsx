@@ -15,18 +15,18 @@ import {
   SegmentedTabs,
   cn,
 } from "@piya/ui";
+import type { OfferingData } from "@piya/shared/models";
 import type {
-  OfferingData,
+  OfferingFormDraft,
   OfferingSubType,
   OfferingType,
-} from "@piya/shared/services";
+} from "@piya/shared/types";
 import {
   createEmptyOfferingDraft,
   createOfferingDraft,
   draftToOffering,
   formatOfferingLabel,
-  type OfferingFormDraft,
-} from "./offeringForm";
+} from "@piya/shared/utils";
 
 type EditorMode = "create" | "edit";
 type EditorTab = "manual" | "ai";

@@ -1,23 +1,32 @@
-export type IDType =
-  | "national_identity_number"
-  | "driver_license"
-  | "passport"
-  | "vehicle_registration"
-  | "corporate_affairs_commission"
-  | "proof_of_address";
+import type { DocumentStatusType, IDType } from "../types/document.type";
 
-export type DocumentStatusType = "processing" | "verified" | "failed";
-
-export type NationalIDData = {
+interface UserDocumentData {
+  id: string;
+  type: IDType;
+  createdBy: string;
+  userId?: string;
+  metaData?: { [key: string]: any };
+  documentData:
+    | NationalIDData
+    | DriverLicenseData
+    | PassportData
+    | VehicleRegistrationData
+    | ProofOfAddressData;
+  status: DocumentStatusType;
+  verificationData: { [key: string]: any };
+  verifiedAt?: number;
+  createdAt: number;
+  updatedAt: number;
+}
+interface NationalIDData {
   fullName: string;
   dateOfBirth: string;
   number: string;
   nationality: string;
   frontImageUrl: string;
   backImageUrl?: string | null;
-};
-
-export type DriverLicenseData = {
+}
+interface DriverLicenseData {
   fullName: string;
   dateOfBirth: string;
   number: string;
@@ -25,9 +34,8 @@ export type DriverLicenseData = {
   nationality: string;
   frontImageUrl: string;
   backImageUrl?: string | null;
-};
-
-export type PassportData = {
+}
+interface PassportData {
   fullName: string;
   dateOfBirth: string;
   number: string;
@@ -35,9 +43,8 @@ export type PassportData = {
   expiryDate: string;
   frontImageUrl: string;
   backImageUrl?: string | null;
-};
-
-export type VehicleRegistrationData = {
+}
+interface VehicleRegistrationData {
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
@@ -45,9 +52,8 @@ export type VehicleRegistrationData = {
   registrationNumber: string;
   ownerName: string;
   registrationDocument: string | null;
-};
-
-export type ProofOfAddressData = {
+}
+interface ProofOfAddressData {
   addressLine1: string;
   addressLine2?: string;
   landmark?: string;
@@ -57,23 +63,13 @@ export type ProofOfAddressData = {
   country: string;
   nationality: string;
   billUrl: string | null;
-};
+}
 
-export type UserDocumentData = {
-  id: string;
-  type: IDType;
-  createdBy: string;
-  userId?: string;
-  metaData?: Record<string, unknown>;
-  documentData:
-    | NationalIDData
-    | DriverLicenseData
-    | PassportData
-    | VehicleRegistrationData
-    | ProofOfAddressData;
-  status: DocumentStatusType;
-  verificationData: Record<string, unknown>;
-  verifiedAt?: number;
-  createdAt: number;
-  updatedAt: number;
+export type {
+  UserDocumentData,
+  NationalIDData,
+  DriverLicenseData,
+  PassportData,
+  VehicleRegistrationData,
+  ProofOfAddressData,
 };

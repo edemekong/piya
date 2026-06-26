@@ -19,7 +19,7 @@ import {
   getItemCountLabel,
   getPrimaryOrderType,
   isTrackableOrder,
-} from "./orderUtils";
+} from "@piya/shared/utils";
 
 type OrdersTableProps = {
   orders: OrderData[];

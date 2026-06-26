@@ -14,7 +14,7 @@ export type RewardType =
   | "gift_card_grant"
   | "custom_perk";
 
-export type RewardMetadata = {
+export type DiscountRewardMetadata = {
   buyQuantity?: number;
   getQuantity?: number;
   applicableIds?: string[];
@@ -26,7 +26,7 @@ export type DiscountReward = {
   type: RewardType;
   value: number;
   maxDiscountAmount?: number | null;
-  metadata?: RewardMetadata | null;
+  metadata?: DiscountRewardMetadata | null;
 };
 
 export type DiscountRules = {

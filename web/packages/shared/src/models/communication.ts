@@ -1,78 +1,14 @@
+import type {
+  CommunicationEventType,
+  CommunicationFrequency,
+} from "../types/communication.type";
 import type { BaseModel } from "./base";
 
-export type CommunicationEventType =
-  | "onboarding"
-  | "birthday_congrats"
-  | "anniversary_milestone"
-  | "badge_upgraded"
-  | "win_back_inactive"
-  | "marketing_broadcast"
-  | "discount_alert";
-
-export type CommunicationFrequency =
-  | "once"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "cron";
-
-export type CommunicationChannel = "email" | "sms" | "whatsapp";
-
-export type CommunicationStatus = "active" | "paused" | "draft";
-
-export type CommunicationSchedule = {
-  frequency: CommunicationFrequency;
-  dayOfWeek: number;
-  hour: number;
-  minute: number;
-  startDate: number;
-  timezone: string;
-};
-
-export type CommunicationMessage = {
-  subject?: string | null;
-  body: string;
-};
-
-export type CommunicationCTA = {
-  label: string;
-  url: string;
-  type: string;
-};
-
-export type CommunicationTemplate = {
-  providerTemplateId?: string | null;
-  name: string;
-  language?: string | null;
-  variables?: Record<string, string> | null;
-};
-
-export type CommunicationStep = {
-  channel: CommunicationChannel;
-  identityId?: string | null;
-  delay: number;
-  message: CommunicationMessage;
-  ctas: CommunicationCTA[];
-  template?: CommunicationTemplate | null;
-};
-
-export type CommunicationTrigger = {
-  type: CommunicationEventType;
-  schedule?: CommunicationSchedule | null;
-};
-
-export type AudienceFilter = {
-  targetTags?: string[];
-  targetBadgeTypes?: string[];
-  segmentQuery?: Record<string, unknown>;
-};
-
-export interface CommunicationData extends BaseModel {
+interface CommunicationData extends BaseModel {
   name: string;
   businessId: string;
   createdBy: string;
   isActive: boolean;
-  status: CommunicationStatus;
   type: CommunicationEventType;
   hasPendingBatch: boolean;
   lastExecutedAt?: number | null;
@@ -81,22 +17,55 @@ export interface CommunicationData extends BaseModel {
   stepsOrder: string[];
   trigger: CommunicationTrigger;
   targetAudience?: AudienceFilter | null;
-  stats: {
-    recipients: number;
-    delivered: number;
-    failed: number;
-    pending: number;
-  };
+}
+interface CommunicationStep {
+  channel: CommunicationSchedule;
+  identityId?: string | null;
+  delay: number;
+  message: CommunicationMessage;
+  ctas: CommunicationCTA[];
+  template?: CommunicationTemplate | null;
+}
+interface CommunicationTemplate {
+  providerTemplateId?: string | null;
+  name: string;
+  language?: string | null;
+  variables?: Record<string, string> | null;
+}
+interface CommunicationTrigger {
+  type: CommunicationEventType;
+  schedule?: CommunicationSchedule | null;
+}
+interface CommunicationSchedule {
+  frequency: CommunicationFrequency;
+  dayOfWeek: number;
+  hour: number;
+  minute: number;
+  startDate: number;
+  timezone: string;
+}
+interface CommunicationMessage {
+  subject?: string | null;
+  body: string;
+}
+interface CommunicationCTA {
+  label: string;
+  url: string;
+  type: string;
+}
+interface AudienceFilter {
+  targetTags?: string[];
+  targetBadgeTypes?: string[];
+  segmentQuery?: Record<string, any>;
 }
 
-export type CommunicationRecipient = {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  status: "pending" | "delivered" | "failed";
-  channel: CommunicationChannel;
-  lastActivityAt: number;
+export type {
+  CommunicationData,
+  CommunicationStep,
+  CommunicationTemplate,
+  CommunicationTrigger,
+  CommunicationSchedule,
+  CommunicationMessage,
+  CommunicationCTA,
+  AudienceFilter,
 };
-
-export type CommunicationEditorMode = "create" | "edit";

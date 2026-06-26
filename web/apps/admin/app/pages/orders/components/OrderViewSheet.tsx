@@ -9,7 +9,7 @@ import {
   getItemCountLabel,
   getPrimaryOrderType,
   isTrackableOrder,
-} from "./orderUtils";
+} from "@piya/shared/utils";
 
 type OrderViewSheetProps = {
   onClose: () => void;

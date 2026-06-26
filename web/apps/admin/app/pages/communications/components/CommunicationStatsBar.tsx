@@ -1,5 +1,5 @@
 import { Activity, CirclePause, Send } from "lucide-react";
-import { formatNumber } from "../communicationUtils";
+import { formatNumber } from "@piya/shared/utils";
 
 type CommunicationStatsBarProps = {
   stats: {

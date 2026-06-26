@@ -1,14 +1,13 @@
 import * as React from "react";
 import { ListFilter, Plus, Search } from "lucide-react";
 import { Button } from "@piya/ui";
-import type { ContactData } from "@piya/shared/models";
-import type { OrderData } from "@piya/shared/models";
-import { getContacts } from "@piya/shared/services";
 import {
-  getOfferings,
-  type OfferingData,
-} from "@piya/shared/services";
-import { getOrders } from "@piya/shared/services";
+  useGetContactsQuery,
+  useGetOfferingsQuery,
+  useGetOrdersQuery,
+} from "@piya/shared";
+import type { ContactData } from "@piya/shared/models";
+import type { OfferingData, OrderData } from "@piya/shared/models";
 import {
   ContactViewSheet,
   type ContactViewParentTab,
@@ -20,14 +19,13 @@ import {
   OrdersTable,
   OrderViewSheet,
 } from "./components";
-import { getOrderFulfillment } from "./components/orderUtils";
-
-const initialOrders = getOrders();
-const contacts = getContacts();
-const offerings = getOfferings();
+import { getOrderFulfillment } from "@piya/shared/utils";
 
 export function OrdersPage() {
-  const [orders, setOrders] = React.useState<OrderData[]>(initialOrders);
+  const { data: queriedContacts = [] } = useGetContactsQuery();
+  const { data: queriedOfferings = [] } = useGetOfferingsQuery();
+  const { data: queriedOrders = [] } = useGetOrdersQuery();
+  const [orders, setOrders] = React.useState<OrderData[]>([]);
   const [isCreateSheetOpen, setIsCreateSheetOpen] = React.useState(false);
   const [selectedOrder, setSelectedOrder] = React.useState<OrderData | null>(null);
   const [selectedContact, setSelectedContact] =
@@ -37,6 +35,10 @@ export function OrdersPage() {
   const [contactSheetTab, setContactSheetTab] =
     React.useState<ContactViewParentTab>("overview");
 
+  React.useEffect(() => {
+    setOrders(queriedOrders);
+  }, [queriedOrders]);
+
   function handleCreateOrder(order: OrderData) {
     setOrders((current) => [order, ...current]);
   }
@@ -45,7 +47,7 @@ export function OrdersPage() {
     order: OrderData,
     initialTab: ContactViewParentTab = "overview",
   ) {
-    const existingContact = contacts.find(
+    const existingContact = queriedContacts.find(
       (contact) => contact.id === order.contact.id,
     );
     setContactSheetTab(initialTab);
@@ -53,7 +55,7 @@ export function OrdersPage() {
   }
 
   function handleItemSelect(offeringId?: string) {
-    const offering = offerings.find((item) => item.id === offeringId);
+    const offering = queriedOfferings.find((item) => item.id === offeringId);
     if (offering) setSelectedOffering(offering);
   }
 

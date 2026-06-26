@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya API Services"
+  short_description: "Write shared API service adapters"
+  default_prompt: "Use $piya-api-service-writer to add a Piya shared service method backed by a backend endpoint."

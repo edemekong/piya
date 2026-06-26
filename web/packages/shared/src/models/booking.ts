@@ -1,30 +1,30 @@
+import type {
+  BookingParticipantRoleType,
+  BookingParticipantStatusType,
+  BookingParticipantType,
+  BookingStatusType,
+} from "../types/booking.type";
+import type { ServiceType } from "../types/service.type";
 import type { BaseModel } from "./base";
 import type { TimezoneData } from "./availability";
-import type { OfferingType } from "./offering";
 
-export type BookingStatusType =
-  | "pending"
-  | "confirmed"
-  | "cancelled"
-  | "completed"
-  | "no_show";
-
-export type BookingParticipantType = "contact" | "team_member" | "guest";
-export type BookingParticipantRoleType = "host" | "attendee";
-export type BookingParticipantStatusType =
-  | "pending"
-  | "accepted"
-  | "declined"
-  | "cancelled";
-
-export type MiniServiceData = {
+interface BookingData extends BaseModel {
+  businessId: string;
+  availabilityId?: string | null;
+  createdBy: string;
+  service: MiniServiceData;
+  participants: BookingParticipant[];
+  status: BookingStatusType;
+  when: BookingTimeData;
+  metadata?: Record<string, any> | null;
+}
+interface MiniServiceData {
   id: string;
   name: string;
-  type: OfferingType;
+  type: ServiceType;
   duration?: number | null;
-};
-
-export type BookingParticipant = {
+}
+interface BookingParticipant {
   contactId?: string | null;
   userId?: string | null;
   name: string;
@@ -35,21 +35,11 @@ export type BookingParticipant = {
   status: BookingParticipantStatusType;
   comment?: string | null;
   timezone?: TimezoneData | null;
-};
-
-export type BookingTimeData = {
+}
+interface BookingTimeData {
   startAt: number;
   endAt: number;
   timezone: TimezoneData;
-};
-
-export interface BookingData extends BaseModel {
-  businessId: string;
-  availabilityId?: string | null;
-  createdBy: string;
-  service: MiniServiceData;
-  participants: BookingParticipant[];
-  status: BookingStatusType;
-  when: BookingTimeData;
-  metadata?: Record<string, unknown> | null;
 }
+
+export type { BookingData, MiniServiceData, BookingParticipant, BookingTimeData };

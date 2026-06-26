@@ -1,0 +1,4 @@
+interface:
+  display_name: "Piya State Management"
+  short_description: "Choose local, Redux, or RTK Query state"
+  default_prompt: "Use $piya-state-management to decide where state belongs for a Piya admin workflow."

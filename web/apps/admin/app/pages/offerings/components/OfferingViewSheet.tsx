@@ -1,6 +1,6 @@
 import { AppSheet, Badge } from "@piya/ui";
-import type { OfferingData } from "@piya/shared/services";
-import { formatOfferingLabel } from "./offeringForm";
+import type { OfferingData } from "@piya/shared/models";
+import { formatOfferingLabel } from "@piya/shared/utils";
 
 type OfferingViewSheetProps = {
   offering: OfferingData | null;
@@ -72,7 +72,7 @@ export function OfferingViewSheet({
                   "Not set"
                 }
               />
-              <Detail label="Image URL" value={offering.imageUrl ?? "Not set"} />
+              <Detail label="Image URL" value={offering.imageUrls?.[0] ?? "Not set"} />
             </>
           )}
           <Detail label="Tags" value={offering.tags.join(", ") || "Not set"} />

@@ -1,6 +1,6 @@
 import type { BaseModel } from "./base";
 
-export type OrderItemType =
+type OrderItemType =
   | "physical"
   | "digital"
   | "consultation"
@@ -11,7 +11,7 @@ export type OrderItemType =
   | "delivery"
   | "pickup";
 
-export type OrderStatus =
+type OrderStatus =
   | "draft"
   | "pending"
   | "confirmed"
@@ -21,16 +21,16 @@ export type OrderStatus =
   | "cancelled"
   | "archived";
 
-export type OrderPaymentStatus = "unpaid" | "paid" | "refunded" | "partial";
+type OrderPaymentStatus = "unpaid" | "paid" | "refunded" | "partial";
 
-export type OrderContact = {
+type OrderContact = {
   id: string;
   name: string;
   email?: string;
   phoneNumber?: string;
 };
 
-export type OrderFulfillmentDetails = {
+type OrderFulfillmentDetails = {
   address: string;
   city: string;
   state: string;
@@ -41,7 +41,7 @@ export type OrderFulfillmentDetails = {
   estimatedDeliveryAt?: number;
 };
 
-export type OrderItemBase = {
+type OrderItemBase = {
   id: string;
   offeringId?: string;
   name: string;
@@ -51,37 +51,37 @@ export type OrderItemBase = {
   metadata?: Record<string, string | number | boolean>;
 };
 
-export type PhysicalOrderItem = OrderItemBase & {
+type PhysicalOrderItem = OrderItemBase & {
   type: "physical";
   fulfillment?: OrderFulfillmentDetails;
 };
 
-export type DigitalOrderItem = OrderItemBase & {
+type DigitalOrderItem = OrderItemBase & {
   type: "digital";
   downloadUrl?: string;
 };
 
-export type ConsultationOrderItem = OrderItemBase & {
+type ConsultationOrderItem = OrderItemBase & {
   type: "consultation" | "consultation_online";
   seatCount?: number;
   sessionCount?: number;
 };
 
-export type EventOrderItem = OrderItemBase & {
+type EventOrderItem = OrderItemBase & {
   type: "event" | "event_online";
   attendeeCount?: number;
 };
 
-export type DigitalServiceOrderItem = OrderItemBase & {
+type DigitalServiceOrderItem = OrderItemBase & {
   type: "digital_service";
 };
 
-export type DeliveryOrderItem = OrderItemBase & {
+type DeliveryOrderItem = OrderItemBase & {
   type: "delivery" | "pickup";
   fulfillment: OrderFulfillmentDetails;
 };
 
-export type OrderItem =
+type OrderItem =
   | PhysicalOrderItem
   | DigitalOrderItem
   | ConsultationOrderItem
@@ -89,7 +89,7 @@ export type OrderItem =
   | DigitalServiceOrderItem
   | DeliveryOrderItem;
 
-export interface OrderData extends BaseModel {
+interface OrderData extends BaseModel {
   shareId: string;
   businessId: string;
   contact: OrderContact;
@@ -101,3 +101,20 @@ export interface OrderData extends BaseModel {
   items: OrderItem[];
   notes?: string;
 }
+
+export type {
+  ConsultationOrderItem,
+  DeliveryOrderItem,
+  DigitalOrderItem,
+  DigitalServiceOrderItem,
+  EventOrderItem,
+  OrderContact,
+  OrderData,
+  OrderFulfillmentDetails,
+  OrderItem,
+  OrderItemBase,
+  OrderItemType,
+  OrderPaymentStatus,
+  OrderStatus,
+  PhysicalOrderItem,
+};

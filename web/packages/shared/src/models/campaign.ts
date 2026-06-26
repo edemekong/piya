@@ -1,33 +1,12 @@
+import type {
+  CampaignStatusType,
+  CampaignType,
+  RewardType,
+} from "../types/campaign.type";
+import type { ContactBadgeType } from "../types/contact.type";
 import type { BaseModel } from "./base";
-import type { ContactBadgeType } from "./contact";
-import type { RewardType } from "./discount";
 
-export type CampaignType = "loyalty" | "discount";
-export type CampaignStatusType = "draft" | "active" | "paused" | "expired";
-
-export type CampaignRewardMetadata = {
-  buyQuantity?: number;
-  getQuantity?: number;
-  giftId?: string;
-  customPerkDescription?: string;
-};
-
-export type CampaignReward = {
-  type: RewardType;
-  value: number;
-  maxDiscountAmount?: number | null;
-  metadata?: CampaignRewardMetadata | null;
-};
-
-export type CampaignRules = {
-  minimumOrderValue?: number | null;
-  targetBadgeTypes?: ContactBadgeType[] | null;
-  targetTags?: string[] | null;
-  maxUsesPerContact: number;
-  totalUsageLimit?: number | null;
-};
-
-export interface CampaignData extends BaseModel {
+interface CampaignData extends BaseModel {
   businessId: string;
   createdBy: string;
   title: string;
@@ -40,3 +19,25 @@ export interface CampaignData extends BaseModel {
   startsAt: number;
   endsAt?: number | null;
 }
+interface CampaignReward {
+  type: RewardType;
+  value: number;
+  maxDiscountAmount?: number | null;
+  metadata?: RewardMetadata | null;
+}
+interface RewardMetadata {
+  buyQuantity?: number;
+  getQuantity?: number;
+  giftId?: string;
+  customPerkDescription?: string;
+}
+interface CampaignRules {
+  
+  minimumOrderValue?: number | null;
+  targetBadgeTypes?: ContactBadgeType[] | null;
+  targetTags?: string[] | null;
+  maxUsesPerContact: number;
+  totalUsageLimit?: number | null;
+}
+
+export type { CampaignData, CampaignReward, RewardMetadata, CampaignRules };

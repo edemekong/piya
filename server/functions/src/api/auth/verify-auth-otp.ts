@@ -19,35 +19,25 @@ verifyAuthOTPRoute.post(
   OptionalAuthMiddleware,
   asyncHandler(async (req, res) => {
     const { phoneOrEmail, code, dialCode } = req.body;
-    const normalizedPhone =
+    const newPhone =
       typeof phoneOrEmail === "string"
         ? ValidationsUtils.getValidPhoneNumber(phoneOrEmail, dialCode)
         : null;
-    const isPhone = normalizedPhone !== null;
+    const isPhone = newPhone !== null;
     const isEmail = ValidationsUtils.isValidEmail(phoneOrEmail);
 
     if (!phoneOrEmail || (!isPhone && !isEmail)) {
       const error = API_RESPONSE.invalidAuthIdentifier;
-      return ErrorResult(
-        res,
-        error.statusCode,
-        error.message,
-        error.code,
-      );
+      return ErrorResult(res, error.statusCode, error.message, error.code);
     }
 
     if (!code || code.length < 4) {
       const error = API_RESPONSE.invalidOTP;
-      return ErrorResult(
-        res,
-        error.statusCode,
-        error.message,
-        error.code,
-      );
+      return ErrorResult(res, error.statusCode, error.message, error.code);
     }
 
     const result = await AuthService.verifyAuthOTP({
-      phoneOrEmail: isPhone ? normalizedPhone! : phoneOrEmail,
+      phoneOrEmail: isPhone ? newPhone! : phoneOrEmail,
       code,
       isPhone,
       linkToUid: req.currentUser?.uid,
@@ -61,13 +51,8 @@ verifyAuthOTPRoute.post(
             ? API_RESPONSE.phoneAlreadyInUse
             : result.reason === VERIFY_AUTH_OTP_REASON.emailInUse
               ? API_RESPONSE.emailAlreadyInUse
-            : API_RESPONSE.otpInvalid;
-      return ErrorResult(
-        res,
-        error.statusCode,
-        error.message,
-        error.code,
-      );
+              : API_RESPONSE.otpInvalid;
+      return ErrorResult(res, error.statusCode, error.message, error.code);
     }
 
     const response = API_RESPONSE.authSuccessful;

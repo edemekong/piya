@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Megaphone } from "lucide-react";
 import { Button } from "@piya/ui";
-import { getContacts } from "@piya/shared/services";
+import { useGetContactsQuery } from "@piya/shared";
 import { CommunicationEditorSheet } from "@/pages/communications/components";
 import {
   CommunicationTrendChart,
@@ -13,9 +13,8 @@ import {
   RecentOrders,
 } from "./components";
 
-const contacts = getContacts();
-
 export function OverviewPage() {
+  const { data: contacts = [] } = useGetContactsQuery();
   const [isCommunicationSheetOpen, setIsCommunicationSheetOpen] =
     React.useState(false);
 

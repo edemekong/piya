@@ -1,10 +1,11 @@
+import type { CommunicationData } from "../models";
 import type {
+  CommunicationAdminData,
   CommunicationChannel,
-  CommunicationData,
   CommunicationEventType,
   CommunicationFrequency,
   CommunicationStatus,
-} from "@piya/shared/models";
+} from "../types";
 
 export const CHANNEL_OPTIONS: CommunicationChannel[] = [
   "email",
@@ -83,34 +84,6 @@ export const COMMUNICATION_VARIABLES = [
   "{{app.name}}",
 ];
 
-export function formatLabel(value: string) {
-  return value
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-export function formatDate(timestamp?: number | null) {
-  if (!timestamp) return "Not yet";
-
-  return new Intl.DateTimeFormat("en", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(timestamp);
-}
-
-export function formatTime(timestamp: number) {
-  return new Intl.DateTimeFormat("en", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(timestamp);
-}
-
-export function formatNumber(value: number) {
-  return new Intl.NumberFormat("en").format(value);
-}
-
 export function formatDelay(minutes: number) {
   if (minutes <= 0) return "Send immediately";
   if (minutes <= 60) return `Delay ${minutes} ${minutes === 1 ? "min" : "mins"}`;
@@ -126,7 +99,7 @@ export function formatDelay(minutes: number) {
   return `Delay ${formattedDays} ${formattedDays === 1 ? "day" : "days"}`;
 }
 
-export function statusClassName(status: CommunicationStatus) {
+export function communicationStatusClassName(status: CommunicationStatus) {
   if (status === "active") {
     return "border-success/20 bg-success/10 text-success";
   }
@@ -138,10 +111,14 @@ export function statusClassName(status: CommunicationStatus) {
   return "border-border bg-fill text-[#2F4B4F]/65";
 }
 
-export function getPrimaryStep(communication: CommunicationData) {
+export const statusClassName = communicationStatusClassName;
+
+export function getPrimaryStep(
+  communication: CommunicationAdminData | CommunicationData,
+) {
   return communication.steps[communication.stepsOrder[0]];
 }
 
-export function getCommunicationChannels(communication: CommunicationData) {
+export function getCommunicationChannels(communication: CommunicationAdminData) {
   return communication.stepsOrder.map((stepId) => communication.steps[stepId].channel);
 }

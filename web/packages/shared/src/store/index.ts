@@ -1,4 +1,14 @@
 export {
+  domainApi,
+  useGetCommunicationRecipientsQuery,
+  useGetCommunicationsQuery,
+  useGetContactsQuery,
+  useGetDiscountsQuery,
+  useGetGiftsQuery,
+  useGetOfferingsQuery,
+  useGetOrdersQuery,
+} from "./domain-api";
+export {
   makeAppStore,
   rootReducer,
   type AppDispatch,

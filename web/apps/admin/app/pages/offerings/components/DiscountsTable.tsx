@@ -1,11 +1,11 @@
 import * as React from "react";
 import { CalendarDays, MoreVertical, Pencil, TicketPercent, Trash2 } from "lucide-react";
 import { cn } from "@piya/ui";
-import type { DiscountData } from "@piya/shared/services";
+import type { DiscountData } from "@piya/shared/models";
 import {
   formatDiscountDate,
   formatDiscountLabel,
-} from "./discountForm";
+} from "@piya/shared/utils";
 
 type DiscountsTableProps = {
   discounts: DiscountData[];

@@ -2,28 +2,11 @@ import type {
   OrderData,
   OrderFulfillmentDetails,
   OrderItem,
-} from "@piya/shared/models";
+} from "../models";
+import { formatEnumLabel } from "./format";
 
 export function formatOrderLabel(value: string) {
-  return value
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-export function formatMoney(value: number, currency: string) {
-  return new Intl.NumberFormat("en-NG", {
-    currency,
-    style: "currency",
-  }).format(value);
-}
-
-export function formatDate(timestamp: number) {
-  return new Intl.DateTimeFormat("en", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(timestamp);
+  return formatEnumLabel(value);
 }
 
 export function getItemCountLabel(order: OrderData) {

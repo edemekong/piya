@@ -8,8 +8,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { Badge, cn } from "@piya/ui";
-import type { OfferingData } from "@piya/shared/services";
-import { formatOfferingLabel } from "./offeringForm";
+import type { OfferingData } from "@piya/shared/models";
+import { formatOfferingLabel } from "@piya/shared/utils";
 
 type OfferingsTableProps = {
   offerings: OfferingData[];
@@ -79,7 +79,7 @@ export function OfferingsTable({
 }
 
 function OfferingImage({ offering }: { offering: OfferingData }) {
-  const imageUrl = offering.imageUrl ?? offering.imageUrls?.[0];
+  const imageUrl = offering.imageUrls?.[0];
 
   return imageUrl ? (
     <img

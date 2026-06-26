@@ -2,13 +2,13 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@piya/ui";
 import {
-  getCommunicationRecipients,
-  getCommunications,
-} from "@piya/shared/services";
+  useGetCommunicationRecipientsQuery,
+  useGetCommunicationsQuery,
+} from "@piya/shared";
 import type {
-  CommunicationData,
+  CommunicationAdminData as CommunicationData,
   CommunicationEditorMode,
-} from "@piya/shared/models";
+} from "@piya/shared/types";
 import {
   CommunicationCardsList,
   CommunicationEditorSheet,
@@ -17,11 +17,10 @@ import {
   CommunicationViewSheet,
 } from "./components";
 
-const initialCommunications = getCommunications();
-
 export function CommunicationsPage() {
+  const { data: queriedCommunications = [] } = useGetCommunicationsQuery();
   const [communications, setCommunications] =
-    React.useState<CommunicationData[]>(initialCommunications);
+    React.useState<CommunicationData[]>([]);
   const [editorMode, setEditorMode] =
     React.useState<CommunicationEditorMode>("create");
   const [isEditorOpen, setIsEditorOpen] = React.useState(false);
@@ -31,6 +30,14 @@ export function CommunicationsPage() {
     React.useState<CommunicationData | null>(null);
   const [recipientsCommunication, setRecipientsCommunication] =
     React.useState<CommunicationData | null>(null);
+  const { data: recipients = [] } = useGetCommunicationRecipientsQuery(
+    recipientsCommunication?.id ?? "",
+    { skip: !recipientsCommunication },
+  );
+
+  React.useEffect(() => {
+    setCommunications(queriedCommunications);
+  }, [queriedCommunications]);
 
   const stats = React.useMemo(
     () => ({
@@ -44,10 +51,6 @@ export function CommunicationsPage() {
     }),
     [communications],
   );
-
-  const recipients = recipientsCommunication
-    ? getCommunicationRecipients(recipientsCommunication.id)
-    : [];
 
   function openCreateEditor() {
     setEditorMode("create");

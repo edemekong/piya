@@ -15,15 +15,3 @@ export type GiftData = {
   imageUrl?: string | null;
   tags: string[];
 };
-
-export type GiftDraft = {
-  currency: string;
-  description: string;
-  estimatedValue: string;
-  imageUrl: string;
-  maxPerContact: string;
-  name: string;
-  quantityAvailable: string;
-  status: GiftStatusType;
-  tags: string;
-};

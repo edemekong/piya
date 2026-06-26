@@ -1,5 +1,2 @@
-export const appConfig = {
-  name: "Piya",
-  adminName: "Piya",
-  portalName: "Piya Portal",
-};
+export { appConfig, assertConfigured } from "./app-config";
+export { URLController } from "./url-controller";

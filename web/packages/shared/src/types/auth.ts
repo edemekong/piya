@@ -29,6 +29,12 @@ export type RequestPhoneOTPParams = {
   type: OTPRequestType;
 };
 
+export type RequestOTPBody = {
+  phoneOrEmail: string;
+  dialCode?: string;
+  type?: OTPRequestType;
+};
+
 export type RequestOTPResult = {
   sent: boolean;
   error?: string;

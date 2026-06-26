@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { OverviewRange } from "../overview.mock";
+import type { OverviewRange } from "@piya/shared/types";
 import { communicationTrend } from "../overview.mock";
 import { OverviewRangeSelect } from "./OverviewRangeSelect";
 

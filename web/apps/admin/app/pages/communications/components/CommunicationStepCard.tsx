@@ -1,13 +1,16 @@
 import * as React from "react";
 import { Code2, Link2, Mail, Timer, Trash2 } from "lucide-react";
 import { Button, cn } from "@piya/ui";
-import type { CommunicationChannel, CommunicationStep } from "@piya/shared/models";
+import type {
+  CommunicationAdminStep as CommunicationStep,
+  CommunicationChannel,
+} from "@piya/shared/types";
 import {
   CHANNEL_OPTIONS,
   COMMUNICATION_VARIABLES,
   formatDelay,
   formatLabel,
-} from "../communicationUtils";
+} from "@piya/shared/utils";
 import { CommunicationChannelIcon } from "./CommunicationChannelIcon";
 
 type CommunicationStepCardProps = {

@@ -8,8 +8,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { OverviewRange } from "@piya/shared/types";
 import { formatMoney } from "@piya/shared/utils";
-import type { OverviewRange } from "../overview.mock";
 import { overviewTrend } from "../overview.mock";
 import { OverviewRangeSelect } from "./OverviewRangeSelect";
 
