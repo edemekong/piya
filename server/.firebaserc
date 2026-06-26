@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "getpiyaapp"
+    "prod": "getpiyaapp"
   },
   "targets": {},
   "etags": {}

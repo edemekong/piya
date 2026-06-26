@@ -22,11 +22,19 @@ corepack pnpm dev:portal
 
 ## Railway
 
-Create separate Railway services for admin and portal from the same repo.
+Create separate Railway services for admin and portal from the same repo. The checked-in
+`railway.toml` deploys the admin app.
 
 Use `web` as the service root directory.
 
 Admin service:
+
+```sh
+railway link
+pnpm deploy:admin
+```
+
+Railway config:
 
 ```sh
 Build Command: pnpm build:admin

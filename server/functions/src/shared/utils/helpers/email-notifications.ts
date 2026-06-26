@@ -1,10 +1,11 @@
+import { finalConfiguration } from "../../../configs/configurations";
 import { resendEmailClient } from "../../../configs/resend";
 
 export async function sendEmailTo({
   emails,
   subject,
   html,
-  from = "Piya App",
+  from = "Piya",
   fromEmailUserID = "piya",
 }: {
   emails: string[];
@@ -14,13 +15,17 @@ export async function sendEmailTo({
   fromEmailUserID?: string;
 }): Promise<boolean> {
   try {
-    const mailDomain = `resend.dev`;
+    const { DOMAIN: APP_DOMAIN } = finalConfiguration();
+    const DOMAIN = `mail.${APP_DOMAIN}`;
+
+    const fromName = from
+      ? `${from} <${fromEmailUserID}@${DOMAIN}>`
+      : `${fromEmailUserID}@${DOMAIN}`;
+
     const { data: emailData, error } = await resendEmailClient().emails.send({
-      from: from
-        ? `${from} <${fromEmailUserID}@${mailDomain}>`
-        : `${fromEmailUserID}@${mailDomain}`,
+      from: fromName,
       to: emails,
-      replyTo: `support@${mailDomain}`,
+      replyTo: `support@${DOMAIN}`,
       subject: subject,
       html: html,
     });

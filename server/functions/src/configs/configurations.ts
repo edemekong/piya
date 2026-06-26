@@ -12,7 +12,8 @@ const GOOGLE_MAP_API_KEY = defineString("GOOGLE_MAP_API_KEY");
 const PREMBLY_API_KEY = defineString("PREMBLY_API_KEY");
 const PAYSTACK_SECRET_KEY = defineString("PAYSTACK_SECRET_KEY");
 const PAYSTACK_PUBLIC_KEY = defineString("PAYSTACK_PUBLIC_KEY");
-const WEB_APP_BASE_URL = defineString("WEB_APP_BASE_URL");
+const PORTAL_URL = defineString("PORTAL_URL");
+const DASHBOARD_URL = defineString("DASHBOARD_URL");
 
 const defaultAppBranding = {
   name: "Piya",
@@ -43,7 +44,8 @@ const finalConfig = {
   PAYSTACK_SECRET_KEY: undefined as string | undefined,
   PAYSTACK_PUBLIC_KEY: undefined as string | undefined,
   PAYSTACK_BASE_URL: "https://api.paystack.co" as string,
-  WEB_APP_BASE_URL: undefined as string | undefined,
+  PORTAL_URL: undefined as string | undefined,
+  DASHBOARD_URL: undefined as string | undefined,
   appBranding: defaultAppBranding,
 };
 
@@ -64,7 +66,8 @@ onInit(() => {
   finalConfig.PREMBLY_API_KEY = PREMBLY_API_KEY.value();
   finalConfig.PAYSTACK_SECRET_KEY = PAYSTACK_SECRET_KEY.value();
   finalConfig.PAYSTACK_PUBLIC_KEY = PAYSTACK_PUBLIC_KEY.value();
-  finalConfig.WEB_APP_BASE_URL = WEB_APP_BASE_URL.value();
+  finalConfig.PORTAL_URL = PORTAL_URL.value();
+  finalConfig.DASHBOARD_URL = DASHBOARD_URL.value();
 
   finalConfig.SERVICE_ACCOUNT = SERVICE_ACCOUNT;
 });

@@ -74,7 +74,7 @@ export class AuthService {
     if (shouldSendEmail) {
       await sendEmailTo({
         emails: [email],
-        subject: "Your Piya Verification Code",
+        subject: "Your Piya OTP Code",
         html: renderOTPVerificationEmail({
           userName: userRecord?.displayName || "there",
           otpCode,
