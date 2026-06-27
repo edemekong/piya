@@ -20,9 +20,7 @@ function decodeBase64Image(value: string): DecodedBase64File {
   const match = value.match(BASE64_IMAGE_PATTERN);
 
   if (!match) {
-    throw new Error(
-      "profileImage must be a JPEG, PNG, or WebP base64 data URI",
-    );
+    throw new Error("Image must be a JPEG, PNG, or WebP base64 data URI");
   }
 
   const file: DecodedBase64File = {
@@ -30,25 +28,25 @@ function decodeBase64Image(value: string): DecodedBase64File {
     buffer: Buffer.from(match[2].replace(/\s/g, ""), "base64"),
   };
 
-  validateProfileImage(file);
+  validateImage(file);
   return file;
 }
 
-function validateProfileImage(file: DecodedBase64File) {
+function validateImage(file: DecodedBase64File) {
   if (!isAllowedImageType(file.contentType)) {
-    throw new Error("Only JPEG, PNG, and WebP profile images are allowed");
+    throw new Error("Only JPEG, PNG, and WebP images are allowed");
   }
 
   if (file.buffer.length === 0) {
-    throw new Error("Profile image is empty");
+    throw new Error("Image is empty");
   }
 
   if (file.buffer.length > MAX_PROFILE_IMAGE_SIZE) {
-    throw new Error("Profile image must not exceed 5 MB");
+    throw new Error("Image must not exceed 5 MB");
   }
 
   if (!matchesImageSignature(file.buffer, file.contentType)) {
-    throw new Error("Profile image content does not match its file type");
+    throw new Error("Image content does not match its file type");
   }
 }
 
@@ -92,5 +90,5 @@ export {
   extensionForContentType,
   isAllowedImageType,
   matchesImageSignature,
-  validateProfileImage,
+  validateImage,
 };

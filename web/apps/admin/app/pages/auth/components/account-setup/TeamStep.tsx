@@ -1,14 +1,10 @@
 import { MoreVertical, Send } from "lucide-react";
-import { AppAvatar, Badge, Button } from "@piya/ui";
-import { profileMenuItems } from "../profileSections";
+import { AppAvatar, Badge, Button, SettingsCard } from "@piya/ui";
 import {
   FieldGrid,
   ProfileField,
   ProfileSelect,
-} from "../components/ProfileFields";
-import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
-
-const section = profileMenuItems.find((item) => item.value === "members")!;
+} from "@/pages/profile/components/ProfileFields";
 
 const members = [
   { email: "amara@example.com", name: "Amara Okafor", role: "Admin" },
@@ -16,16 +12,12 @@ const members = [
   { email: "maya@example.com", name: "Maya Chen", role: "Marketing" },
 ];
 
-export function MembersProfilePage() {
+function TeamStep() {
   return (
-    <ProfileSectionShell
-      description={section.description}
-      icon={section.icon}
-      title={section.label}
-    >
+    <div className="max-w-[820px] space-y-4">
       <SettingsCard
         actions={
-          <Button icon={<Send />} size="sm">
+          <Button icon={<Send />} size="sm" type="button">
             Send invite
           </Button>
         }
@@ -70,6 +62,8 @@ export function MembersProfilePage() {
           ))}
         </div>
       </SettingsCard>
-    </ProfileSectionShell>
+    </div>
   );
 }
+
+export { TeamStep };

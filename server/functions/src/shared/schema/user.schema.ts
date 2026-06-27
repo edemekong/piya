@@ -111,62 +111,13 @@ const updateUserSchema = z
     message: "At least one update field is required",
   });
 
-const accountSetupInternalFields = {
-  token: z.unknown().optional(),
-  user: z.unknown().optional(),
-};
-
-const customerAccountSetupSchema = z.object({
-    accountType: z.literal("customer"),
-    name: z.string().trim().min(1),
-    profileImage: z.string().min(1).optional(),
-    dob: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected date format YYYY-MM-DD"),
-    gender: genderSchema,
-    ...accountSetupInternalFields,
-  }).strict();
-
-const riderAccountSetupSchema = z.object({
-  accountType: z.literal("rider"),
-  name: z.string().trim().min(1),
-  dob: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected date format YYYY-MM-DD"),
-  gender: genderSchema,
-  // Rider-specific fields and document uploads will be added here.
-  ...accountSetupInternalFields,
-}).strict();
-
-const accountSetupSchema = z
-  .discriminatedUnion("accountType", [
-    customerAccountSetupSchema,
-    riderAccountSetupSchema,
-  ])
-  .transform(({ token: _token, user: _user, ...data }) => data);
-
 type CreateUserBody = z.infer<typeof createUserSchema>;
 type UpdateUserBody = z.infer<typeof updateUserSchema>;
-type AccountSetupBody = z.infer<typeof accountSetupSchema>;
-type CustomerAccountSetupBody = Extract<
-  AccountSetupBody,
-  { accountType: "customer" }
->;
-type RiderAccountSetupBody = Extract<
-  AccountSetupBody,
-  { accountType: "rider" }
->;
 
 export {
-  accountSetupSchema,
   createUserSchema,
-  customerAccountSetupSchema,
-  riderAccountSetupSchema,
   updateUserSchema,
   userSchema,
-  AccountSetupBody,
   CreateUserBody,
-  CustomerAccountSetupBody,
-  RiderAccountSetupBody,
   UpdateUserBody,
 };

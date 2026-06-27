@@ -8,6 +8,9 @@ import {
 import type { UserData } from "../models";
 import type {
   BaseAPIServiceOptions,
+  AccountSetupInput,
+  AccountSetupPayload,
+  AccountSetupStep,
   CreateUserInput,
   UpdateUserInput,
   UserPayload,
@@ -68,7 +71,28 @@ export class UserService extends BaseAPIService {
     return data.user;
   }
 
-  async getCurrentUser(uid = this.currentFirebaseUserId): Promise<UserData | null> {
+  async updateAccountSetupStep<TStep extends AccountSetupStep>(
+    step: TStep,
+    input: AccountSetupInput<TStep>,
+  ): Promise<AccountSetupPayload> {
+    return this.patch<AccountSetupPayload, AccountSetupInput<TStep>>(
+      this.urlController.accountSetup(step),
+      {
+        body: input,
+        withToken: true,
+      },
+    );
+  }
+
+  getAccountSetup(): Promise<AccountSetupPayload> {
+    return this.get<AccountSetupPayload>(this.urlController.accountSetup(), {
+      withToken: true,
+    });
+  }
+
+  async getCurrentUser(
+    uid = this.currentFirebaseUserId,
+  ): Promise<UserData | null> {
     if (!uid) return null;
 
     const snapshot = await getDoc(this.userDocument(uid));

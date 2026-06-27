@@ -109,13 +109,13 @@ export function GiftForm({
       <TextField
         label="Gift name"
         onChange={(name) => onChange({ name })}
-        placeholder="e.g. Mini Glow Serum"
+        placeholder="Enter gift name"
         value={draft.name}
       />
       <TextAreaField
         label="Description"
         onChange={(description) => onChange({ description })}
-        placeholder="Describe the gift customers receive."
+        placeholder="Enter gift description"
         value={draft.description}
       />
       <div className="grid gap-4 sm:grid-cols-2">
@@ -124,20 +124,20 @@ export function GiftForm({
           label="Estimated value"
           onChange={(estimatedValue) => onChange({ estimatedValue })}
           onCurrencyChange={(currency) => onChange({ currency })}
-          placeholder="8500"
+          placeholder="Enter estimated value"
           value={draft.estimatedValue}
         />
         <TextField
           label="Quantity available"
           onChange={(quantityAvailable) => onChange({ quantityAvailable })}
-          placeholder="120"
+          placeholder="Enter quantity available"
           type="number"
           value={draft.quantityAvailable}
         />
         <TextField
           label="Max per contact"
           onChange={(maxPerContact) => onChange({ maxPerContact })}
-          placeholder="1"
+          placeholder="Enter max per contact"
           type="number"
           value={draft.maxPerContact}
         />

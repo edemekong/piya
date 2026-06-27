@@ -1,13 +1,15 @@
 import { randomUUID } from "crypto";
 import { storage } from "../../configs/firebase";
+import { MAX_BRAND_IMAGE_SIZE } from "../constants";
 import type {
+  BusinessBrandAssetType,
   DecodedBase64File,
   UploadFileOptions,
 } from "../types/storage.type";
 import {
   decodeBase64Image,
   extensionForContentType,
-  validateProfileImage,
+  validateImage,
 } from "../utils/storage.utils";
 
 class StorageService {
@@ -44,13 +46,31 @@ class StorageService {
     userId: string,
     file: DecodedBase64File,
   ): Promise<string> {
-    validateProfileImage(file);
+    validateImage(file);
 
     const extension = extensionForContentType(file.contentType);
     return this.uploadFile({
       buffer: file.buffer,
       contentType: file.contentType,
       destination: `users/${userId}/profile/profile.${extension}`,
+    });
+  }
+
+  static async uploadBusinessBrandImage(
+    businessId: string,
+    asset: BusinessBrandAssetType,
+    file: DecodedBase64File,
+  ): Promise<string> {
+    validateImage(file);
+    if (file.buffer.length > MAX_BRAND_IMAGE_SIZE) {
+      throw new Error("Brand image must not exceed 4 MB");
+    }
+
+    const extension = extensionForContentType(file.contentType);
+    return this.uploadFile({
+      buffer: file.buffer,
+      contentType: file.contentType,
+      destination: `business/${businessId}/branding/${asset}.${extension}`,
     });
   }
 

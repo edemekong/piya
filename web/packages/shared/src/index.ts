@@ -3,3 +3,10 @@ export * from "./models";
 export * from "./services";
 export * from "./store";
 export * from "./utils";
+
+export type {
+  AccountSetupBrandDetailsInput,
+  AccountSetupBusinessProfileInput,
+  AccountSetupPersonalInfoInput,
+} from "./types/api";
+export type { BusinessCategoryTypes } from "./types/business.type";

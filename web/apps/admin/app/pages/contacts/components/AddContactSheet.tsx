@@ -104,16 +104,16 @@ function ModeButton({
 function ManualContactForm() {
   return (
     <form className="grid gap-4">
-      <Field label="Full name" placeholder="e.g. Ada Johnson" />
-      <Field label="Email address" placeholder="ada@example.com" type="email" />
-      <Field label="Phone number" placeholder="+234 800 000 0000" />
-      <Field label="Country code" placeholder="e.g. NG" />
-      <Field label="Tags" placeholder="e.g. vip, high value" />
+      <Field label="Full name" placeholder="Enter full name" />
+      <Field label="Email address" placeholder="Enter email address" type="email" />
+      <Field label="Phone number" placeholder="Enter phone number" />
+      <Field label="Country code" placeholder="Enter country code" />
+      <Field label="Tags" placeholder="Enter tags" />
       <label className="grid gap-2">
         <span className="text-footnote font-semibold text-[#2F4B4F]">Address</span>
         <textarea
           className="min-h-28 rounded-sm border border-border bg-fill px-3 py-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-          placeholder="Add customer address"
+          placeholder="Enter customer address"
         />
       </label>
     </form>

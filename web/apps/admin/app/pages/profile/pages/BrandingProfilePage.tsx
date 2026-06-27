@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Upload } from "lucide-react";
 import { Button } from "@piya/ui";
+import { UploadFieldSuffix } from "@/components/inputs";
 import { profileMenuItems } from "../profileSections";
 import { FieldGrid, ProfileField } from "../components/ProfileFields";
 import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
@@ -34,41 +34,47 @@ export function BrandingProfilePage() {
       <SettingsCard title="Brand assets">
         <FieldGrid>
           <ProfileField
-            label="Logo URL"
+            label="Logo"
             onChange={(event) => updateBrandAsset("logo", event.target.value)}
             suffix={
-              <UploadSuffix
+              <UploadFieldSuffix
                 accept="image/*"
                 label="Upload logo"
-                onSelect={(url) => updateBrandAsset("logo", url)}
+                onSelect={(file) =>
+                  updateBrandAsset("logo", URL.createObjectURL(file))
+                }
               />
             }
             value={brandAssets.logo}
           />
           <ProfileField
-            label="Favicon URL"
+            label="Favicon"
             onChange={(event) =>
               updateBrandAsset("favicon", event.target.value)
             }
             suffix={
-              <UploadSuffix
+              <UploadFieldSuffix
                 accept="image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon"
                 label="Upload favicon"
-                onSelect={(url) => updateBrandAsset("favicon", url)}
+                onSelect={(file) =>
+                  updateBrandAsset("favicon", URL.createObjectURL(file))
+                }
               />
             }
             value={brandAssets.favicon}
           />
           <ProfileField
-            label="Cover image URL"
+            label="Cover image"
             onChange={(event) =>
               updateBrandAsset("coverImage", event.target.value)
             }
             suffix={
-              <UploadSuffix
+              <UploadFieldSuffix
                 accept="image/*"
                 label="Upload cover image"
-                onSelect={(url) => updateBrandAsset("coverImage", url)}
+                onSelect={(file) =>
+                  updateBrandAsset("coverImage", URL.createObjectURL(file))
+                }
               />
             }
             value={brandAssets.coverImage}
@@ -110,43 +116,5 @@ export function BrandingProfilePage() {
         </div>
       </SettingsCard>
     </ProfileSectionShell>
-  );
-}
-
-function UploadSuffix({
-  accept,
-  label,
-  onSelect,
-}: {
-  accept: string;
-  label: string;
-  onSelect: (url: string) => void;
-}) {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    onSelect(URL.createObjectURL(file));
-  }
-
-  return (
-    <>
-      <input
-        accept={accept}
-        className="hidden"
-        onChange={handleChange}
-        ref={inputRef}
-        type="file"
-      />
-      <button
-        aria-label={label}
-        className="flex w-12 shrink-0 items-center justify-center border-l border-border text-[#2F4B4F]/65 transition hover:bg-white hover:text-primary"
-        onClick={() => inputRef.current?.click()}
-        type="button"
-      >
-        <Upload className="size-4" />
-      </button>
-    </>
   );
 }

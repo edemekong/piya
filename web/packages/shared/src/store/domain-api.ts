@@ -6,18 +6,46 @@ import type {
   OfferingData,
   OrderData,
 } from "../models";
-import type { CommunicationAdminData, CommunicationRecipient } from "../types";
+import type {
+  AccountSetupPayload,
+  CommunicationAdminData,
+  CommunicationRecipient,
+  UpdateAccountSetupRequest,
+} from "../types";
+import { ApiServiceError } from "../services/base-api.service";
 import { communicationsService } from "../services/communications.service";
 import { contactsService } from "../services/contacts.service";
 import { discountsService } from "../services/discounts.service";
 import { giftsService } from "../services/gifts.service";
 import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
+import { userService } from "../services/user.service";
+
+type DomainApiError = {
+  message: string;
+  code?: string;
+  statusCode?: number;
+};
+
+function getDomainApiError(error: unknown): DomainApiError {
+  if (error instanceof ApiServiceError) {
+    return {
+      message: error.message,
+      ...(error.code ? { code: error.code } : {}),
+      ...(error.statusCode ? { statusCode: error.statusCode } : {}),
+    };
+  }
+
+  return {
+    message: error instanceof Error ? error.message : "Request failed",
+  };
+}
 
 export const domainApi = createApi({
-  baseQuery: fakeBaseQuery(),
+  baseQuery: fakeBaseQuery<DomainApiError>(),
   reducerPath: "domainApi",
   tagTypes: [
+    "AccountSetup",
     "Communication",
     "CommunicationRecipient",
     "Contact",
@@ -27,6 +55,31 @@ export const domainApi = createApi({
     "Order",
   ],
   endpoints: (builder) => ({
+    getAccountSetup: builder.query<AccountSetupPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await userService.getAccountSetup() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["AccountSetup"],
+    }),
+    updateAccountSetup: builder.mutation<
+      AccountSetupPayload,
+      UpdateAccountSetupRequest
+    >({
+      queryFn: async ({ input, step }) => {
+        try {
+          return {
+            data: await userService.updateAccountSetupStep(step, input),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup"],
+    }),
     getCommunications: builder.query<CommunicationAdminData[], void>({
       queryFn: () => ({ data: communicationsService.getCommunications() }),
       providesTags: ["Communication"],
@@ -63,6 +116,7 @@ export const domainApi = createApi({
 });
 
 export const {
+  useGetAccountSetupQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
   useGetContactsQuery,
@@ -70,4 +124,5 @@ export const {
   useGetGiftsQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
+  useUpdateAccountSetupMutation,
 } = domainApi;

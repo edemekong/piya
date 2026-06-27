@@ -14,6 +14,21 @@ const inputClassName =
 const textareaClassName =
   "min-h-28 rounded-sm border border-border bg-fill px-3 py-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white";
 
+function FieldLabel({
+  label,
+  required,
+}: {
+  label: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <span className={labelClassName}>
+      {label}
+      {required ? <span className="text-error"> *</span> : null}
+    </span>
+  );
+}
+
 export type AppTextFieldProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "className"
@@ -33,6 +48,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
       inputClassName: customInputClassName,
       label,
       onChange,
+      required,
       suffix,
       value,
       ...props
@@ -46,7 +62,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
 
     return (
       <label className={cn("grid gap-2", className)}>
-        <span className={labelClassName}>{label}</span>
+        <FieldLabel label={label} required={required} />
         {suffix ? (
           <span
             className={cn(
@@ -60,6 +76,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
                 customInputClassName,
               )}
               ref={ref}
+              required={required}
               {...valueProps}
               {...props}
             />
@@ -73,6 +90,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
               customInputClassName,
             )}
             ref={ref}
+            required={required}
             {...valueProps}
             {...props}
           />
@@ -107,6 +125,7 @@ export const AppTextareaField = React.forwardRef<
       className,
       label,
       onChange,
+      required,
       textareaClassName: customTextareaClassName,
       value,
       ...props
@@ -120,10 +139,11 @@ export const AppTextareaField = React.forwardRef<
 
     return (
       <label className={cn("grid gap-2", className)}>
-        <span className={labelClassName}>{label}</span>
+        <FieldLabel label={label} required={required} />
         <textarea
           className={cn(textareaClassName, customTextareaClassName)}
           ref={ref}
+          required={required}
           {...valueProps}
           {...props}
         />
@@ -149,6 +169,7 @@ export function AppSelectField({
   label,
   onChange,
   options,
+  required,
   selectClassName,
   value,
   ...props
@@ -160,9 +181,10 @@ export function AppSelectField({
 
   return (
     <label className={cn("grid gap-2", className)}>
-      <span className={labelClassName}>{label}</span>
+      <FieldLabel label={label} required={required} />
       <select
         className={cn(inputClassName, "pr-10", selectClassName)}
+        required={required}
         {...valueProps}
         {...props}
       >

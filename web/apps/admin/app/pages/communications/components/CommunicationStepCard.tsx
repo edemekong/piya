@@ -163,7 +163,7 @@ export function CommunicationStepCard({
                       message: { ...step.message, subject: event.target.value },
                     })
                   }
-                  placeholder="Email subject"
+                  placeholder="Enter email subject"
                   ref={subjectInputRef}
                   value={step.message.subject ?? ""}
                 />
@@ -189,7 +189,7 @@ export function CommunicationStepCard({
                   message: { ...step.message, body: event.target.value },
                 })
               }
-              placeholder="Write the message body"
+              placeholder="Enter message body"
               ref={bodyTextareaRef}
               value={step.message.body}
             />
@@ -220,7 +220,7 @@ export function CommunicationStepCard({
                   ],
                 })
               }
-              placeholder="Button label"
+              placeholder="Enter button label"
               value={step.ctas[0]?.label ?? ""}
             />
             <input
@@ -236,7 +236,7 @@ export function CommunicationStepCard({
                   ],
                 })
               }
-              placeholder="https://"
+              placeholder="Enter button URL"
               value={step.ctas[0]?.url ?? ""}
             />
           </div>

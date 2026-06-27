@@ -49,10 +49,30 @@ const API_RESPONSE = {
     code: "USER_UPDATED",
     message: "User updated",
   },
+  accountSetupUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "ACCOUNT_SETUP_UPDATED",
+    message: "Account setup updated",
+  },
+  accountSetupFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "ACCOUNT_SETUP_FETCHED",
+    message: "Account setup fetched",
+  },
   accountSetupCompleted: {
     statusCode: STATUS_CODES.ok,
     code: "ACCOUNT_SETUP_COMPLETED",
     message: "Account setup completed",
+  },
+  accountSetupIncomplete: {
+    statusCode: STATUS_CODES.unprocessableEntity,
+    code: "ACCOUNT_SETUP_INCOMPLETE",
+    message: "Complete the required account setup fields first",
+  },
+  businessNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "BUSINESS_NOT_FOUND",
+    message: "Business not found",
   },
   riderAccountSetupUnavailable: {
     statusCode: STATUS_CODES.unprocessableEntity,

@@ -36,6 +36,11 @@ export type UserPayload = {
   user: import("../models").UserData;
 };
 
+export type AccountSetupPayload = {
+  business?: import("../models").BusinessData | null;
+  user: import("../models").UserData;
+};
+
 export type AuthTokenPayload = {
   authToken: string;
 };
@@ -52,3 +57,60 @@ export type UpdateUserInput = Partial<
     settings: Partial<import("../models").UserSettingsData>;
   }
 >;
+
+export type AccountSetupStep =
+  | "personal-info"
+  | "business-profile"
+  | "brand-details"
+  | "complete";
+
+export type AccountSetupPersonalInfoInput = {
+  name: string;
+  phoneNumber?: string | null;
+  profileImage?: string;
+  profileImageUrl?: string;
+  dob?: string | null;
+  gender?: import("./user.type").UserGenderType | null;
+};
+
+export type AccountSetupBusinessProfileInput = {
+  name: string;
+  category?: import("./business.type").BusinessCategoryTypes;
+  domain: string;
+  description: string;
+  email?: string | null;
+  phoneNumber?: string | null;
+  logo?: string;
+};
+
+export type AccountSetupBrandDetailsInput = {
+  logo?: string | null;
+  logoBase64?: string;
+  favicon?: string | null;
+  faviconBase64?: string;
+  coverImage?: string | null;
+  coverImageBase64?: string;
+  primaryColor: string;
+  secondaryColor?: string | null;
+  accentColor?: string | null;
+  socialLinks?: Record<string, string> | null;
+};
+
+export type AccountSetupCompleteInput = Record<string, never>;
+
+export type AccountSetupInputByStep = {
+  "personal-info": AccountSetupPersonalInfoInput;
+  "business-profile": AccountSetupBusinessProfileInput;
+  "brand-details": AccountSetupBrandDetailsInput;
+  complete: AccountSetupCompleteInput;
+};
+
+export type AccountSetupInput<TStep extends AccountSetupStep> =
+  AccountSetupInputByStep[TStep];
+
+export type UpdateAccountSetupRequest = {
+  [TStep in AccountSetupStep]: {
+    step: TStep;
+    input: AccountSetupInput<TStep>;
+  };
+}[AccountSetupStep];

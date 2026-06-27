@@ -151,13 +151,13 @@ export function DiscountEditorSheet({
             <TextField
               label="Title"
               onChange={(title) => updateDraft({ title })}
-              placeholder="e.g. Summer Glow 15%"
+              placeholder="Enter discount title"
               value={draft.title}
             />
             <TextAreaField
               label="Description"
               onChange={(description) => updateDraft({ description })}
-              placeholder="Describe who this discount is for and when it applies."
+              placeholder="Enter discount description"
               value={draft.description}
             />
             <div className="grid gap-4 sm:grid-cols-2">
@@ -171,7 +171,7 @@ export function DiscountEditorSheet({
                     codeGeneration: enabled ? "unique_per_contact" : "manual",
                   })
                 }
-                placeholder="GLOW15"
+                placeholder="Enter discount code"
                 value={draft.code}
               />
             </div>
@@ -221,7 +221,7 @@ export function DiscountEditorSheet({
                 onChange={(minimumOrderValue) =>
                   updateDraft({ minimumOrderValue })
                 }
-                placeholder="40000"
+                placeholder="Enter minimum spend"
                 value={draft.minimumOrderValue}
               />
               <TextField
@@ -229,14 +229,14 @@ export function DiscountEditorSheet({
                 onChange={(maxUsesPerContact) =>
                   updateDraft({ maxUsesPerContact })
                 }
-                placeholder="1"
+                placeholder="Enter max uses per contact"
                 type="number"
                 value={draft.maxUsesPerContact}
               />
               <TextField
                 label="Total usage limit"
                 onChange={(totalUsageLimit) => updateDraft({ totalUsageLimit })}
-                placeholder="250"
+                placeholder="Enter total usage limit"
                 type="number"
                 value={draft.totalUsageLimit}
               />
@@ -373,7 +373,7 @@ function RewardValueFields({
         <PercentField
           label="Discount percentage"
           onChange={(rewardValue) => onChange({ rewardValue })}
-          placeholder="15"
+          placeholder="Enter discount percentage"
           value={draft.rewardValue}
         />
         <MoneyField
@@ -381,7 +381,7 @@ function RewardValueFields({
           label="Max discount amount"
           onCurrencyChange={(currency) => onChange({ currency })}
           onChange={(maxDiscountAmount) => onChange({ maxDiscountAmount })}
-          placeholder="15000"
+          placeholder="Enter max discount amount"
           value={draft.maxDiscountAmount}
         />
       </>
@@ -402,7 +402,7 @@ function RewardValueFields({
         }
         onChange={(rewardValue) => onChange({ rewardValue })}
         onCurrencyChange={(currency) => onChange({ currency })}
-        placeholder="10000"
+        placeholder="Enter amount"
         value={draft.rewardValue}
       />
     );
@@ -414,14 +414,14 @@ function RewardValueFields({
         <TextField
           label="Buy quantity"
           onChange={(buyQuantity) => onChange({ buyQuantity })}
-          placeholder="2"
+          placeholder="Enter buy quantity"
           type="number"
           value={draft.buyQuantity}
         />
         <TextField
           label="Get quantity"
           onChange={(getQuantity) => onChange({ getQuantity })}
-          placeholder="1"
+          placeholder="Enter get quantity"
           type="number"
           value={draft.getQuantity}
         />
@@ -446,7 +446,7 @@ function RewardValueFields({
       <TextAreaField
         label="Perk description"
         onChange={(perkDescription) => onChange({ perkDescription })}
-        placeholder="Describe the perk customers receive."
+        placeholder="Enter perk description"
         value={draft.perkDescription}
       />
     );

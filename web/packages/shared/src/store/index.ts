@@ -1,5 +1,6 @@
 export {
   domainApi,
+  useGetAccountSetupQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
   useGetContactsQuery,
@@ -7,6 +8,7 @@ export {
   useGetGiftsQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
+  useUpdateAccountSetupMutation,
 } from "./domain-api";
 export {
   makeAppStore,

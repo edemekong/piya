@@ -26,6 +26,8 @@ export {
 export { InfoCard } from "./components/info-card";
 export { IconSectionHeader } from "./components/icon-section-header";
 export { MultiSelectDropdown } from "./components/multi-select";
+export { PhoneNumberField } from "./components/phone-number-field";
+export { isValidSupportedPhoneNumber } from "./components/phone-utils";
 export { SectionHeader } from "./components/section-header";
 export { SegmentedTabs } from "./components/segmented-tabs";
 export { SettingsCard } from "./components/settings-card";
@@ -65,6 +67,7 @@ export type {
 export type { InfoCardProps } from "./components/info-card";
 export type { IconSectionHeaderProps } from "./components/icon-section-header";
 export type { MultiSelectDropdownProps } from "./components/multi-select";
+export type { PhoneNumberFieldProps } from "./components/phone-number-field";
 export type { SectionHeaderProps } from "./components/section-header";
 export type {
   SegmentedTabItem,

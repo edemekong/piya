@@ -223,13 +223,13 @@ function ManualOfferingForm({
       <TextField
         label="Name"
         onChange={(name) => onChange({ name })}
-        placeholder="e.g. Starter Skincare Kit"
+        placeholder="Enter offering name"
         value={draft.name}
       />
       <TextAreaField
         label="Description"
         onChange={(description) => onChange({ description })}
-        placeholder="Describe the offering"
+        placeholder="Enter offering description"
         value={draft.description}
       />
       <SelectField
@@ -263,13 +263,13 @@ function ManualOfferingForm({
               label="Price"
               onCurrencyChange={(currency) => onChange({ currency })}
               onChange={(price) => onChange({ price })}
-              placeholder="45000"
+              placeholder="Enter price"
               value={draft.price}
             />
             <TextField
               label="Quantity"
               onChange={(quantity) => onChange({ quantity })}
-              placeholder="36"
+              placeholder="Enter quantity"
               type="number"
               value={draft.quantity}
             />
@@ -303,13 +303,13 @@ function ManualOfferingForm({
               label="Price"
               onCurrencyChange={(currency) => onChange({ currency })}
               onChange={(price) => onChange({ price })}
-              placeholder="30000"
+              placeholder="Enter price"
               value={draft.price}
             />
             <TextField
               label="Duration"
               onChange={(duration) => onChange({ duration })}
-              placeholder="Minutes"
+              placeholder="Enter duration in minutes"
               type="number"
               value={draft.duration}
             />
@@ -324,7 +324,7 @@ function ManualOfferingForm({
             <TextField
               label="Meeting link"
               onChange={(meetingLink) => onChange({ meetingLink })}
-              placeholder="https://meet.google.com/..."
+              placeholder="Enter meeting link"
               type="url"
               value={draft.meetingLink}
             />
@@ -334,19 +334,19 @@ function ManualOfferingForm({
               <TextField
                 label="Address"
                 onChange={(locationAddress) => onChange({ locationAddress })}
-                placeholder="12 Admiralty Way"
+                placeholder="Enter address"
                 value={draft.locationAddress}
               />
               <TextField
                 label="City"
                 onChange={(locationCity) => onChange({ locationCity })}
-                placeholder="Lekki"
+                placeholder="Enter city"
                 value={draft.locationCity}
               />
               <TextField
                 label="State"
                 onChange={(locationState) => onChange({ locationState })}
-                placeholder="Lagos"
+                placeholder="Enter state"
                 value={draft.locationState}
               />
               <CountryPicker
@@ -359,7 +359,7 @@ function ManualOfferingForm({
                 onChange={(locationPostalCode) =>
                   onChange({ locationPostalCode })
                 }
-                placeholder="105102"
+                placeholder="Enter postal code"
                 value={draft.locationPostalCode}
               />
             </div>
@@ -655,7 +655,7 @@ function AiOfferingPanel() {
       <TextAreaField
         label="Describe your offering"
         onChange={setPrompt}
-        placeholder="Share the name, audience, pricing, and any details you want included."
+        placeholder="Enter offering details to generate"
         value={prompt}
       />
       <Button

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { UserData } from "../../shared/model/user";
-import { createUserSchema, CreateUserBody } from "../../shared/schema/user";
+import { createUserSchema, CreateUserBody } from "../../shared/schema/user.schema";
 import { UserService } from "../../shared/services/user.service";
 import {
   asyncHandler,

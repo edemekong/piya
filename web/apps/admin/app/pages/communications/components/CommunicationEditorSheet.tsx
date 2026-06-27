@@ -168,7 +168,7 @@ export function CommunicationEditorSheet({
                       name: event.target.value,
                     }))
                   }
-                  placeholder="e.g. June discount alert"
+                  placeholder="Enter communication name"
                   value={draft.name}
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -397,7 +397,7 @@ function ScheduleTimeField({
               event.currentTarget.blur();
             }
           }}
-          placeholder="09:00"
+          placeholder="Enter time"
           value={value}
         />
         <span className="flex w-12 shrink-0 justify-center border-l border-border text-caption-1 font-semibold text-[#2F4B4F]/60">

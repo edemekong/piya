@@ -2,58 +2,36 @@ import {
   ArrowLeft,
   ArrowRight,
   Building2,
-  CalendarDays,
   Check,
-  ChevronRight,
-  Circle,
-  Globe2,
   MessageCircle,
-  MoreVertical,
   Palette,
-  Send,
-  Truck,
-  Upload,
-  UserRound,
   Users,
-  type LucideIcon,
 } from "lucide-react";
-import type * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@remix-run/react";
 import {
   showToast,
   type AppDispatch,
-  userService,
+  type BusinessData,
+  type UserData,
+  useGetAccountSetupQuery,
+  useUpdateAccountSetupMutation,
 } from "@piya/shared";
-import {
-  AppAvatar,
-  Badge,
-  Button,
-  SegmentedTabs,
-  SettingsCard,
-  cn,
-} from "@piya/ui";
+import { Button, cn, isValidSupportedPhoneNumber } from "@piya/ui";
 import { useDispatch } from "react-redux";
+import { StepContent } from "@/pages/auth/components/account-setup";
+import type {
+  SetupDraft,
+  SetupStep,
+  SetupStepId,
+} from "@/pages/auth/utils/account-setup-types";
 import {
-  FieldGrid,
-  ProfileField,
-  ProfileSelect,
-  ProfileTextarea,
-} from "@/pages/profile/components/ProfileFields";
-import {
+  ACCOUNT_SETUP_PATH,
   DEFAULT_AUTHENTICATED_PATH,
   getReturnToFromSearch,
   getSafeReturnTo,
 } from "@/utils/auth-routing";
 import { useAdminAuthRedirect } from "@/utils/use-admin-auth-redirect";
-
-type SetupStep = {
-  id: string;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  optional?: boolean;
-};
 
 const setupSteps: SetupStep[] = [
   {
@@ -73,7 +51,6 @@ const setupSteps: SetupStep[] = [
     title: "Brand details",
     description: "Tone, visuals, and customer promise",
     icon: Palette,
-    optional: true,
   },
   {
     id: "integration",
@@ -91,136 +68,35 @@ const setupSteps: SetupStep[] = [
   },
 ];
 
-const businessCategories = [
-  { label: "Laundry", value: "laundry" },
-  { label: "Fashion tailoring", value: "fashion_tailoring" },
-  { label: "Salon", value: "salon" },
-  { label: "Barbershop", value: "barbershop" },
-  { label: "Spa", value: "spa" },
-  { label: "Beauty studio", value: "beauty_studio" },
-  { label: "Car wash", value: "car_wash" },
-  { label: "Logistics delivery", value: "logistics_delivery" },
-  { label: "Restaurant", value: "restaurant" },
-  { label: "Food vendor", value: "food_vendor" },
-  { label: "Supermarket", value: "supermarket" },
-  { label: "Farm produce", value: "farm_produce" },
-  { label: "Fashion store", value: "fashion_store" },
-  { label: "Electronics store", value: "electronics_store" },
-  { label: "Photography", value: "photography" },
-  { label: "Consulting", value: "consulting" },
-  { label: "Real estate agent", value: "real_estate_agent" },
-  { label: "Hotel guesthouse", value: "hotel_guesthouse" },
-  { label: "Shortlet apartment", value: "shortlet_apartment" },
-];
-
-const brandColors = [
-  { label: "Primary color", value: "#2F4B4F" },
-  { label: "Secondary color", value: "#F4C95D" },
-  { label: "Accent color", value: "#F6F8F7" },
-];
-
-const members = [
-  { email: "amara@example.com", name: "Amara Okafor", role: "Admin" },
-  { email: "tunde@example.com", name: "Tunde Balogun", role: "Support" },
-  { email: "maya@example.com", name: "Maya Chen", role: "Marketing" },
-];
-
-type IntegrationTab =
-  | "domain"
-  | "message-channel"
-  | "availability"
-  | "delivery";
-
-type IntegrationConnection = {
-  connected?: boolean;
-  name: string;
-  subtitle: string;
-};
-
-const integrationTabs = [
-  {
-    icon: <Globe2 className="size-4" />,
-    label: "Domain",
-    value: "domain",
+const initialSetupDraft: SetupDraft = {
+  personalInfo: {
+    name: "",
+    gender: null,
+    phoneNumber: "",
+    profileImage: "",
+    profileImageUrl: "",
   },
-  {
-    icon: <MessageCircle className="size-4" />,
-    label: "Message",
-    value: "message-channel",
+  businessProfile: {
+    name: "",
+    category: "fashion_store",
+    domain: "",
+    description: "",
+    email: "",
+    phoneNumber: "",
   },
-  {
-    icon: <CalendarDays className="size-4" />,
-    label: "Availability",
-    value: "availability",
-  },
-  {
-    icon: <Truck className="size-4" />,
-    label: "Delivery",
-    value: "delivery",
-  },
-] satisfies {
-  icon: React.ReactNode;
-  label: string;
-  value: IntegrationTab;
-}[];
-
-const integrationsByTab: Record<
-  IntegrationTab,
-  { title: string; connections: IntegrationConnection[] }
-> = {
-  domain: {
-    title: "Domain",
-    connections: [
-      {
-        connected: true,
-        name: "Connect your domain",
-        subtitle:
-          "Let customers visit your business at your own website address instead of a Piya link.",
-      },
-    ],
-  },
-  "message-channel": {
-    title: "Message channel",
-    connections: [
-      {
-        connected: true,
-        name: "Connect email",
-        subtitle:
-          "Send customer emails from your business address for orders, replies, and updates.",
-      },
-      {
-        name: "Connect SMS",
-        subtitle: "Deliver short updates and reminders by text message.",
-      },
-      {
-        name: "Connect WhatsApp",
-        subtitle: "Reach clients through WhatsApp conversations and alerts.",
-      },
-    ],
-  },
-  availability: {
-    title: "Availability",
-    connections: [
-      {
-        name: "Connect calendar",
-        subtitle: "Sync events and consultations with your external calendar.",
-      },
-      {
-        connected: true,
-        name: "Set up available hours",
-        subtitle: "Choose the days and times clients can book with you.",
-      },
-    ],
-  },
-  delivery: {
-    title: "Delivery integration",
-    connections: [
-      {
-        name: "Set delivery prices",
-        subtitle:
-          "Configure price per kilometer for each available delivery vehicle.",
-      },
-    ],
+  brandDetails: {
+    logo: "",
+    favicon: "",
+    coverImage: "",
+    primaryColor: "#2F4B4F",
+    secondaryColor: "#F4C95D",
+    accentColor: "#F6F8F7",
+    socialLinks: {
+      instagram: "",
+      x: "",
+      facebook: "",
+      linkedin: "",
+    },
   },
 };
 
@@ -229,34 +105,203 @@ export function AccountSetupPage() {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
+  const activeStepId = getSetupStepId(location.search);
+  const activeStep = setupSteps.findIndex((step) => step.id === activeStepId);
+  const currentStepIndex = activeStep === -1 ? 0 : activeStep;
+  const [draft, setDraft] = useState<SetupDraft>(initialSetupDraft);
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
   const [isFinishingSetup, setIsFinishingSetup] = useState(false);
-  const currentStep = setupSteps[activeStep];
-  const isFirstStep = activeStep === 0;
-  const isLastStep = activeStep === setupSteps.length - 1;
+  const [maxVisitedStepIndex, setMaxVisitedStepIndex] =
+    useState(currentStepIndex);
+  const currentStep = setupSteps[currentStepIndex];
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === setupSteps.length - 1;
   const isOptionalStep = currentStep.optional === true;
+  const {
+    data: accountSetup,
+    error: accountSetupLoadError,
+  } = useGetAccountSetupQuery(undefined, {
+    skip: authStatus !== "ready",
+  });
+  const [updateAccountSetup] = useUpdateAccountSetupMutation();
+
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get("step")) return;
+
+    const params = new URLSearchParams(location.search);
+    params.set("step", activeStepId);
+    navigate(`${ACCOUNT_SETUP_PATH}?${params.toString()}`, { replace: true });
+  }, [activeStepId, location.search, navigate]);
+
+  useEffect(() => {
+    if (!accountSetup || isDraftLoaded) return;
+
+    setDraft(createSetupDraft(accountSetup.user, accountSetup.business));
+    setIsDraftLoaded(true);
+  }, [accountSetup, isDraftLoaded]);
+
+  useEffect(() => {
+    if (!accountSetupLoadError || isDraftLoaded) return;
+
+    showToast(dispatch, {
+      message: getAccountSetupErrorMessage(
+        accountSetupLoadError,
+        "Unable to load saved account setup. Empty fields are shown so you can continue.",
+      ),
+      variant: "error",
+    });
+    setIsDraftLoaded(true);
+  }, [accountSetupLoadError, dispatch, isDraftLoaded]);
+
+  useEffect(() => {
+    setMaxVisitedStepIndex((current) => Math.max(current, currentStepIndex));
+  }, [currentStepIndex]);
 
   function showPreviousStep() {
-    setActiveStep((current) => Math.max(current - 1, 0));
+    showVisitedStepByIndex(Math.max(currentStepIndex - 1, 0));
   }
 
   function showNextStep() {
-    setActiveStep((current) => Math.min(current + 1, setupSteps.length - 1));
+    showStepByIndex(Math.min(currentStepIndex + 1, setupSteps.length - 1));
+  }
+
+  function showStepByIndex(index: number) {
+    const step = setupSteps[index] ?? setupSteps[0];
+    const params = new URLSearchParams(location.search);
+    params.set("step", step.id);
+    setMaxVisitedStepIndex((current) => Math.max(current, index));
+    navigate(`${ACCOUNT_SETUP_PATH}?${params.toString()}`);
+  }
+
+  function showVisitedStepByIndex(index: number) {
+    if (index > maxVisitedStepIndex) return;
+
+    const step = setupSteps[index] ?? setupSteps[0];
+    const params = new URLSearchParams(location.search);
+    params.set("step", step.id);
+    navigate(`${ACCOUNT_SETUP_PATH}?${params.toString()}`);
+  }
+
+  async function saveCurrentStep() {
+    if (currentStep.id === "personal-info") {
+      if (!isValidSupportedPhoneNumber(draft.personalInfo.phoneNumber)) {
+        throw new Error("Enter a valid phone number.");
+      }
+
+      await updateAccountSetup({
+        step: "personal-info",
+        input: {
+          name: draft.personalInfo.name,
+          gender: draft.personalInfo.gender ?? null,
+          phoneNumber: emptyStringToUndefined(draft.personalInfo.phoneNumber),
+          profileImage: emptyStringToUndefined(draft.personalInfo.profileImage),
+          profileImageUrl: emptyStringToUndefined(
+            draft.personalInfo.profileImageUrl,
+          ),
+        },
+      }).unwrap();
+      return;
+    }
+
+    if (currentStep.id === "business-profile") {
+      if (
+        draft.businessProfile.phoneNumber &&
+        !isValidSupportedPhoneNumber(draft.businessProfile.phoneNumber)
+      ) {
+        throw new Error("Enter a valid business phone number.");
+      }
+
+      await updateAccountSetup({
+        step: "business-profile",
+        input: {
+          name: draft.businessProfile.name,
+          category: draft.businessProfile.category,
+          domain: draft.businessProfile.domain,
+          description: draft.businessProfile.description,
+          email: emptyStringToUndefined(draft.businessProfile.email),
+          phoneNumber: emptyStringToUndefined(
+            draft.businessProfile.phoneNumber,
+          ),
+          logo: emptyStringToUndefined(draft.businessProfile.logo),
+        },
+      }).unwrap();
+      return;
+    }
+
+    if (currentStep.id === "brand-details") {
+      const result = await updateAccountSetup({
+        step: "brand-details",
+        input: {
+          logo: emptyStringToUndefined(draft.brandDetails.logo),
+          logoBase64: draft.brandDetails.logoBase64,
+          favicon: emptyStringToUndefined(draft.brandDetails.favicon),
+          faviconBase64: draft.brandDetails.faviconBase64,
+          coverImage: emptyStringToUndefined(draft.brandDetails.coverImage),
+          coverImageBase64: draft.brandDetails.coverImageBase64,
+          primaryColor: draft.brandDetails.primaryColor,
+          secondaryColor: emptyStringToUndefined(
+            draft.brandDetails.secondaryColor,
+          ),
+          accentColor: emptyStringToUndefined(draft.brandDetails.accentColor),
+          socialLinks: getNonEmptySocialLinks(draft.brandDetails.socialLinks),
+        },
+      }).unwrap();
+      const branding = result.business?.branding;
+
+      if (branding) {
+        setDraft((current) => ({
+          ...current,
+          brandDetails: {
+            ...current.brandDetails,
+            logo: branding.logo ?? "",
+            logoBase64: undefined,
+            favicon: branding.favicon ?? "",
+            faviconBase64: undefined,
+            coverImage: branding.coverImage ?? "",
+            coverImageBase64: undefined,
+          },
+        }));
+      }
+    }
+  }
+
+  async function continueFromCurrentStep() {
+    setIsFinishingSetup(true);
+
+    try {
+      await saveCurrentStep();
+      showNextStep();
+    } catch (error) {
+      const message = getAccountSetupErrorMessage(
+        error,
+        "Unable to save this account setup step. Please try again.",
+      );
+      showToast(dispatch, {
+        message,
+        variant: "error",
+      });
+    } finally {
+      setIsFinishingSetup(false);
+    }
   }
 
   async function finishSetup() {
     setIsFinishingSetup(true);
 
     try {
-      await userService.updateUser({ accountSetupCompleted: true });
+      await updateAccountSetup({ step: "complete", input: {} }).unwrap();
       const returnTo = getSafeReturnTo(
         getReturnToFromSearch(location.search),
         DEFAULT_AUTHENTICATED_PATH,
       );
       navigate(returnTo, { replace: true });
     } catch (error) {
+      const message = getAccountSetupErrorMessage(
+        error,
+        "Unable to finish account setup. Please try again.",
+      );
       showToast(dispatch, {
-        message: getAccountSetupErrorMessage(error),
+        message,
         variant: "error",
       });
     } finally {
@@ -278,17 +323,22 @@ export function AccountSetupPage() {
             <div className="mt-8 space-y-2">
               {setupSteps.map((step, index) => {
                 const StepIcon = step.icon;
-                const isActive = index === activeStep;
-                const isComplete = index < activeStep;
+                const isActive = index === currentStepIndex;
+                const isComplete = index < currentStepIndex;
+                const isVisited = index <= maxVisitedStepIndex;
 
                 return (
                   <button
                     className={cn(
-                      "group grid w-full grid-cols-[32px_1fr] gap-3 p-2 text-left transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+                      "group grid w-full grid-cols-[32px_1fr] gap-3 p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+                      isVisited
+                        ? "hover:text-primary"
+                        : "cursor-not-allowed opacity-55",
                       isActive && "text-primary",
                     )}
+                    disabled={!isVisited}
                     key={step.id}
-                    onClick={() => setActiveStep(index)}
+                    onClick={() => showVisitedStepByIndex(index)}
                     type="button"
                   >
                     <span className="relative flex justify-center">
@@ -333,8 +383,8 @@ export function AccountSetupPage() {
 
             <div className="mt-auto pt-8">
               <span className="inline-flex rounded-full bg-secondary px-4 py-2 text-footnote font-semibold text-primary">
-                {Math.round(((activeStep + 1) / setupSteps.length) * 100)}%
-                complete
+                {Math.round(((currentStepIndex + 1) / setupSteps.length) * 100)}
+                % complete
               </span>
             </div>
           </aside>
@@ -350,7 +400,7 @@ export function AccountSetupPage() {
                 </p>
               </div>
               <p className="shrink-0 text-footnote font-semibold text-primary">
-                {activeStep + 1} of {setupSteps.length}
+                {currentStepIndex + 1} of {setupSteps.length}
               </p>
             </div>
 
@@ -359,7 +409,20 @@ export function AccountSetupPage() {
               onSubmit={(event) => event.preventDefault()}
             >
               <div className="flex-1 py-6">
-                <StepContent activeStep={activeStep} />
+                {!isDraftLoaded ? (
+                  <div className="max-w-[820px] rounded-sm border border-border bg-fill p-4">
+                    <p className="text-callout text-text-secondary">
+                      Loading saved account setup...
+                    </p>
+                  </div>
+                ) : (
+                  <StepContent
+                    draft={draft}
+                    email={accountSetup?.user.email ?? ""}
+                    setDraft={setDraft}
+                    stepId={currentStep.id}
+                  />
+                )}
               </div>
 
               <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -377,6 +440,7 @@ export function AccountSetupPage() {
                   {isOptionalStep ? (
                     <button
                       className="text-callout font-semibold text-primary underline underline-offset-4 transition hover:text-[#2F4B4F]"
+                      disabled={!isDraftLoaded || isFinishingSetup}
                       onClick={showNextStep}
                       type="button"
                     >
@@ -385,8 +449,8 @@ export function AccountSetupPage() {
                   ) : null}
 
                   <Button
-                    disabled={isFinishingSetup}
-                    onClick={isLastStep ? finishSetup : showNextStep}
+                    disabled={!isDraftLoaded || isFinishingSetup}
+                    onClick={isLastStep ? finishSetup : continueFromCurrentStep}
                     trailing={<ArrowRight />}
                     type="button"
                   >
@@ -394,7 +458,9 @@ export function AccountSetupPage() {
                       ? isFinishingSetup
                         ? "Finishing..."
                         : "Finish setup"
-                      : "Continue"}
+                      : isFinishingSetup
+                        ? "Saving..."
+                        : "Continue"}
                   </Button>
                 </div>
               </div>
@@ -406,272 +472,87 @@ export function AccountSetupPage() {
   );
 }
 
-function getAccountSetupErrorMessage(error: unknown) {
+function getAccountSetupErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error) {
     return error.message;
   }
 
-  return "Unable to finish account setup. Please try again.";
-}
-
-function StepContent({ activeStep }: { activeStep: number }) {
-  switch (activeStep) {
-    case 0:
-      return <PersonalInfoStep />;
-    case 1:
-      return <BusinessProfileStep />;
-    case 2:
-      return <BrandDetailsStep />;
-    case 3:
-      return <IntegrationStep />;
-    case 4:
-      return <TeamStep />;
-    default:
-      return null;
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
   }
+
+  return fallback;
 }
 
-function PersonalInfoStep() {
-  return (
-    <div className="max-w-[820px] space-y-4">
-      <SettingsCard title="Profile image">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
-              <UserRound className="size-9" />
-            </span>
-            <div>
-              <p className="font-semibold text-[#2F4B4F]">Ada Okafor</p>
-              <p className="mt-1 text-callout text-[#2F4B4F]/65">
-                JPG, PNG, or WebP. Recommended size 400x400.
-              </p>
-            </div>
-          </div>
-          <Button icon={<Upload />} size="sm" type="button" variant="secondary">
-            Upload image
-          </Button>
-        </div>
-      </SettingsCard>
+function createSetupDraft(
+  user: UserData,
+  business?: BusinessData | null,
+): SetupDraft {
+  const branding = business?.branding;
 
-      <SettingsCard title="Personal information">
-        <FieldGrid>
-          <ProfileField label="First name" placeholder="Ada" />
-          <ProfileField label="Last name" placeholder="Okafor" />
-          <ProfileField
-            label="Email"
-            placeholder="ada@example.com"
-            type="email"
-          />
-          <ProfileField
-            label="Phone number"
-            placeholder="+234 801 234 5678"
-            type="tel"
-          />
-        </FieldGrid>
-      </SettingsCard>
-    </div>
-  );
+  return {
+    personalInfo: {
+      name: user.name,
+      gender: user.gender ?? null,
+      phoneNumber: user.phoneNumber ?? "",
+      profileImage: "",
+      profileImageUrl: user.profileImageUrl ?? "",
+      dob: user.dob ?? null,
+    },
+    businessProfile: {
+      name: business?.name ?? "",
+      category: business?.category ?? "fashion_store",
+      domain: business?.domain ?? "",
+      description: business?.description ?? "",
+      email: business?.email ?? "",
+      phoneNumber: business?.phoneNumber ?? "",
+      logo: business?.logo ?? "",
+    },
+    brandDetails: {
+      logo: branding?.logo ?? "",
+      favicon: branding?.favicon ?? "",
+      coverImage: branding?.coverImage ?? "",
+      primaryColor: branding?.primaryColor ?? "#2F4B4F",
+      secondaryColor: branding?.secondaryColor ?? "#F4C95D",
+      accentColor: branding?.accentColor ?? "#F6F8F7",
+      socialLinks: {
+        instagram: branding?.socialLinks?.instagram ?? "",
+        x: branding?.socialLinks?.x ?? "",
+        facebook: branding?.socialLinks?.facebook ?? "",
+        linkedin: branding?.socialLinks?.linkedin ?? "",
+      },
+    },
+  };
 }
 
-function BusinessProfileStep() {
-  return (
-    <div className="max-w-[820px] space-y-4">
-      <SettingsCard title="Business identity">
-        <FieldGrid>
-          <ProfileField label="Business name" value="Piya Store" />
-          <ProfileSelect
-            label="Business category"
-            options={businessCategories}
-            value="fashion_store"
-          />
-          <div className="md:col-span-2">
-            <ProfileField label="Public domain" value="piya.store" />
-          </div>
-        </FieldGrid>
-        <ProfileTextarea
-          label="Business description"
-          value="Customer commerce, ordering, and messaging in one admin workspace."
-        />
-      </SettingsCard>
+function getSetupStepId(search: string): SetupStepId {
+  const step = new URLSearchParams(search).get("step");
 
-      <SettingsCard title="Business contact">
-        <FieldGrid>
-          <ProfileField
-            label="Business email"
-            type="email"
-            value="hello@piya.store"
-          />
-          <ProfileField
-            label="Business phone"
-            type="tel"
-            value="+234 802 000 0000"
-          />
-        </FieldGrid>
-      </SettingsCard>
+  if (setupSteps.some((setupStep) => setupStep.id === step)) {
+    return step as SetupStepId;
+  }
 
-      <SettingsCard title="Service locations">
-        <button
-          className="flex h-12 w-full items-center justify-center rounded-sm border border-dashed border-[#2F4B4F]/25 bg-fill text-callout font-semibold text-[#2F4B4F]/65 transition hover:border-primary hover:bg-white hover:text-primary"
-          type="button"
-        >
-          Add locations you operate
-        </button>
-      </SettingsCard>
-    </div>
-  );
+  return "personal-info";
 }
 
-function BrandDetailsStep() {
-  return (
-    <div className="max-w-[820px] space-y-4">
-      <SettingsCard title="Brand assets">
-        <FieldGrid>
-          <ProfileField label="Logo URL" value="/assets/logo.png" />
-          <ProfileField label="Favicon URL" value="/favicon.ico" />
-          <ProfileField label="Cover image URL" value="/assets/cover.png" />
-        </FieldGrid>
-      </SettingsCard>
-
-      <SettingsCard title="Social links">
-        <FieldGrid>
-          <ProfileField label="Instagram" value="@piya" />
-          <ProfileField label="X / Twitter" value="@piya" />
-          <ProfileField label="Facebook" value="https://facebook.com/piya" />
-          <ProfileField
-            label="LinkedIn"
-            value="https://linkedin.com/company/piya"
-          />
-        </FieldGrid>
-      </SettingsCard>
-
-      <SettingsCard title="Brand colors">
-        <div className="grid gap-4 sm:grid-cols-3">
-          {brandColors.map((color) => (
-            <label className="grid min-w-0 gap-2" key={color.label}>
-              <span className="text-footnote font-normal text-[#2F4B4F]">
-                {color.label}
-              </span>
-              <span className="flex h-12 min-w-0 items-center gap-3 rounded-sm border border-border bg-fill px-3">
-                <span
-                  className="size-6 rounded-full border border-border"
-                  style={{ backgroundColor: color.value }}
-                />
-                <input
-                  className="my-2 min-w-0 flex-1 bg-transparent text-callout text-[#2F4B4F] outline-none"
-                  defaultValue={color.value}
-                />
-              </span>
-            </label>
-          ))}
-        </div>
-      </SettingsCard>
-    </div>
-  );
+function emptyStringToUndefined(value: string | null | undefined) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
 }
 
-function IntegrationStep() {
-  const [activeTab, setActiveTab] = useState<IntegrationTab>("domain");
-  const activeIntegration = integrationsByTab[activeTab];
+function getNonEmptySocialLinks(
+  socialLinks: Record<string, string> | null | undefined,
+) {
+  if (!socialLinks) return undefined;
 
-  return (
-    <div className="max-w-[820px] space-y-4">
-      <SegmentedTabs
-        items={integrationTabs}
-        onValueChange={setActiveTab}
-        value={activeTab}
-      />
-
-      <SettingsCard title={activeIntegration.title}>
-        <div className="grid gap-3">
-          {activeIntegration.connections.map((connection) => (
-            <ConnectionCard connection={connection} key={connection.name} />
-          ))}
-        </div>
-      </SettingsCard>
-    </div>
+  const entries = Object.entries(socialLinks).filter(
+    ([, value]) => value.trim().length > 0,
   );
-}
 
-function TeamStep() {
-  return (
-    <div className="max-w-[820px] space-y-4">
-      <SettingsCard
-        actions={
-          <Button icon={<Send />} size="sm" type="button">
-            Send invite
-          </Button>
-        }
-        title="Invite teammate"
-      >
-        <FieldGrid className="md:grid-cols-[minmax(0,1fr)_220px]">
-          <ProfileField
-            label="Email address"
-            placeholder="teammate@example.com"
-          />
-          <ProfileSelect
-            label="Role"
-            options={["Admin", "Manager"]}
-            value="Admin"
-          />
-        </FieldGrid>
-      </SettingsCard>
-
-      <SettingsCard title="Team members">
-        <div className="grid gap-2">
-          {members.map((member) => (
-            <div
-              className="flex items-center gap-3 rounded-md bg-fill px-3 py-3"
-              key={member.email}
-            >
-              <AppAvatar className="size-10" name={member.name} />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-[#2F4B4F]">{member.name}</p>
-                <p className="truncate text-footnote text-[#2F4B4F]/60">
-                  {member.email}
-                </p>
-              </div>
-              <Badge>{member.role}</Badge>
-              <button
-                aria-label={`Open actions for ${member.name}`}
-                className="flex size-8 items-center justify-center rounded-full text-[#2F4B4F]/60 hover:bg-white"
-                type="button"
-              >
-                <MoreVertical className="size-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </SettingsCard>
-    </div>
-  );
-}
-
-function ConnectionCard({
-  connection,
-}: {
-  connection: IntegrationConnection;
-}) {
-  return (
-    <button
-      className="flex w-full items-center gap-3 rounded-md border border-border bg-fill px-4 py-4 text-left transition hover:border-primary/30 hover:bg-secondary/25"
-      type="button"
-    >
-      {connection.connected ? (
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
-          <Check className="size-5 stroke-[3]" />
-        </span>
-      ) : (
-        <Circle className="size-8 shrink-0 text-[#2F4B4F]/35" />
-      )}
-      <span className="min-w-0 flex-1">
-        <span className="block font-semibold text-[#2F4B4F]">
-          {connection.name}
-        </span>
-        <span className="mt-1 block text-callout text-[#2F4B4F]/65">
-          {connection.subtitle}
-        </span>
-      </span>
-      <ChevronRight className="size-5 shrink-0 text-[#2F4B4F]/45" />
-    </button>
-  );
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 }

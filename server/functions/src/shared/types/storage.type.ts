@@ -1,4 +1,5 @@
 type ImageContentType = "image/jpeg" | "image/png" | "image/webp";
+type BusinessBrandAssetType = "logo" | "favicon" | "cover-image";
 
 type UploadFileOptions = {
   buffer: Buffer;
@@ -11,4 +12,9 @@ type DecodedBase64File = {
   contentType: ImageContentType;
 };
 
-export { DecodedBase64File, ImageContentType, UploadFileOptions };
+export {
+  BusinessBrandAssetType,
+  DecodedBase64File,
+  ImageContentType,
+  UploadFileOptions,
+};

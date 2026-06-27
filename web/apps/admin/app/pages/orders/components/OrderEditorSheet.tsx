@@ -120,14 +120,14 @@ export function OrderEditorSheet({
           <TextField
             label="Contact / customer"
             onChange={(contactName) => updateDraft({ contactName })}
-            placeholder="e.g. Ada Lovelace"
+            placeholder="Enter customer name"
             value={draft.contactName}
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
               label="Email"
               onChange={(contactEmail) => updateDraft({ contactEmail })}
-              placeholder="customer@example.com"
+              placeholder="Enter customer email"
               type="email"
               value={draft.contactEmail}
             />
@@ -136,7 +136,7 @@ export function OrderEditorSheet({
               onChange={(contactPhoneNumber) =>
                 updateDraft({ contactPhoneNumber })
               }
-              placeholder="+234 800 000 0000"
+              placeholder="Enter phone number"
               value={draft.contactPhoneNumber}
             />
           </div>
@@ -155,13 +155,13 @@ export function OrderEditorSheet({
             <TextField
               label="Items"
               onChange={(itemName) => updateDraft({ itemName })}
-              placeholder="e.g. Starter Skincare Kit"
+              placeholder="Enter item name"
               value={draft.itemName}
             />
             <TextField
               label={showPeopleCount ? "Quantity / sessions" : "Quantity"}
               onChange={(quantity) => updateDraft({ quantity })}
-              placeholder="1"
+              placeholder="Enter quantity"
               type="number"
               value={draft.quantity}
             />
@@ -169,7 +169,7 @@ export function OrderEditorSheet({
               <TextField
                 label="Attendees"
                 onChange={(attendeeCount) => updateDraft({ attendeeCount })}
-                placeholder="3"
+                placeholder="Enter attendee count"
                 type="number"
                 value={draft.attendeeCount}
               />
@@ -179,7 +179,7 @@ export function OrderEditorSheet({
               <TextField
                 label="Seats / sessions"
                 onChange={(seatCount) => updateDraft({ seatCount })}
-                placeholder="1"
+                placeholder="Enter seat count"
                 type="number"
                 value={draft.seatCount}
               />
@@ -215,14 +215,14 @@ export function OrderEditorSheet({
               onChange={(fulfillmentAddress) =>
                 updateDraft({ fulfillmentAddress })
               }
-              placeholder="Street address"
+              placeholder="Enter street address"
               value={draft.fulfillmentAddress}
             />
             <div className="grid gap-4 sm:grid-cols-2">
               <TextField
                 label="City"
                 onChange={(fulfillmentCity) => updateDraft({ fulfillmentCity })}
-                placeholder="Lagos"
+                placeholder="Enter city"
                 value={draft.fulfillmentCity}
               />
               <TextField
@@ -230,7 +230,7 @@ export function OrderEditorSheet({
                 onChange={(fulfillmentState) =>
                   updateDraft({ fulfillmentState })
                 }
-                placeholder="Lagos"
+                placeholder="Enter state"
                 value={draft.fulfillmentState}
               />
               <TextField
@@ -238,19 +238,19 @@ export function OrderEditorSheet({
                 onChange={(fulfillmentCountry) =>
                   updateDraft({ fulfillmentCountry })
                 }
-                placeholder="Nigeria"
+                placeholder="Enter country"
                 value={draft.fulfillmentCountry}
               />
               <TextField
                 label="Carrier"
                 onChange={(carrier) => updateDraft({ carrier })}
-                placeholder="GIG Logistics"
+                placeholder="Enter carrier"
                 value={draft.carrier}
               />
               <TextField
                 label="Tracking code"
                 onChange={(trackingCode) => updateDraft({ trackingCode })}
-                placeholder="GIG-829112"
+                placeholder="Enter tracking code"
                 value={draft.trackingCode}
               />
               <SelectField
@@ -284,7 +284,7 @@ export function OrderEditorSheet({
         <TextAreaField
           label="Notes"
           onChange={(notes) => updateDraft({ notes })}
-          placeholder="Add fulfilment notes or customer preferences."
+          placeholder="Enter fulfillment notes"
           value={draft.notes}
         />
       </form>
@@ -412,7 +412,7 @@ function MoneyField({
           className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
           inputMode="decimal"
           onChange={(event) => onChange(event.target.value)}
-          placeholder="45000"
+          placeholder="Enter amount"
           type="number"
           value={value}
         />

@@ -38,7 +38,7 @@ function AddDomainSheet({ onClose, open }: AddDomainSheetProps) {
           <input
             className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
             name="domain"
-            placeholder="example.com"
+            placeholder="Enter domain"
             required
             type="text"
           />
@@ -52,7 +52,7 @@ function AddDomainSheet({ onClose, open }: AddDomainSheetProps) {
             this domain.
           </p>
           <p className="mt-3 text-callout text-[#2F4B4F]/65">
-            Example: customers can use{" "}
+            Customers can use{" "}
             <span className="font-semibold text-[#2F4B4F]">
               https://yourbusiness.com
             </span>{" "}

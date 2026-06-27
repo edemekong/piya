@@ -7,6 +7,14 @@ export type Business = {
 };
 
 export type {
+  AccountSetupBrandDetailsInput,
+  AccountSetupBusinessProfileInput,
+  AccountSetupCompleteInput,
+  AccountSetupInput,
+  AccountSetupInputByStep,
+  AccountSetupPayload,
+  AccountSetupPersonalInfoInput,
+  AccountSetupStep,
   ApiClientOptions,
   ApiRequestOptions,
   ApiResponseBody,
@@ -14,6 +22,7 @@ export type {
   BaseAPIServiceOptions,
   CreateUserInput,
   TokenProvider,
+  UpdateAccountSetupRequest,
   UpdateUserInput,
   UserPayload,
 } from "./api";

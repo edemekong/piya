@@ -32,6 +32,11 @@ export class URLController {
     return this.path("/v1/users/update");
   }
 
+  accountSetup(step?: string) {
+    const query = step ? `?step=${encodeURIComponent(step)}` : "";
+    return this.path(`/v1/users/account-setup${query}`);
+  }
+
   user(id: string) {
     return this.path(`/v1/users/fetch/${encodeURIComponent(id)}`);
   }

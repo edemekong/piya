@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { updateUserSchema, UpdateUserBody } from "../../shared/schema/user";
+import { updateUserSchema, UpdateUserBody } from "../../shared/schema/user.schema";
 import { UserService } from "../../shared/services/user.service";
 import {
   asyncHandler,

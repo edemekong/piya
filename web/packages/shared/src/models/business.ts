@@ -28,6 +28,9 @@ interface BusinessBranding {
   accentColor?: string | null;
   socialLinks?: Record<string, string> | null;
 }
+interface BusinessBrandingData extends BusinessBranding, BaseModel {
+  businessId: string;
+}
 interface MemberData extends BaseModel {
   businessId: string;
   name: string;
@@ -36,4 +39,9 @@ interface MemberData extends BaseModel {
   permission: MemberPermissionType;
 }
 
-export type { BusinessData, BusinessBranding, MemberData };
+export type {
+  BusinessData,
+  BusinessBranding,
+  BusinessBrandingData,
+  MemberData,
+};

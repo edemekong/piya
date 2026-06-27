@@ -45,7 +45,7 @@ function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
           <input
             className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
             name="senderName"
-            placeholder="Your Business"
+            placeholder="Enter sender name"
             required
             type="text"
           />
@@ -61,7 +61,7 @@ function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
               name="emailSubdomain"
               onChange={(event) => setEmailSubdomain(event.target.value)}
               pattern="[A-Za-z0-9-]+"
-              placeholder="mail"
+              placeholder="Enter subdomain"
               required
               type="text"
               value={emailSubdomain}
@@ -81,7 +81,7 @@ function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
               className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
               name="senderPrefix"
               pattern="[^@\s]+"
-              placeholder="hello"
+              placeholder="Enter sender email"
               required
               type="text"
             />
