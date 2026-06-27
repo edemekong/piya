@@ -21,6 +21,7 @@ export * from "./delivery";
 export * from "./discount";
 export * from "./document";
 export * from "./gift";
+export * from "./lead-request";
 export * from "./location";
 export * from "./offering";
 export * from "./order";

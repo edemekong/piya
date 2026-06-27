@@ -19,3 +19,13 @@ export function renderMemberInvitationEmail(data: {
 }): string {
   return renderTemplate("member-invitation", data);
 }
+
+export function renderLeadRequestReceivedEmail(data: {
+  greetingName: string;
+  requestLabel: string;
+}): string {
+  return renderTemplate("lead-request-received", {
+    ...data,
+    previewText: "We received your Piya request and will get back to you immediately.",
+  });
+}

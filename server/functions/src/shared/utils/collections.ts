@@ -1,6 +1,7 @@
 const COLLECTIONS = {
   auth_otp_codes: "auth_otp_codes",
   business: "business",
+  leadRequests: "lead_requests",
   users: "users",
 } as const;
 

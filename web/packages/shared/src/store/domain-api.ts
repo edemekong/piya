@@ -11,6 +11,7 @@ import type {
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
+  CreateLeadRequestInput,
   InviteMemberInput,
   TeamPayload,
   UpdateAccountSetupRequest,
@@ -23,6 +24,7 @@ import { communicationsService } from "../services/communications.service";
 import { contactsService } from "../services/contacts.service";
 import { discountsService } from "../services/discounts.service";
 import { giftsService } from "../services/gifts.service";
+import { leadRequestService } from "../services/lead-request.service";
 import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
 import { teamService } from "../services/team.service";
@@ -100,6 +102,16 @@ export const domainApi = createApi({
               api.signal,
             ),
           };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+    }),
+    createLeadRequest: builder.mutation<void, CreateLeadRequestInput>({
+      queryFn: async (input, api) => {
+        try {
+          await leadRequestService.createLeadRequest(input, api.signal);
+          return { data: undefined };
         } catch (error) {
           return { error: getDomainApiError(error) };
         }
@@ -210,6 +222,7 @@ export const domainApi = createApi({
 
 export const {
   useLazyCheckBusinessSlugAvailabilityQuery,
+  useCreateLeadRequestMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useGetAccountSetupQuery,

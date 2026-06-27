@@ -32,6 +32,10 @@ export {
   getFirebaseStorage,
 } from "./firebase.service";
 export * from "./gifts.service";
+export {
+  LeadRequestService,
+  leadRequestService,
+} from "./lead-request.service";
 export * from "./offerings.service";
 export * from "./orders.service";
 export { BusinessTeamService, teamService } from "./team.service";

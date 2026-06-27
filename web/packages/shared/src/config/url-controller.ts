@@ -45,6 +45,10 @@ export class URLController {
     return this.path("/v1/businesses/slug-availability");
   }
 
+  get leadRequests() {
+    return this.path("/v1/lead-requests");
+  }
+
   get memberInvitations() {
     return this.path("/v1/businesses/member-invitations");
   }

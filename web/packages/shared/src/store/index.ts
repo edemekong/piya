@@ -1,6 +1,7 @@
 export {
   domainApi,
   useLazyCheckBusinessSlugAvailabilityQuery,
+  useCreateLeadRequestMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useGetAccountSetupQuery,

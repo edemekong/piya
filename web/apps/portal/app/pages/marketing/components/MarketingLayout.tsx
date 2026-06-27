@@ -1,5 +1,6 @@
 import { Link } from "@remix-run/react";
 import { ArrowRight } from "lucide-react";
+import { useCreateLeadRequestMutation } from "@piya/shared";
 import {
   AppFieldGrid,
   AppSelectField,
@@ -36,27 +37,42 @@ const demoFocusOptions = [
 
 export function MarketingLayout({ children, className }: MarketingLayoutProps) {
   const [isDemoSheetOpen, setIsDemoSheetOpen] = React.useState(false);
+  const [demoRequestMessage, setDemoRequestMessage] = React.useState<
+    { type: "success" | "error"; text: string } | null
+  >(null);
+  const [createLeadRequest, demoRequestState] = useCreateLeadRequestMutation();
 
-  function submitDemoRequest(event: React.FormEvent<HTMLFormElement>) {
+  async function submitDemoRequest(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    const body = [
-      ["Name", formData.get("fullName")],
-      ["Work email", formData.get("workEmail")],
-      ["Business name", formData.get("businessName")],
-      ["Phone or WhatsApp", formData.get("phone")],
-      ["Business size", formData.get("businessSize")],
-      ["Demo focus", formData.get("demoFocus")],
-      ["Notes", formData.get("notes")],
-    ]
-      .map(([label, value]) => `${label}: ${String(value ?? "").trim()}`)
-      .join("\n");
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    setDemoRequestMessage(null);
 
-    window.location.href = `mailto:support@piya.store?subject=${encodeURIComponent(
-      "Request a Piya demo",
-    )}&body=${encodeURIComponent(body)}`;
-    setIsDemoSheetOpen(false);
+    try {
+      await createLeadRequest({
+        type: "demo",
+        data: {
+          fullName: String(formData.get("fullName") ?? "").trim(),
+          workEmail: String(formData.get("workEmail") ?? "").trim(),
+          businessName: String(formData.get("businessName") ?? "").trim(),
+          phone: getOptionalFormValue(formData, "phone"),
+          businessSize: getOptionalFormValue(formData, "businessSize"),
+          demoFocus: String(formData.get("demoFocus") ?? "").trim(),
+          notes: getOptionalFormValue(formData, "notes"),
+        },
+      }).unwrap();
+      form.reset();
+      setDemoRequestMessage({
+        type: "success",
+        text: "Demo request sent. We will reach out by email.",
+      });
+    } catch (error) {
+      setDemoRequestMessage({
+        type: "error",
+        text: getLeadRequestErrorMessage(error),
+      });
+    }
   }
 
   return (
@@ -133,18 +149,29 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
         footer={
           <>
             <Button
-              onClick={() => setIsDemoSheetOpen(false)}
+              onClick={() => {
+                setIsDemoSheetOpen(false);
+                setDemoRequestMessage(null);
+              }}
               type="button"
               variant="secondary"
             >
               Cancel
             </Button>
-            <Button form="demo-request-form" type="submit">
+            <Button
+              buttonState={demoRequestState.isLoading ? "loading" : "enabled"}
+              form="demo-request-form"
+              loadingLabel="Sending request"
+              type="submit"
+            >
               Send request
             </Button>
           </>
         }
-        onClose={() => setIsDemoSheetOpen(false)}
+        onClose={() => {
+          setIsDemoSheetOpen(false);
+          setDemoRequestMessage(null);
+        }}
         open={isDemoSheetOpen}
         title="Request a demo"
       >
@@ -202,10 +229,40 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
             name="notes"
             placeholder="Preferred day or time, current tools, or what you want to solve."
           />
+          {demoRequestMessage ? (
+            <p
+              className={cn(
+                "rounded-md px-3 py-2 text-subheadline font-semibold",
+                demoRequestMessage.type === "success"
+                  ? "bg-success/10 text-success"
+                  : "bg-error/10 text-error",
+              )}
+            >
+              {demoRequestMessage.text}
+            </p>
+          ) : null}
         </form>
       </AppSheet>
     </main>
   );
+}
+
+function getOptionalFormValue(formData: FormData, name: string) {
+  const value = String(formData.get(name) ?? "").trim();
+  return value ? value : null;
+}
+
+function getLeadRequestErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Could not send the request. Please try again.";
 }
 
 export function PiyaLogo({

@@ -134,6 +134,11 @@ const API_RESPONSE = {
     code: "MEMBER_INVITATION_DELETED",
     message: "Invitation deleted",
   },
+  leadRequestCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "LEAD_REQUEST_CREATED",
+    message: "Lead request created",
+  },
   teamOwnerRequired: {
     statusCode: STATUS_CODES.forbidden,
     code: "TEAM_OWNER_REQUIRED",

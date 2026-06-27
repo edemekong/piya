@@ -47,6 +47,20 @@ export type BusinessSlugAvailabilityPayload = {
   slug: string;
 };
 
+export type CreateDemoLeadRequestInput = {
+  type: "demo";
+  data: import("../models").DemoLeadRequestData;
+};
+
+export type CreateRemindMeLeadRequestInput = {
+  type: "remind_me";
+  data: import("../models").RemindMeLeadRequestData;
+};
+
+export type CreateLeadRequestInput =
+  | CreateDemoLeadRequestInput
+  | CreateRemindMeLeadRequestInput;
+
 export type AuthTokenPayload = {
   authToken: string;
 };

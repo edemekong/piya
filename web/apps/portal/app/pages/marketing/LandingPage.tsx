@@ -1,4 +1,5 @@
 import { Link } from "@remix-run/react";
+import { useCreateLeadRequestMutation } from "@piya/shared";
 import {
   ArrowRight,
   BadgePercent,
@@ -20,7 +21,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { AppTextField, Button, cn } from "@piya/ui";
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import {
   MarketingLayout,
   MarketingSection,
@@ -164,6 +165,12 @@ const comparisonItems = {
 
 export function LandingPage() {
   const [heroWordIndex, setHeroWordIndex] = useState(0);
+  const [marketEmail, setMarketEmail] = useState("");
+  const [marketRequestMessage, setMarketRequestMessage] = useState<
+    { type: "success" | "error"; text: string } | null
+  >(null);
+  const [createLeadRequest, marketRequestState] =
+    useCreateLeadRequestMutation();
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -172,6 +179,28 @@ export function LandingPage() {
 
     return () => window.clearInterval(intervalId);
   }, []);
+
+  async function submitMarketReminder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMarketRequestMessage(null);
+
+    try {
+      await createLeadRequest({
+        type: "remind_me",
+        data: { email: marketEmail.trim() },
+      }).unwrap();
+      setMarketEmail("");
+      setMarketRequestMessage({
+        type: "success",
+        text: "Thanks. We will let you know when Piya is available.",
+      });
+    } catch (error) {
+      setMarketRequestMessage({
+        type: "error",
+        text: getLeadRequestErrorMessage(error),
+      });
+    }
+  }
 
   return (
     <MarketingLayout>
@@ -264,23 +293,44 @@ export function LandingPage() {
               <p className="text-headline font-semibold">
                 Want Piya in your market?
               </p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+              <form
+                className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]"
+                onSubmit={submitMarketReminder}
+              >
                 <AppTextField
                   className="[&_span]:text-white/70"
                   inputClassName="border-white/15 bg-white/10 text-white placeholder:text-white/45 focus:border-secondary focus:bg-white/15"
                   label="Email"
+                  name="email"
+                  onChange={(event) => setMarketEmail(event.target.value)}
                   placeholder="you@example.com"
+                  required
                   type="email"
+                  value={marketEmail}
                 />
                 <Button
-                  asChild
+                  buttonState={
+                    marketRequestState.isLoading ? "loading" : "enabled"
+                  }
                   className="self-end bg-secondary text-primary hover:bg-secondary-light"
+                  loadingLabel="Saving request"
+                  type="submit"
                 >
-                  <a href="mailto:support@piya.store?subject=Piya%20market%20availability">
-                    Notify me
-                  </a>
+                  Notify me
                 </Button>
-              </div>
+                {marketRequestMessage ? (
+                  <p
+                    className={cn(
+                      "text-subheadline font-semibold sm:col-span-2",
+                      marketRequestMessage.type === "success"
+                        ? "text-secondary"
+                        : "text-error",
+                    )}
+                  >
+                    {marketRequestMessage.text}
+                  </p>
+                ) : null}
+              </form>
             </div>
           </div>
 
@@ -510,4 +560,17 @@ function RotatingHeroWord({ value }: { value: string }) {
       {value}
     </span>
   );
+}
+
+function getLeadRequestErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Could not save your request. Please try again.";
 }

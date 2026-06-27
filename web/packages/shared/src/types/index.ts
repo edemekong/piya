@@ -24,6 +24,7 @@ export type {
   BaseAPIServiceOptions,
   BusinessSlugAvailabilityPayload,
   CreateUserInput,
+  CreateLeadRequestInput,
   InviteMemberInput,
   MemberInvitationPayload,
   MemberPayload,
