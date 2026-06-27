@@ -38,6 +38,7 @@ export type UserPayload = {
 
 export type AccountSetupPayload = {
   business?: import("../models").BusinessData | null;
+  channelSettings?: import("../models").ChannelSettingsData | null;
   user: import("../models").UserData;
 };
 
@@ -62,6 +63,7 @@ export type AccountSetupStep =
   | "personal-info"
   | "business-profile"
   | "brand-details"
+  | "integration"
   | "complete";
 
 export type AccountSetupPersonalInfoInput = {
@@ -76,7 +78,6 @@ export type AccountSetupPersonalInfoInput = {
 export type AccountSetupBusinessProfileInput = {
   name: string;
   category?: import("./business.type").BusinessCategoryTypes;
-  domain: string;
   description: string;
   email?: string | null;
   phoneNumber?: string | null;
@@ -96,12 +97,23 @@ export type AccountSetupBrandDetailsInput = {
   socialLinks?: Record<string, string> | null;
 };
 
+export type AccountSetupEmailIntegrationInput = {
+  fromEmailLocalPart: string;
+  replyToEmail: string;
+};
+
+export type AccountSetupIntegrationInput = {
+  slug?: string | null;
+  email?: AccountSetupEmailIntegrationInput | null;
+};
+
 export type AccountSetupCompleteInput = Record<string, never>;
 
 export type AccountSetupInputByStep = {
   "personal-info": AccountSetupPersonalInfoInput;
   "business-profile": AccountSetupBusinessProfileInput;
   "brand-details": AccountSetupBrandDetailsInput;
+  integration: AccountSetupIntegrationInput;
   complete: AccountSetupCompleteInput;
 };
 

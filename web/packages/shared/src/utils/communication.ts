@@ -67,7 +67,7 @@ export const COMMUNICATION_VARIABLES = [
   "{{business.name}}",
   "{{business.email}}",
   "{{business.phoneNumber}}",
-  "{{business.domain}}",
+  "{{business.portalUrl}}",
   "{{communication.title}}",
   "{{communication.code}}",
   "{{communication.rewardType}}",

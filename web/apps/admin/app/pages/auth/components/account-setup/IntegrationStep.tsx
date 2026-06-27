@@ -10,6 +10,12 @@ import {
 } from "lucide-react";
 import { SegmentedTabs, SettingsCard } from "@piya/ui";
 import { useState } from "react";
+import { getBusinessSlug } from "@piya/shared";
+import {
+  ConnectDomainSheet,
+  ConnectEmailSheet,
+} from "@/pages/profile/components";
+import type { SetupDraft } from "@/pages/auth/utils/account-setup-types";
 
 type IntegrationTab =
   | "domain"
@@ -18,6 +24,7 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
+  action?: "domain" | "email" | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -58,10 +65,10 @@ const integrationsByTab: Record<
     title: "Domain",
     connections: [
       {
-        connected: true,
-        name: "Connect your domain",
+        action: "domain",
+        name: "Connect domain",
         subtitle:
-          "Let customers visit your business at your own website address instead of a Piya link.",
+          "Set up a Piya sub-domain or custom domain for customers to visit your portal.",
       },
     ],
   },
@@ -69,16 +76,17 @@ const integrationsByTab: Record<
     title: "Message channel",
     connections: [
       {
-        connected: true,
+        action: "email",
         name: "Connect email",
         subtitle:
-          "Send customer emails from your business address for orders, replies, and updates.",
+          "Choose the address customers see and where their replies are sent.",
       },
       {
         name: "Connect SMS",
         subtitle: "Deliver short updates and reminders by text message.",
       },
       {
+        action: "whatsapp",
         name: "Connect WhatsApp",
         subtitle: "Reach clients through WhatsApp conversations and alerts.",
       },
@@ -110,37 +118,119 @@ const integrationsByTab: Record<
   },
 };
 
-function IntegrationStep() {
+type IntegrationStepProps = {
+  draft: SetupDraft;
+  setDraft: React.Dispatch<React.SetStateAction<SetupDraft>>;
+};
+
+function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
   const [activeTab, setActiveTab] = useState<IntegrationTab>("domain");
+  const [isDomainSheetOpen, setIsDomainSheetOpen] = useState(false);
+  const [isEmailSheetOpen, setIsEmailSheetOpen] = useState(false);
   const activeIntegration = integrationsByTab[activeTab];
+  const suggestedSlug =
+    draft.integration.slug || getBusinessSlug(draft.businessProfile.name);
+  const suggestedFromEmailLocalPart =
+    draft.integration.email.fromEmailLocalPart || suggestedSlug;
+  const suggestedReplyToEmail =
+    draft.integration.email.replyToEmail || draft.businessProfile.email || "";
+
+  function connectDomain(slug: string) {
+    setDraft((current) => ({
+      ...current,
+      integration: {
+        ...current.integration,
+        domainConnected: true,
+        email: {
+          ...current.integration.email,
+          fromEmailLocalPart: slug,
+        },
+        slug,
+      },
+    }));
+  }
+
+  function connectEmail(input: {
+    fromEmailLocalPart: string;
+    replyToEmail: string;
+  }) {
+    setDraft((current) => ({
+      ...current,
+      integration: {
+        ...current.integration,
+        domainConnected: true,
+        email: input,
+        emailConnected: true,
+        slug: input.fromEmailLocalPart,
+      },
+    }));
+  }
 
   return (
-    <div className="max-w-[820px] space-y-4">
-      <SegmentedTabs
-        items={integrationTabs}
-        onValueChange={setActiveTab}
-        value={activeTab}
-      />
+    <>
+      <div className="max-w-[820px] space-y-4">
+        <SegmentedTabs
+          items={integrationTabs}
+          onValueChange={setActiveTab}
+          value={activeTab}
+        />
 
-      <SettingsCard title={activeIntegration.title}>
-        <div className="grid gap-3">
-          {activeIntegration.connections.map((connection) => (
-            <ConnectionCard connection={connection} key={connection.name} />
-          ))}
-        </div>
-      </SettingsCard>
-    </div>
+        <SettingsCard title={activeIntegration.title}>
+          <div className="grid gap-3">
+            {activeIntegration.connections.map((connection) => {
+              const connected =
+                connection.action === "domain"
+                  ? draft.integration.domainConnected
+                  : connection.action === "email"
+                    ? draft.integration.emailConnected
+                    : connection.connected;
+
+              return (
+                <ConnectionCard
+                  connection={{ ...connection, connected }}
+                  key={connection.name}
+                  onClick={
+                    connection.action === "domain"
+                      ? () => setIsDomainSheetOpen(true)
+                      : connection.action === "email"
+                        ? () => setIsEmailSheetOpen(true)
+                        : undefined
+                  }
+                />
+              );
+            })}
+          </div>
+        </SettingsCard>
+      </div>
+
+      <ConnectDomainSheet
+        initialSlug={suggestedSlug}
+        onClose={() => setIsDomainSheetOpen(false)}
+        onConnect={connectDomain}
+        open={isDomainSheetOpen}
+      />
+      <ConnectEmailSheet
+        initialFromEmailLocalPart={suggestedFromEmailLocalPart}
+        initialReplyToEmail={suggestedReplyToEmail}
+        onClose={() => setIsEmailSheetOpen(false)}
+        onConnect={connectEmail}
+        open={isEmailSheetOpen}
+      />
+    </>
   );
 }
 
 function ConnectionCard({
   connection,
+  onClick,
 }: {
   connection: IntegrationConnection;
+  onClick?: () => void;
 }) {
   return (
     <button
       className="flex w-full items-center gap-3 rounded-md border border-border bg-fill px-4 py-4 text-left transition hover:border-primary/30 hover:bg-secondary/25"
+      onClick={onClick}
       type="button"
     >
       {connection.connected ? (
@@ -158,7 +248,9 @@ function ConnectionCard({
           {connection.subtitle}
         </span>
       </span>
-      <ChevronRight className="size-5 shrink-0 text-[#2F4B4F]/45" />
+      {onClick ? (
+        <ChevronRight className="size-5 shrink-0 text-[#2F4B4F]/45" />
+      ) : null}
     </button>
   );
 }

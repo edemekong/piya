@@ -27,7 +27,7 @@ function StepContent({ draft, email, setDraft, stepId }: StepContentProps) {
     case "brand-details":
       return <BrandDetailsStep draft={draft} setDraft={setDraft} />;
     case "integration":
-      return <IntegrationStep />;
+      return <IntegrationStep draft={draft} setDraft={setDraft} />;
     case "team":
       return <TeamStep />;
     default:

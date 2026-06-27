@@ -74,6 +74,11 @@ const API_RESPONSE = {
     code: "BUSINESS_NOT_FOUND",
     message: "Business not found",
   },
+  businessSlugUnavailable: {
+    statusCode: STATUS_CODES.conflict,
+    code: "BUSINESS_SLUG_UNAVAILABLE",
+    message: "This Piya sub-domain is not available",
+  },
   riderAccountSetupUnavailable: {
     statusCode: STATUS_CODES.unprocessableEntity,
     code: "RIDER_ACCOUNT_SETUP_UNAVAILABLE",

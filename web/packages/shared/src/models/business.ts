@@ -11,7 +11,7 @@ interface BusinessData extends BaseModel {
   category?: BusinessCategoryTypes;
   createdBy: string;
   logo?: string;
-  domain: string;
+  slug?: string | null;
   description: string;
   email?: string | null;
   phoneNumber?: string | null;

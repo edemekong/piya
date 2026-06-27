@@ -58,17 +58,6 @@ function BusinessProfileStep({ draft, setDraft }: BusinessProfileStepProps) {
             options={businessCategories}
             value={businessProfile.category}
           />
-          <div className="md:col-span-2">
-            <ProfileField
-              label="Public domain"
-              onChange={(event) =>
-                updateBusinessProfile("domain", event.target.value)
-              }
-              placeholder="Enter public domain"
-              required
-              value={businessProfile.domain}
-            />
-          </div>
         </FieldGrid>
         <ProfileTextarea
           label="Business description"

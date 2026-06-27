@@ -33,6 +33,7 @@ const accountSetupStepSchema = z.object({
     "personal-info",
     "business-profile",
     "brand-details",
+    "integration",
     "complete",
   ]),
 });
@@ -58,7 +59,6 @@ const accountSetupBusinessProfileSchema = z
   .object({
     name: z.string().trim().min(1),
     category: businessCategorySchema.optional(),
-    domain: z.string().trim().min(1),
     description: z.string().trim().min(1),
     email: z.email().nullable().optional(),
     phoneNumber: z.string().trim().min(1).nullable().optional(),
@@ -85,6 +85,31 @@ const accountSetupBrandDetailsSchema = z
   .strict()
   .transform(({ token: _token, user: _user, ...data }) => data);
 
+const businessSlugSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(55)
+  .regex(
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    "Use lowercase letters, numbers, and single hyphens only",
+  );
+
+const accountSetupIntegrationSchema = z
+  .object({
+    slug: businessSlugSchema.nullable().optional(),
+    email: z
+      .object({
+        fromEmailLocalPart: businessSlugSchema,
+        replyToEmail: z.email(),
+      })
+      .nullable()
+      .optional(),
+    ...internalFields,
+  })
+  .strict()
+  .transform(({ token: _token, user: _user, ...data }) => data);
+
 const accountSetupCompleteSchema = z
   .object(internalFields)
   .strict()
@@ -100,17 +125,22 @@ type AccountSetupBusinessProfileBody = z.infer<
 type AccountSetupBrandDetailsBody = z.infer<
   typeof accountSetupBrandDetailsSchema
 >;
+type AccountSetupIntegrationBody = z.infer<
+  typeof accountSetupIntegrationSchema
+>;
 type AccountSetupCompleteBody = z.infer<typeof accountSetupCompleteSchema>;
 
 export {
   accountSetupBrandDetailsSchema,
   accountSetupBusinessProfileSchema,
   accountSetupCompleteSchema,
+  accountSetupIntegrationSchema,
   accountSetupPersonalInfoSchema,
   accountSetupStepSchema,
   AccountSetupBrandDetailsBody,
   AccountSetupBusinessProfileBody,
   AccountSetupCompleteBody,
+  AccountSetupIntegrationBody,
   AccountSetupPersonalInfoBody,
   AccountSetupStepQuery,
 };

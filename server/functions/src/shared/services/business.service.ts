@@ -1,3 +1,4 @@
+import { finalConfiguration } from "../../configs/configurations";
 import { db } from "../../configs/firebase";
 import type {
   BusinessBranding,
@@ -5,32 +6,54 @@ import type {
   BusinessData,
   MemberData,
 } from "../model/business";
+import type {
+  ChannelSettingsData,
+  EmailChannelSettings,
+} from "../model/channel-settings";
 import type { UserData } from "../model/user";
 import type {
   AccountSetupBrandDetailsBody,
   AccountSetupBusinessProfileBody,
+  AccountSetupIntegrationBody,
 } from "../schema/account-setup.schema";
+import type {
+  BusinessBrand,
+  UpdateBusinessIntegrationsResult,
+  UpsertBusinessProfileResult,
+} from "../types/business-service.type";
 import { ApiError } from "../utils/api-response";
 import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
 import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
+import {
+  getBusinessSlug,
+  getBusinessSlugFromHostname,
+  isReservedBusinessSlug,
+} from "../utils/business-slug";
 import { StorageService } from "./storage.service";
-
-type BusinessBrand = {
-  businessId: string;
-};
-
-type UpsertBusinessProfileResult = {
-  business: BusinessData;
-  user: UserData;
-};
 
 export class BusinessService {
   static async getBrandConfig(hostname: string): Promise<BusinessBrand | null> {
-    return null;
+    const slug = getBusinessSlugFromHostname(
+      hostname,
+      finalConfiguration().DOMAIN,
+    );
+    if (!slug) return null;
+
+    const snapshot = await this.businessCollection()
+      .where("slug", "==", slug)
+      .limit(1)
+      .get();
+    const business = snapshot.docs[0]?.data() as BusinessData | undefined;
+
+    if (!business || business.status === "suspended") return null;
+
+    return { businessId: business.id };
   }
 
-  static async getBusiness(businessId?: string | null): Promise<BusinessData | null> {
+  static async getBusiness(
+    businessId?: string | null,
+  ): Promise<BusinessData | null> {
     if (!businessId) return null;
 
     const snapshot = await this.businessDocument(businessId).get();
@@ -68,6 +91,21 @@ export class BusinessService {
     return snapshot.data() as BusinessBrandingData;
   }
 
+  static async getChannelSettings(
+    businessId?: string | null,
+  ): Promise<ChannelSettingsData | null> {
+    if (!businessId) return null;
+
+    const snapshot = await this.businessDocument(businessId)
+      .collection(BUSINESS_SUBCOLLECTIONS.channelSettings)
+      .doc("config")
+      .get();
+
+    if (!snapshot.exists) return null;
+
+    return snapshot.data() as ChannelSettingsData;
+  }
+
   static async upsertBusinessProfileForUser(
     user: UserData,
     data: AccountSetupBusinessProfileBody,
@@ -90,7 +128,7 @@ export class BusinessService {
       ...(category ? { category } : {}),
       createdBy: existingBusiness?.createdBy ?? user.id,
       ...(logo ? { logo } : {}),
-      domain: data.domain,
+      slug: existingBusiness?.slug ?? null,
       description: data.description,
       email: data.email ?? existingBusiness?.email ?? null,
       phoneNumber: data.phoneNumber ?? existingBusiness?.phoneNumber ?? null,
@@ -145,6 +183,124 @@ export class BusinessService {
     await batch.commit();
 
     return { business, user: updatedUser };
+  }
+
+  static async updateBusinessIntegrations(
+    businessId: string,
+    data: AccountSetupIntegrationBody,
+  ): Promise<UpdateBusinessIntegrationsResult | null> {
+    const businessRef = this.businessDocument(businessId);
+    const snapshot = await businessRef.get();
+    if (!snapshot.exists) return null;
+
+    const existingBusiness = snapshot.data() as BusinessData;
+    const existingChannelSettings = await this.getChannelSettings(businessId);
+    const requestedSlug =
+      data.slug ?? data.email?.fromEmailLocalPart ?? existingBusiness.slug;
+    const slug = requestedSlug
+      ? await this.getAvailableBusinessSlug(businessId, requestedSlug)
+      : null;
+    const now = getUTCTimeNow();
+    const business: BusinessData = {
+      ...existingBusiness,
+      slug,
+      updatedAt: now,
+    };
+    let channelSettings = existingChannelSettings;
+    const requiresEmailDomain =
+      Boolean(data.email) || Boolean(slug && existingChannelSettings?.email);
+    const appDomain = requiresEmailDomain
+      ? finalConfiguration().DOMAIN
+      : undefined;
+
+    if (requiresEmailDomain && !appDomain) {
+      const response = API_RESPONSE.serverError;
+      throw new ApiError(
+        response.statusCode,
+        response.message,
+        response.code,
+      );
+    }
+
+    if (data.email && appDomain) {
+      if (!slug || getBusinessSlug(data.email.fromEmailLocalPart) !== slug) {
+        const response = API_RESPONSE.invalidRequest;
+        throw new ApiError(
+          response.statusCode,
+          "The email From value must match the Piya sub-domain",
+          response.code,
+        );
+      }
+
+      const email: EmailChannelSettings = {
+        provider: "resend",
+        status: "active",
+        fromEmail: `${slug}@mail.${appDomain}`,
+        replyToEmail: data.email.replyToEmail,
+      };
+      channelSettings = {
+        id: "config",
+        businessId,
+        email,
+        whatsapp: existingChannelSettings?.whatsapp ?? null,
+        sms: existingChannelSettings?.sms ?? null,
+        createdAt: existingChannelSettings?.createdAt ?? now,
+        updatedAt: now,
+      };
+    } else if (slug && existingChannelSettings?.email && appDomain) {
+      channelSettings = {
+        ...existingChannelSettings,
+        email: {
+          ...existingChannelSettings.email,
+          fromEmail: `${slug}@mail.${appDomain}`,
+        },
+        updatedAt: now,
+      };
+    }
+
+    const batch = db().batch();
+    batch.set(businessRef, business, { merge: true });
+    if (channelSettings) {
+      batch.set(
+        businessRef
+          .collection(BUSINESS_SUBCOLLECTIONS.channelSettings)
+          .doc("config"),
+        channelSettings,
+        { merge: true },
+      );
+    }
+    await batch.commit();
+
+    return { business, channelSettings };
+  }
+
+  static async getAvailableBusinessSlug(businessId: string, slug: string) {
+    const normalizedSlug = getBusinessSlug(slug);
+    if (!normalizedSlug || isReservedBusinessSlug(normalizedSlug)) {
+      const response = API_RESPONSE.businessSlugUnavailable;
+      throw new ApiError(
+        response.statusCode,
+        response.message,
+        response.code,
+      );
+    }
+
+    const existing = await this.businessCollection()
+      .where("slug", "==", normalizedSlug)
+      .limit(1)
+      .get();
+    const existingBusinessId = existing.docs[0]?.id;
+
+    if (existingBusinessId && existingBusinessId !== businessId) {
+      const response = API_RESPONSE.businessSlugUnavailable;
+      throw new ApiError(
+        response.statusCode,
+        response.message,
+        response.code,
+      );
+    }
+
+    return normalizedSlug;
   }
 
   static async updateBusinessBranding(

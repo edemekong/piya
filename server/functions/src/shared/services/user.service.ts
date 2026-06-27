@@ -149,7 +149,6 @@ class UserService {
     const business = await BusinessService.getBusiness(businessId);
     if (
       !business?.name?.trim() ||
-      !business.domain?.trim() ||
       !business.description?.trim()
     ) {
       return {

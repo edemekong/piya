@@ -1,6 +1,7 @@
 import type {
   AccountSetupBrandDetailsInput,
   AccountSetupBusinessProfileInput,
+  AccountSetupEmailIntegrationInput,
   AccountSetupPersonalInfoInput,
 } from "@piya/shared";
 import type { LucideIcon } from "lucide-react";
@@ -24,6 +25,12 @@ type SetupDraft = {
   personalInfo: AccountSetupPersonalInfoInput;
   businessProfile: AccountSetupBusinessProfileInput;
   brandDetails: AccountSetupBrandDetailsInput;
+  integration: {
+    domainConnected: boolean;
+    email: AccountSetupEmailIntegrationInput;
+    emailConnected: boolean;
+    slug: string;
+  };
 };
 
 export type { SetupDraft, SetupStep, SetupStepId };

@@ -13,7 +13,9 @@ import {
   showToast,
   type AppDispatch,
   type BusinessData,
+  type ChannelSettingsData,
   type UserData,
+  getBusinessSlug,
   useGetAccountSetupQuery,
   useUpdateAccountSetupMutation,
 } from "@piya/shared";
@@ -79,7 +81,6 @@ const initialSetupDraft: SetupDraft = {
   businessProfile: {
     name: "",
     category: "fashion_store",
-    domain: "",
     description: "",
     email: "",
     phoneNumber: "",
@@ -97,6 +98,15 @@ const initialSetupDraft: SetupDraft = {
       facebook: "",
       linkedin: "",
     },
+  },
+  integration: {
+    domainConnected: false,
+    email: {
+      fromEmailLocalPart: "",
+      replyToEmail: "",
+    },
+    emailConnected: false,
+    slug: "",
   },
 };
 
@@ -136,7 +146,13 @@ export function AccountSetupPage() {
   useEffect(() => {
     if (!accountSetup || isDraftLoaded) return;
 
-    setDraft(createSetupDraft(accountSetup.user, accountSetup.business));
+    setDraft(
+      createSetupDraft(
+        accountSetup.user,
+        accountSetup.business,
+        accountSetup.channelSettings,
+      ),
+    );
     setIsDraftLoaded(true);
   }, [accountSetup, isDraftLoaded]);
 
@@ -146,7 +162,7 @@ export function AccountSetupPage() {
     showToast(dispatch, {
       message: getAccountSetupErrorMessage(
         accountSetupLoadError,
-        "Unable to load saved account setup. Empty fields are shown so you can continue.",
+        "Unable to load saved account setup.",
       ),
       variant: "error",
     });
@@ -216,7 +232,6 @@ export function AccountSetupPage() {
         input: {
           name: draft.businessProfile.name,
           category: draft.businessProfile.category,
-          domain: draft.businessProfile.domain,
           description: draft.businessProfile.description,
           email: emptyStringToUndefined(draft.businessProfile.email),
           phoneNumber: emptyStringToUndefined(
@@ -262,6 +277,19 @@ export function AccountSetupPage() {
           },
         }));
       }
+      return;
+    }
+
+    if (currentStep.id === "integration") {
+      const integration = draft.integration;
+
+      await updateAccountSetup({
+        step: "integration",
+        input: {
+          slug: integration.domainConnected ? integration.slug : null,
+          email: integration.emailConnected ? integration.email : null,
+        },
+      }).unwrap();
     }
   }
 
@@ -408,12 +436,21 @@ export function AccountSetupPage() {
               className="flex flex-1 flex-col"
               onSubmit={(event) => event.preventDefault()}
             >
-              <div className="flex-1 py-6">
+              <div
+                className={cn(
+                  "flex-1 py-6",
+                  !isDraftLoaded && "flex items-center justify-center",
+                )}
+              >
                 {!isDraftLoaded ? (
-                  <div className="max-w-[820px] rounded-sm border border-border bg-fill p-4">
-                    <p className="text-callout text-text-secondary">
+                  <div aria-live="polite" role="status">
+                    <span
+                      aria-hidden="true"
+                      className="block size-6 animate-spin rounded-full border-2 border-primary border-t-transparent"
+                    />
+                    <span className="sr-only">
                       Loading saved account setup...
-                    </p>
+                    </span>
                   </div>
                 ) : (
                   <StepContent
@@ -492,8 +529,12 @@ function getAccountSetupErrorMessage(error: unknown, fallback: string) {
 function createSetupDraft(
   user: UserData,
   business?: BusinessData | null,
+  channelSettings?: ChannelSettingsData | null,
 ): SetupDraft {
   const branding = business?.branding;
+  const suggestedSlug = getBusinessSlug(business?.name ?? "");
+  const savedFromEmail = channelSettings?.email?.fromEmail ?? "";
+  const savedFromEmailLocalPart = savedFromEmail.split("@")[0] ?? "";
 
   return {
     personalInfo: {
@@ -507,7 +548,6 @@ function createSetupDraft(
     businessProfile: {
       name: business?.name ?? "",
       category: business?.category ?? "fashion_store",
-      domain: business?.domain ?? "",
       description: business?.description ?? "",
       email: business?.email ?? "",
       phoneNumber: business?.phoneNumber ?? "",
@@ -526,6 +566,16 @@ function createSetupDraft(
         facebook: branding?.socialLinks?.facebook ?? "",
         linkedin: branding?.socialLinks?.linkedin ?? "",
       },
+    },
+    integration: {
+      domainConnected: Boolean(business?.slug),
+      email: {
+        fromEmailLocalPart: savedFromEmailLocalPart || suggestedSlug,
+        replyToEmail:
+          channelSettings?.email?.replyToEmail ?? business?.email ?? "",
+      },
+      emailConnected: Boolean(channelSettings?.email),
+      slug: business?.slug ?? suggestedSlug,
     },
   };
 }

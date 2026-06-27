@@ -1,9 +1,9 @@
 import type {
+  ChannelProviderType,
   ChannelProviderStatusType,
   SMSRegistrationStatusType,
   SMSSenderType,
 } from "../types/channel-settings.type";
-import type { Providers } from "../types/domain.type";
 import type { BaseModel } from "./base";
 
 interface ChannelSettingsData extends BaseModel {
@@ -13,18 +13,13 @@ interface ChannelSettingsData extends BaseModel {
   sms?: SMSChannelSettings | null;
 }
 interface EmailChannelSettings {
-  provider: Extract<Providers, "resend">;
+  provider: Extract<ChannelProviderType, "resend">;
   status: ChannelProviderStatusType;
-  fromName: string;
   fromEmail: string;
-  replyToEmail?: string | null;
-  domain: string;
-  providerDomainId?: string | null;
-  credentialReference?: string | null;
-  lastError?: string | null;
+  replyToEmail: string;
 }
 interface WhatsAppChannelSettings {
-  provider: Extract<Providers, "whatsapp_cloud">;
+  provider: Extract<ChannelProviderType, "whatsapp_cloud">;
   status: ChannelProviderStatusType;
   businessAccountId?: string | null;
   phoneNumberId?: string | null;
@@ -36,7 +31,7 @@ interface WhatsAppChannelSettings {
   lastError?: string | null;
 }
 interface SMSChannelSettings {
-  provider: Extract<Providers, "link_mobility">;
+  provider: Extract<ChannelProviderType, "link_mobility">;
   status: ChannelProviderStatusType;
   senderId: string;
   senderType: SMSSenderType;

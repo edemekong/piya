@@ -1,24 +1,53 @@
 import * as React from "react";
-import { AppSheet, Button } from "@piya/ui";
+import {
+  getBusinessSlug,
+  type AccountSetupEmailIntegrationInput,
+} from "@piya/shared";
+import { AppSheet, AppTextField, Button } from "@piya/ui";
 
 type ConnectEmailSheetProps = {
+  initialFromEmailLocalPart: string;
+  initialReplyToEmail: string;
   onClose: () => void;
+  onConnect: (input: AccountSetupEmailIntegrationInput) => void;
   open: boolean;
 };
 
-function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
-  const [emailSubdomain, setEmailSubdomain] = React.useState("mail");
-  const emailDomain = `${emailSubdomain || "mail"}.yourbusiness.com`;
+function ConnectEmailSheet({
+  initialFromEmailLocalPart,
+  initialReplyToEmail,
+  onClose,
+  onConnect,
+  open,
+}: ConnectEmailSheetProps) {
+  const [fromEmailLocalPart, setFromEmailLocalPart] = React.useState(
+    initialFromEmailLocalPart,
+  );
+  const [replyToEmail, setReplyToEmail] = React.useState(initialReplyToEmail);
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    setFromEmailLocalPart(initialFromEmailLocalPart);
+    setReplyToEmail(initialReplyToEmail);
+  }, [initialFromEmailLocalPart, initialReplyToEmail, open]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const nextFromEmailLocalPart = getBusinessSlug(fromEmailLocalPart);
+    if (!nextFromEmailLocalPart || !replyToEmail.trim()) return;
+
+    onConnect({
+      fromEmailLocalPart: nextFromEmailLocalPart,
+      replyToEmail: replyToEmail.trim().toLowerCase(),
+    });
     onClose();
   }
 
   return (
     <AppSheet
       ariaLabel="connect email"
-      description="Add the email domain Piya should use when sending customer emails for your business."
       footer={
         <>
           <Button onClick={onClose} type="button" variant="secondary">
@@ -38,61 +67,32 @@ function ConnectEmailSheet({ onClose, open }: ConnectEmailSheetProps) {
         id="connect-email-form"
         onSubmit={handleSubmit}
       >
-        <label className="grid gap-2">
-          <span className="text-footnote font-semibold text-[#2F4B4F]">
-            Sender name
-          </span>
-          <input
-            className="h-12 rounded-sm border border-border bg-fill px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-            name="senderName"
-            placeholder="Enter sender name"
-            required
-            type="text"
-          />
-        </label>
-
-        <label className="grid gap-2">
-          <span className="text-footnote font-semibold text-[#2F4B4F]">
-            Email subdomain
-          </span>
-          <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
-            <input
-              className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
-              name="emailSubdomain"
-              onChange={(event) => setEmailSubdomain(event.target.value)}
-              pattern="[A-Za-z0-9-]+"
-              placeholder="Enter subdomain"
-              required
-              type="text"
-              value={emailSubdomain}
-            />
+        <AppTextField
+          label="From"
+          maxLength={55}
+          onChange={(event) =>
+            setFromEmailLocalPart(getBusinessSlug(event.target.value))
+          }
+          required
+          suffix={
             <span className="flex items-center border-l border-border px-3 text-callout text-[#2F4B4F]/65">
-              .yourbusiness.com
+              @mail.piya.store
             </span>
-          </div>
-        </label>
+          }
+          value={fromEmailLocalPart}
+        />
 
-        <label className="grid gap-2">
-          <span className="text-footnote font-semibold text-[#2F4B4F]">
-            Sender email
-          </span>
-          <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
-            <input
-              className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
-              name="senderPrefix"
-              pattern="[^@\s]+"
-              placeholder="Enter sender email"
-              required
-              type="text"
-            />
-            <span className="flex items-center border-l border-border px-3 text-callout text-[#2F4B4F]/65">
-              @{emailDomain}
-            </span>
-          </div>
-        </label>
+        <AppTextField
+          label="Reply-to"
+          onChange={(event) => setReplyToEmail(event.target.value)}
+          required
+          type="email"
+          value={replyToEmail}
+        />
       </form>
     </AppSheet>
   );
 }
 
 export { ConnectEmailSheet };
+export type { ConnectEmailSheetProps };

@@ -11,15 +11,15 @@ export const TenantMiddleware = async (
     req.headers["x-tenant-host"] ||
     req.headers.host;
 
-  const domainId = typeof hostname === "object" ? hostname[0] : hostname;
+  const tenantHostname = typeof hostname === "object" ? hostname[0] : hostname;
 
-  if (domainId) {
-    const brandConfig = await BusinessService.getBrandConfig(domainId);
-    
+  if (tenantHostname) {
+    const brandConfig = await BusinessService.getBrandConfig(tenantHostname);
+
     if (brandConfig) {
       req.tenant = {
         businessId: brandConfig.businessId,
-        domain: domainId,
+        hostname: tenantHostname,
       };
     }
   }

@@ -33,7 +33,7 @@ export const profileMenuItems: ProfileMenuItem[] = [
     value: "personal",
   },
   {
-    description: "Business name, category, contact details, and domain.",
+    description: "Business name, category, and contact details.",
     icon: Building2,
     label: "Business details",
     value: "business",
@@ -45,7 +45,7 @@ export const profileMenuItems: ProfileMenuItem[] = [
     value: "branding",
   },
   {
-    description: "Domain, message channels, calendar, and available hours.",
+    description: "Portal, message channels, calendar, and available hours.",
     icon: Plug,
     label: "Integrations",
     value: "channels",

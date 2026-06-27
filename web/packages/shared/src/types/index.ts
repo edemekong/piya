@@ -10,8 +10,10 @@ export type {
   AccountSetupBrandDetailsInput,
   AccountSetupBusinessProfileInput,
   AccountSetupCompleteInput,
+  AccountSetupEmailIntegrationInput,
   AccountSetupInput,
   AccountSetupInputByStep,
+  AccountSetupIntegrationInput,
   AccountSetupPayload,
   AccountSetupPersonalInfoInput,
   AccountSetupStep,
@@ -69,6 +71,7 @@ export type {
 } from "./campaign.type";
 
 export type {
+  ChannelProviderType,
   ChannelProviderStatusType,
   SMSRegistrationStatusType,
   SMSSenderType,
@@ -109,14 +112,6 @@ export type {
   DocumentStatusType,
   IDType,
 } from "./document.type";
-
-export type {
-  DNSRecordStatusType,
-  DNSRecordType,
-  DomainStatusType,
-  DomainType,
-  Providers,
-} from "./domain.type";
 
 export type {
   OfferingFeatureType,

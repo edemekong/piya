@@ -48,9 +48,6 @@ export function BusinessProfilePage() {
             options={businessCategories}
             value="fashion_store"
           />
-          <div className="md:col-span-2">
-            <ProfileField label="Public domain" value="piya.store" />
-          </div>
         </FieldGrid>
         <ProfileTextarea
           label="Business description"

@@ -20,7 +20,6 @@ export * from "./contact";
 export * from "./delivery";
 export * from "./discount";
 export * from "./document";
-export * from "./domain";
 export * from "./gift";
 export * from "./location";
 export * from "./offering";

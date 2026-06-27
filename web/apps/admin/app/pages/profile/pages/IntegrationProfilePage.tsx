@@ -9,7 +9,11 @@ import {
   Truck,
 } from "lucide-react";
 import { SegmentedTabs } from "@piya/ui";
-import { AddDomainSheet } from "../components/AddDomainSheet";
+import {
+  getBusinessSlug,
+  type AccountSetupEmailIntegrationInput,
+} from "@piya/shared";
+import { ConnectDomainSheet } from "../components/ConnectDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
 import { profileMenuItems } from "../profileSections";
@@ -66,10 +70,9 @@ const integrationsByTab: Record<
     connections: [
       {
         action: "domain",
-        connected: true,
-        name: "Connect your domain",
+        name: "Connect domain",
         subtitle:
-          "Let customers visit your business at your own website address instead of a Piya link.",
+          "Set up a Piya sub-domain or custom domain for customers to visit your portal.",
       },
     ],
   },
@@ -78,10 +81,9 @@ const integrationsByTab: Record<
     connections: [
       {
         action: "email",
-        connected: true,
         name: "Connect email",
         subtitle:
-          "Send customer emails from your business address for orders, replies, and updates.",
+          "Choose the address customers see and where their replies are sent.",
       },
       {
         name: "Connect SMS",
@@ -122,10 +124,34 @@ const integrationsByTab: Record<
 
 export function IntegrationProfilePage() {
   const [activeTab, setActiveTab] = React.useState<IntegrationTab>("domain");
+  const [domainConnected, setDomainConnected] = React.useState(false);
+  const [emailConnected, setEmailConnected] = React.useState(false);
   const [isDomainSheetOpen, setIsDomainSheetOpen] = React.useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = React.useState(false);
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = React.useState(false);
+  const [slug, setSlug] = React.useState(getBusinessSlug("Piya Store"));
+  const [email, setEmail] =
+    React.useState<AccountSetupEmailIntegrationInput>({
+      fromEmailLocalPart: getBusinessSlug("Piya Store"),
+      replyToEmail: "hello@piya.store",
+    });
   const activeIntegration = integrationsByTab[activeTab];
+
+  function connectDomain(nextSlug: string) {
+    setSlug(nextSlug);
+    setEmail((current) => ({
+      ...current,
+      fromEmailLocalPart: nextSlug,
+    }));
+    setDomainConnected(true);
+  }
+
+  function connectEmail(input: AccountSetupEmailIntegrationInput) {
+    setEmail(input);
+    setSlug(input.fromEmailLocalPart);
+    setDomainConnected(true);
+    setEmailConnected(true);
+  }
 
   return (
     <>
@@ -144,7 +170,15 @@ export function IntegrationProfilePage() {
           <div className="grid gap-3">
             {activeIntegration.connections.map((connection) => (
               <ConnectionCard
-                connection={connection}
+                connection={{
+                  ...connection,
+                  connected:
+                    connection.action === "domain"
+                      ? domainConnected
+                      : connection.action === "email"
+                        ? emailConnected
+                        : connection.connected,
+                }}
                 key={connection.name}
                 onClick={
                   connection.action === "domain"
@@ -161,12 +195,17 @@ export function IntegrationProfilePage() {
         </SettingsCard>
       </ProfileSectionShell>
 
-      <AddDomainSheet
+      <ConnectDomainSheet
+        initialSlug={slug}
         onClose={() => setIsDomainSheetOpen(false)}
+        onConnect={connectDomain}
         open={isDomainSheetOpen}
       />
       <ConnectEmailSheet
+        initialFromEmailLocalPart={email.fromEmailLocalPart}
+        initialReplyToEmail={email.replyToEmail}
         onClose={() => setIsEmailSheetOpen(false)}
+        onConnect={connectEmail}
         open={isEmailSheetOpen}
       />
       <ConnectWhatsAppSheet
@@ -205,7 +244,9 @@ function ConnectionCard({
           {connection.subtitle}
         </span>
       </span>
-      <ChevronRight className="size-5 shrink-0 text-[#2F4B4F]/45" />
+      {onClick ? (
+        <ChevronRight className="size-5 shrink-0 text-[#2F4B4F]/45" />
+      ) : null}
     </button>
   );
 }

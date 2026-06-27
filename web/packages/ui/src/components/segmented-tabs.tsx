@@ -2,6 +2,7 @@ import * as React from "react";
 import { cn } from "../lib/cn";
 
 export type SegmentedTabItem<Value extends string> = {
+  disabled?: boolean;
   icon?: React.ReactNode;
   label: React.ReactNode;
   value: Value;
@@ -34,10 +35,14 @@ export function SegmentedTabs<Value extends string>({
             value === item.value
               ? "bg-white text-[#2F4B4F] shadow-sm"
               : "text-[#2F4B4F]/65",
+            item.disabled && "cursor-not-allowed opacity-45",
             itemClassName,
           )}
+          disabled={item.disabled}
           key={item.value}
-          onClick={() => onValueChange(item.value)}
+          onClick={() => {
+            if (!item.disabled) onValueChange(item.value);
+          }}
           type="button"
         >
           {item.icon}

@@ -3,6 +3,7 @@ import {
   accountSetupBrandDetailsSchema,
   accountSetupBusinessProfileSchema,
   accountSetupCompleteSchema,
+  accountSetupIntegrationSchema,
   accountSetupPersonalInfoSchema,
   accountSetupStepSchema,
   AccountSetupStepQuery,
@@ -41,6 +42,8 @@ accountSetupRouter.get(
 
     const business = await BusinessService.getBusiness(businessId);
     const branding = await BusinessService.getBusinessBranding(businessId);
+    const channelSettings =
+      await BusinessService.getChannelSettings(businessId);
 
     const accountSetupBusiness = business
       ? { ...business, branding: branding ?? business.branding ?? null }
@@ -51,7 +54,7 @@ accountSetupRouter.get(
     return SuccessResult(
       res,
       response.message,
-      { business: accountSetupBusiness, user },
+      { business: accountSetupBusiness, channelSettings, user },
       response.statusCode,
       response.code,
     );
@@ -147,6 +150,35 @@ accountSetupRouter.patch(
         res,
         response.message,
         { business, user },
+        response.statusCode,
+        response.code,
+      );
+    }
+
+    if (step === "integration") {
+      const body = parseBody(accountSetupIntegrationSchema, req.body);
+      const businessId = user.business?.businessIds[0];
+
+      if (!businessId) {
+        const error = API_RESPONSE.accountSetupIncomplete;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
+
+      const result = await BusinessService.updateBusinessIntegrations(
+        businessId,
+        body,
+      );
+
+      if (!result) {
+        const error = API_RESPONSE.businessNotFound;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
+
+      const response = API_RESPONSE.accountSetupUpdated;
+      return SuccessResult(
+        res,
+        response.message,
+        { ...result, user },
         response.statusCode,
         response.code,
       );

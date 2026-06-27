@@ -7,6 +7,8 @@ export * from "./utils";
 export type {
   AccountSetupBrandDetailsInput,
   AccountSetupBusinessProfileInput,
+  AccountSetupEmailIntegrationInput,
+  AccountSetupIntegrationInput,
   AccountSetupPersonalInfoInput,
 } from "./types/api";
 export type { BusinessCategoryTypes } from "./types/business.type";

@@ -1,3 +1,4 @@
+type ChannelProviderType = "resend" | "whatsapp_cloud" | "link_mobility";
 type ChannelProviderStatusType =
   | "not_connected"
   | "pending"
@@ -10,4 +11,9 @@ type SMSRegistrationStatusType =
   | "pending"
   | "approved"
   | "rejected";
-export { ChannelProviderStatusType, SMSSenderType, SMSRegistrationStatusType };
+export {
+  ChannelProviderType,
+  ChannelProviderStatusType,
+  SMSSenderType,
+  SMSRegistrationStatusType,
+};

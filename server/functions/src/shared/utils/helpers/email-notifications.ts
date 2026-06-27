@@ -6,26 +6,26 @@ export async function sendEmailTo({
   subject,
   html,
   from = "Piya",
-  fromEmailUserID = "piya",
+  fromEmailLocalPart = "piya",
 }: {
   emails: string[];
   subject: string;
   html: string;
   from?: string;
-  fromEmailUserID?: string;
+  fromEmailLocalPart?: string;
 }): Promise<boolean> {
   try {
     const { DOMAIN: APP_DOMAIN } = finalConfiguration();
     const DOMAIN = `mail.${APP_DOMAIN}`;
 
     const fromName = from
-      ? `${from} <${fromEmailUserID}@${DOMAIN}>`
-      : `${fromEmailUserID}@${DOMAIN}`;
+      ? `${from} <${fromEmailLocalPart}@${DOMAIN}>`
+      : `${fromEmailLocalPart}@${DOMAIN}`;
 
     const { data: emailData, error } = await resendEmailClient().emails.send({
       from: fromName,
       to: emails,
-      replyTo: `support@${DOMAIN}`,
+      replyTo: `${fromEmailLocalPart}@${DOMAIN}`,
       subject: subject,
       html: html,
     });
@@ -53,7 +53,7 @@ export async function sendEmailWithTemplateTo({
   templateId: string;
   templateData: Record<string, any>;
   from?: string;
-  fromEmailUserID?: string;
+  fromEmailLocalPart?: string;
 }): Promise<boolean> {
   try {
     const { data: emailData, error } = await resendEmailClient().emails.send({
