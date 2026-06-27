@@ -1,14 +1,64 @@
 import { Link } from "@remix-run/react";
 import { ArrowRight } from "lucide-react";
-import { Button, cn } from "@piya/ui";
-import type * as React from "react";
+import {
+  AppFieldGrid,
+  AppSelectField,
+  AppSheet,
+  AppTextareaField,
+  AppTextField,
+  Button,
+  cn,
+} from "@piya/ui";
+import * as React from "react";
 
 type MarketingLayoutProps = {
   children: React.ReactNode;
   className?: string;
 };
 
+const demoBusinessSizeOptions = [
+  { label: "Select size", value: "" },
+  { label: "Just starting", value: "Just starting" },
+  { label: "1-5 team members", value: "1-5 team members" },
+  { label: "6-20 team members", value: "6-20 team members" },
+  { label: "21-50 team members", value: "21-50 team members" },
+  { label: "51+ team members", value: "51+ team members" },
+] as const;
+
+const demoFocusOptions = [
+  { label: "Select focus", value: "" },
+  { label: "Contacts and customer profiles", value: "Contacts and customer profiles" },
+  { label: "Campaigns and messaging", value: "Campaigns and messaging" },
+  { label: "Loyalty, discounts, and gifts", value: "Loyalty, discounts, and gifts" },
+  { label: "WhatsApp, email, and SMS channels", value: "WhatsApp, email, and SMS channels" },
+  { label: "Full customer operations", value: "Full customer operations" },
+] as const;
+
 export function MarketingLayout({ children, className }: MarketingLayoutProps) {
+  const [isDemoSheetOpen, setIsDemoSheetOpen] = React.useState(false);
+
+  function submitDemoRequest(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const body = [
+      ["Name", formData.get("fullName")],
+      ["Work email", formData.get("workEmail")],
+      ["Business name", formData.get("businessName")],
+      ["Phone or WhatsApp", formData.get("phone")],
+      ["Business size", formData.get("businessSize")],
+      ["Demo focus", formData.get("demoFocus")],
+      ["Notes", formData.get("notes")],
+    ]
+      .map(([label, value]) => `${label}: ${String(value ?? "").trim()}`)
+      .join("\n");
+
+    window.location.href = `mailto:support@piya.store?subject=${encodeURIComponent(
+      "Request a Piya demo",
+    )}&body=${encodeURIComponent(body)}`;
+    setIsDemoSheetOpen(false);
+  }
+
   return (
     <main className={cn("min-h-screen bg-background text-foreground", className)}>
       <header className="border-b border-border bg-background/95 backdrop-blur">
@@ -20,15 +70,13 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
           <div className="flex items-center gap-3">
             <a
               className="hidden text-subheadline font-semibold text-primary underline underline-offset-4 transition hover:text-primary-dark sm:inline-flex"
-              href="mailto:support@piya.store?subject=Create%20a%20Piya%20account"
+              href="https://dashboard.piya.store"
             >
               Get started
             </a>
-            <Button asChild size="sm">
-              <a href="mailto:support@piya.store?subject=Request%20a%20Piya%20demo">
-                Request a demo
-                <ArrowRight className="size-4" />
-              </a>
+            <Button onClick={() => setIsDemoSheetOpen(true)} size="sm" type="button">
+              Request a demo
+              <ArrowRight className="size-4" />
             </Button>
           </div>
         </div>
@@ -78,6 +126,84 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
           </div>
         </div>
       </footer>
+
+      <AppSheet
+        ariaLabel="request a demo"
+        description="Share a few details so we can prepare the right walkthrough."
+        footer={
+          <>
+            <Button
+              onClick={() => setIsDemoSheetOpen(false)}
+              type="button"
+              variant="secondary"
+            >
+              Cancel
+            </Button>
+            <Button form="demo-request-form" type="submit">
+              Send request
+            </Button>
+          </>
+        }
+        onClose={() => setIsDemoSheetOpen(false)}
+        open={isDemoSheetOpen}
+        title="Request a demo"
+      >
+        <form
+          className="grid gap-5"
+          id="demo-request-form"
+          onSubmit={submitDemoRequest}
+        >
+          <AppFieldGrid>
+            <AppTextField
+              autoComplete="name"
+              label="Name"
+              name="fullName"
+              placeholder="Your name"
+              required
+            />
+            <AppTextField
+              autoComplete="email"
+              label="Work email"
+              name="workEmail"
+              placeholder="you@example.com"
+              required
+              type="email"
+            />
+          </AppFieldGrid>
+          <AppTextField
+            autoComplete="organization"
+            label="Business name"
+            name="businessName"
+            placeholder="Your business"
+            required
+          />
+          <AppFieldGrid>
+            <AppTextField
+              autoComplete="tel"
+              label="Phone or WhatsApp"
+              name="phone"
+              placeholder="+234..."
+              type="tel"
+            />
+            <AppSelectField
+              label="Business size"
+              name="businessSize"
+              options={demoBusinessSizeOptions}
+            />
+          </AppFieldGrid>
+          <AppSelectField
+            label="Demo focus"
+            name="demoFocus"
+            options={demoFocusOptions}
+            required
+          />
+          <AppTextareaField
+            label="Notes"
+            name="notes"
+            placeholder="Preferred day or time, current tools, or what you want to solve."
+          />
+        </form>
+      </AppSheet>
     </main>
   );
 }
