@@ -5,6 +5,7 @@ import type { AccountSetupPersonalInfoBody } from "../schema/account-setup.schem
 import type { UpdateUserBody } from "../schema/user.schema";
 import { COLLECTIONS } from "../utils/collections";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
+import { ValidationsUtils } from "../utils/validations.utils";
 import { BusinessService } from "./business.service";
 import { StorageService } from "./storage.service";
 
@@ -77,7 +78,7 @@ class UserService {
     const updatedUser: UserData = {
       ...existingUser,
       name: data.name,
-      phoneNumber: data.phoneNumber ?? existingUser.phoneNumber ?? null,
+      phoneNumber: data.phoneNumber,
       profileImageUrl,
       dob: data.dob ?? existingUser.dob ?? null,
       gender: data.gender ?? existingUser.gender ?? null,
@@ -120,7 +121,12 @@ class UserService {
   > {
     const user = await this.getUser(userId);
 
-    if (!user?.name?.trim()) {
+    if (
+      !user?.name?.trim() ||
+      !ValidationsUtils.isValidSupportedPhoneNumber(
+        user.phoneNumber ?? undefined,
+      )
+    ) {
       return {
         success: false,
         message: "Add your personal information first.",
@@ -155,7 +161,10 @@ class UserService {
     }
 
     const branding = await BusinessService.getBusinessBranding(businessId);
-    if (!branding) {
+    if (
+      !branding ||
+      !ValidationsUtils.isValidHexColor(branding.primaryColor)
+    ) {
       return {
         success: false,
         message: "Add your brand details first.",

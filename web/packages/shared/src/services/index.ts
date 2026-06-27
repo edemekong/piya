@@ -21,6 +21,7 @@ export {
   BaseAPIService,
 } from "./base-api.service";
 export { AuthService, authService } from "./auth.service";
+export { BusinessService, businessService } from "./business.service";
 export * from "./communications.service";
 export * from "./contacts.service";
 export * from "./discounts.service";

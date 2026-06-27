@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 import { SegmentedTabs } from "@piya/ui";
 import {
-  getBusinessSlug,
   type AccountSetupEmailIntegrationInput,
+  useGetAccountSetupQuery,
+  useUpdateAccountSetupMutation,
 } from "@piya/shared";
 import { ConnectDomainSheet } from "../components/ConnectDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
@@ -129,26 +130,57 @@ export function IntegrationProfilePage() {
   const [isDomainSheetOpen, setIsDomainSheetOpen] = React.useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = React.useState(false);
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = React.useState(false);
-  const [slug, setSlug] = React.useState(getBusinessSlug("Piya Store"));
+  const [slug, setSlug] = React.useState("");
   const [email, setEmail] =
     React.useState<AccountSetupEmailIntegrationInput>({
-      fromEmailLocalPart: getBusinessSlug("Piya Store"),
-      replyToEmail: "hello@piya.store",
+      fromEmailLocalPart: "",
+      replyToEmail: "",
     });
+  const { data: accountSetup } = useGetAccountSetupQuery();
+  const [updateAccountSetup] = useUpdateAccountSetupMutation();
   const activeIntegration = integrationsByTab[activeTab];
 
-  function connectDomain(nextSlug: string) {
-    setSlug(nextSlug);
+  React.useEffect(() => {
+    if (!accountSetup) return;
+
+    const savedSlug = accountSetup.business?.slug ?? "";
+    const savedEmail = accountSetup.channelSettings?.email;
+    setSlug(savedSlug);
+    setDomainConnected(Boolean(savedSlug));
+    setEmail({
+      fromEmailLocalPart: savedSlug,
+      replyToEmail: savedEmail?.replyToEmail ?? "",
+    });
+    setEmailConnected(Boolean(savedEmail));
+  }, [accountSetup]);
+
+  async function connectDomain(nextSlug: string) {
+    const result = await updateAccountSetup({
+      step: "integration",
+      input: { slug: nextSlug },
+    }).unwrap();
+    const savedSlug = result.business?.slug ?? nextSlug;
+
+    setSlug(savedSlug);
     setEmail((current) => ({
       ...current,
-      fromEmailLocalPart: nextSlug,
+      fromEmailLocalPart: savedSlug,
     }));
     setDomainConnected(true);
   }
 
-  function connectEmail(input: AccountSetupEmailIntegrationInput) {
+  async function connectEmail(input: AccountSetupEmailIntegrationInput) {
+    const result = await updateAccountSetup({
+      step: "integration",
+      input: {
+        email: input,
+        slug: input.fromEmailLocalPart,
+      },
+    }).unwrap();
+    const savedSlug = result.business?.slug ?? input.fromEmailLocalPart;
+
     setEmail(input);
-    setSlug(input.fromEmailLocalPart);
+    setSlug(savedSlug);
     setDomainConnected(true);
     setEmailConnected(true);
   }
@@ -202,6 +234,7 @@ export function IntegrationProfilePage() {
         open={isDomainSheetOpen}
       />
       <ConnectEmailSheet
+        businessName={accountSetup?.business?.name ?? ""}
         initialFromEmailLocalPart={email.fromEmailLocalPart}
         initialReplyToEmail={email.replyToEmail}
         onClose={() => setIsEmailSheetOpen(false)}

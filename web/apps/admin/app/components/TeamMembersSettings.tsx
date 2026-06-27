@@ -233,7 +233,15 @@ export function TeamMembersSettings({
                   className="flex items-center gap-3 rounded-md bg-fill px-3 py-3"
                   key={menuId}
                 >
-                  <AppAvatar className="size-10" name={name} />
+                  <AppAvatar
+                    className="size-10"
+                    imageUrl={
+                      entry.kind === "member"
+                        ? entry.value.profileImageUrl
+                        : undefined
+                    }
+                    name={name}
+                  />
                   <div className="min-w-0 flex-1">
                     {isInvitation ? (
                       <>

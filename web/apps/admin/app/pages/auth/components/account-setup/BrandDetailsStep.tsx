@@ -206,6 +206,7 @@ function BrandDetailsStep({ draft, setDraft }: BrandDetailsStepProps) {
           <BrandColorField
             label="Primary color"
             onChange={(value) => updateBrandDetails("primaryColor", value)}
+            required
             value={brandDetails.primaryColor}
           />
           <BrandColorField
@@ -250,15 +251,20 @@ function readImageFile(file: File) {
 function BrandColorField({
   label,
   onChange,
+  required,
   value,
 }: {
   label: string;
   onChange: (value: string) => void;
+  required?: boolean;
   value: string;
 }) {
   return (
     <label className="grid min-w-0 gap-2">
-      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
+      <span className="text-footnote font-normal text-[#2F4B4F]">
+        {label}
+        {required ? <span className="text-error"> *</span> : null}
+      </span>
       <span className="flex h-12 min-w-0 items-center gap-3 rounded-sm border border-border bg-fill px-3">
         <span
           className="size-6 rounded-full border border-border"
@@ -267,6 +273,7 @@ function BrandColorField({
         <input
           className="my-2 min-w-0 flex-1 bg-transparent text-callout text-[#2F4B4F] outline-none"
           onChange={(event) => onChange(event.target.value)}
+          required={required}
           value={value}
         />
       </span>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ValidationsUtils } from "../utils/validations.utils";
 
 const genderSchema = z.enum(["male", "female", "other"]);
 const businessCategorySchema = z.enum([
@@ -41,7 +42,14 @@ const accountSetupStepSchema = z.object({
 const accountSetupPersonalInfoSchema = z
   .object({
     name: z.string().trim().min(1),
-    phoneNumber: z.string().trim().min(1).nullable().optional(),
+    phoneNumber: z
+      .string()
+      .trim()
+      .refine(
+        (phoneNumber) =>
+          ValidationsUtils.isValidSupportedPhoneNumber(phoneNumber),
+        "Enter a valid supported phone number",
+      ),
     profileImage: z.string().trim().min(1).optional(),
     profileImageUrl: z.string().trim().min(1).optional(),
     dob: z
@@ -76,7 +84,13 @@ const accountSetupBrandDetailsSchema = z
     faviconBase64: z.string().trim().min(1).optional(),
     coverImage: z.string().trim().min(1).nullable().optional(),
     coverImageBase64: z.string().trim().min(1).optional(),
-    primaryColor: z.string().trim().min(1),
+    primaryColor: z
+      .string()
+      .trim()
+      .refine(
+        (color) => ValidationsUtils.isValidHexColor(color),
+        "Enter a valid 6-digit hex color",
+      ),
     secondaryColor: z.string().trim().min(1).nullable().optional(),
     accentColor: z.string().trim().min(1).nullable().optional(),
     socialLinks: z.record(z.string(), z.string()).nullable().optional(),

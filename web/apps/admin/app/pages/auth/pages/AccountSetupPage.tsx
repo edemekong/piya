@@ -27,6 +27,7 @@ import type {
   SetupStep,
   SetupStepId,
 } from "@/pages/auth/utils/account-setup-types";
+import { getAccountSetupCompletionPercentage } from "@/pages/auth/utils/account-setup-progress";
 import {
   ACCOUNT_SETUP_PATH,
   DEFAULT_AUTHENTICATED_PATH,
@@ -139,6 +140,12 @@ export function AccountSetupPage() {
     skip: authStatus !== "ready",
   });
   const [updateAccountSetup] = useUpdateAccountSetupMutation();
+  const completionPercentage = isDraftLoaded
+    ? getAccountSetupCompletionPercentage(
+        draft,
+        invitationTo ? "personal-info" : "business-setup",
+      )
+    : 0;
 
   useEffect(() => {
     if (new URLSearchParams(location.search).get("step")) return;
@@ -214,7 +221,7 @@ export function AccountSetupPage() {
         input: {
           name: draft.personalInfo.name,
           gender: draft.personalInfo.gender ?? null,
-          phoneNumber: emptyStringToUndefined(draft.personalInfo.phoneNumber),
+          phoneNumber: draft.personalInfo.phoneNumber,
           profileImage: emptyStringToUndefined(draft.personalInfo.profileImage),
           profileImageUrl: emptyStringToUndefined(
             draft.personalInfo.profileImageUrl,
@@ -417,8 +424,7 @@ export function AccountSetupPage() {
 
             <div className="mt-auto pt-8">
               <span className="inline-flex rounded-full bg-secondary px-4 py-2 text-footnote font-semibold text-primary">
-                {Math.round(((currentStepIndex + 1) / setupSteps.length) * 100)}
-                % complete
+                {completionPercentage}% complete
               </span>
             </div>
           </aside>

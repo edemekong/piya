@@ -6,6 +6,7 @@ import { hasChangedFields } from "../../shared/utils/helpers/helper-functions";
 const memberProfileFields = [
   "name",
   "email",
+  "profileImageUrl",
 ] as const satisfies readonly CriticalUserField[];
 
 export const onUserProfileUpdated = onDocumentUpdated(

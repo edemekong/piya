@@ -79,6 +79,11 @@ const API_RESPONSE = {
     code: "BUSINESS_SLUG_UNAVAILABLE",
     message: "This Piya sub-domain is not available",
   },
+  businessSlugAvailabilityChecked: {
+    statusCode: STATUS_CODES.ok,
+    code: "BUSINESS_SLUG_AVAILABILITY_CHECKED",
+    message: "Piya sub-domain availability checked",
+  },
   teamFetched: {
     statusCode: STATUS_CODES.ok,
     code: "TEAM_FETCHED",

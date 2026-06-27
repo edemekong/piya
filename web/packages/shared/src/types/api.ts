@@ -42,6 +42,11 @@ export type AccountSetupPayload = {
   user: import("../models").UserData;
 };
 
+export type BusinessSlugAvailabilityPayload = {
+  available: boolean;
+  slug: string;
+};
+
 export type AuthTokenPayload = {
   authToken: string;
 };
@@ -68,7 +73,7 @@ export type AccountSetupStep =
 
 export type AccountSetupPersonalInfoInput = {
   name: string;
-  phoneNumber?: string | null;
+  phoneNumber: string;
   profileImage?: string;
   profileImageUrl?: string;
   dob?: string | null;

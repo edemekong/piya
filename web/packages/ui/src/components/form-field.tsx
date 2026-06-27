@@ -37,6 +37,7 @@ export type AppTextFieldProps = Omit<
   error?: React.ReactNode;
   inputClassName?: string;
   label: string;
+  success?: React.ReactNode;
   suffix?: React.ReactNode;
 };
 
@@ -49,6 +50,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
       label,
       onChange,
       required,
+      success,
       suffix,
       value,
       ...props
@@ -68,6 +70,9 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
             className={cn(
               "flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white",
               error && "border-error focus-within:border-error",
+              success &&
+                !error &&
+                "border-success focus-within:border-success",
             )}
           >
             <input
@@ -87,6 +92,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
             className={cn(
               inputClassName,
               error && "border-error focus:border-error",
+              success && !error && "border-success focus:border-success",
               customInputClassName,
             )}
             ref={ref}
@@ -98,6 +104,10 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
         {error ? (
           <span className="text-footnote leading-relaxed text-error">
             {error}
+          </span>
+        ) : success ? (
+          <span className="text-footnote leading-relaxed text-success">
+            {success}
           </span>
         ) : null}
       </label>

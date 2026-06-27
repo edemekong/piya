@@ -210,6 +210,7 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
         open={isDomainSheetOpen}
       />
       <ConnectEmailSheet
+        businessName={draft.businessProfile.name}
         initialFromEmailLocalPart={suggestedFromEmailLocalPart}
         initialReplyToEmail={suggestedReplyToEmail}
         onClose={() => setIsEmailSheetOpen(false)}

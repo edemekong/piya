@@ -8,6 +8,7 @@ import type {
 } from "../models";
 import type {
   AccountSetupPayload,
+  BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
   InviteMemberInput,
@@ -17,6 +18,7 @@ import type {
   UpdateMemberRoleRequest,
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
+import { businessService } from "../services/business.service";
 import { communicationsService } from "../services/communications.service";
 import { contactsService } from "../services/contacts.service";
 import { discountsService } from "../services/discounts.service";
@@ -85,6 +87,23 @@ export const domainApi = createApi({
         }
       },
       invalidatesTags: ["AccountSetup"],
+    }),
+    checkBusinessSlugAvailability: builder.query<
+      BusinessSlugAvailabilityPayload,
+      string
+    >({
+      queryFn: async (slug, api) => {
+        try {
+          return {
+            data: await businessService.checkSlugAvailability(
+              slug,
+              api.signal,
+            ),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
     }),
     getTeam: builder.query<TeamPayload, void>({
       queryFn: async () => {
@@ -190,6 +209,7 @@ export const domainApi = createApi({
 });
 
 export const {
+  useLazyCheckBusinessSlugAvailabilityQuery,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useGetAccountSetupQuery,

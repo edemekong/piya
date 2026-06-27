@@ -1,5 +1,8 @@
 import * as React from "react";
-import { getBusinessSlug } from "@piya/shared";
+import {
+  getBusinessSlug,
+  useLazyCheckBusinessSlugAvailabilityQuery,
+} from "@piya/shared";
 import {
   AppSheet,
   AppTextField,
@@ -8,11 +11,17 @@ import {
 } from "@piya/ui";
 
 type DomainTab = "piya-subdomain" | "custom-domain";
+type SlugAvailabilityStatus =
+  | "idle"
+  | "checking"
+  | "available"
+  | "unavailable"
+  | "error";
 
 type ConnectDomainSheetProps = {
   initialSlug: string;
   onClose: () => void;
-  onConnect: (slug: string) => void;
+  onConnect: (slug: string) => Promise<void> | void;
   open: boolean;
 };
 
@@ -33,23 +42,92 @@ function ConnectDomainSheet({
 }: ConnectDomainSheetProps) {
   const [activeTab, setActiveTab] = React.useState<DomainTab>("piya-subdomain");
   const [slug, setSlug] = React.useState(initialSlug);
+  const [availabilityStatus, setAvailabilityStatus] =
+    React.useState<SlugAvailabilityStatus>("idle");
+  const [isConnecting, setIsConnecting] = React.useState(false);
+  const [submissionError, setSubmissionError] = React.useState<string>();
+  const [checkSlugAvailability] =
+    useLazyCheckBusinessSlugAvailabilityQuery();
 
   React.useEffect(() => {
     if (!open) return;
 
     setActiveTab("piya-subdomain");
     setSlug(initialSlug);
+    setAvailabilityStatus("idle");
+    setIsConnecting(false);
+    setSubmissionError(undefined);
   }, [initialSlug, open]);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  React.useEffect(() => {
+    if (!open || !slug) {
+      setAvailabilityStatus("idle");
+      return;
+    }
 
+    let cancelled = false;
+    setAvailabilityStatus("checking");
+    setSubmissionError(undefined);
+
+    const timeoutId = window.setTimeout(() => {
+      void checkSlugAvailability(slug)
+        .unwrap()
+        .then((result) => {
+          if (cancelled) return;
+          setAvailabilityStatus(
+            result.available ? "available" : "unavailable",
+          );
+        })
+        .catch(() => {
+          if (!cancelled) setAvailabilityStatus("error");
+        });
+    }, 800);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [checkSlugAvailability, open, slug]);
+
+  async function connectDomain() {
     const nextSlug = getBusinessSlug(slug);
-    if (!nextSlug) return;
+    if (!nextSlug || availabilityStatus !== "available" || isConnecting) {
+      return;
+    }
 
-    onConnect(nextSlug);
-    onClose();
+    setIsConnecting(true);
+    setSubmissionError(undefined);
+
+    try {
+      await onConnect(nextSlug);
+      onClose();
+    } catch (error) {
+      setSubmissionError(
+        getErrorMessage(error, "Unable to connect this domain."),
+      );
+    } finally {
+      setIsConnecting(false);
+    }
   }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Enter") return;
+
+    event.preventDefault();
+    void connectDomain();
+  }
+
+  const validationError =
+    submissionError ??
+    (availabilityStatus === "unavailable"
+      ? "This Piya sub-domain is not available."
+      : availabilityStatus === "error"
+        ? "Unable to check this Piya sub-domain. Please try again."
+        : undefined);
+  const validationSuccess =
+    availabilityStatus === "available"
+      ? "This Piya sub-domain is available."
+      : undefined;
 
   return (
     <AppSheet
@@ -59,7 +137,12 @@ function ConnectDomainSheet({
           <Button onClick={onClose} type="button" variant="secondary">
             Cancel
           </Button>
-          <Button form="connect-domain-form" type="submit">
+          <Button
+            buttonState={isConnecting ? "loading" : "enabled"}
+            disabled={availabilityStatus !== "available"}
+            onClick={() => void connectDomain()}
+            type="button"
+          >
             Connect domain
           </Button>
         </>
@@ -68,10 +151,9 @@ function ConnectDomainSheet({
       open={open}
       title="Connect domain"
     >
-      <form
+      <div
         className="grid gap-5"
-        id="connect-domain-form"
-        onSubmit={handleSubmit}
+        onKeyDown={handleKeyDown}
       >
         <SegmentedTabs
           items={domainTabs}
@@ -80,10 +162,17 @@ function ConnectDomainSheet({
         />
 
         <AppTextField
+          error={validationError}
           label="Piya sub-domain"
           maxLength={55}
-          onChange={(event) => setSlug(getBusinessSlug(event.target.value))}
+          onChange={(event) => {
+            const nextSlug = getBusinessSlug(event.target.value);
+            setSlug(nextSlug);
+            setAvailabilityStatus(nextSlug ? "checking" : "idle");
+            setSubmissionError(undefined);
+          }}
           required
+          success={validationSuccess}
           suffix={
             <span className="flex items-center border-l border-border px-3 text-callout text-[#2F4B4F]/65">
               .piya.store
@@ -91,6 +180,14 @@ function ConnectDomainSheet({
           }
           value={slug}
         />
+        {availabilityStatus === "checking" ? (
+          <p
+            aria-live="polite"
+            className="-mt-3 text-footnote text-[#2F4B4F]/65"
+          >
+            Checking availability...
+          </p>
+        ) : null}
 
         <ul className="list-disc pl-5 text-callout text-[#2F4B4F]/65">
           <li>
@@ -100,9 +197,22 @@ function ConnectDomainSheet({
             </span>
           </li>
         </ul>
-      </form>
+      </div>
     </AppSheet>
   );
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return error instanceof Error ? error.message : fallback;
 }
 
 export { ConnectDomainSheet };

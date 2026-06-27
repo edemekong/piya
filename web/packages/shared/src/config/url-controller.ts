@@ -41,6 +41,10 @@ export class URLController {
     return this.path("/v1/businesses/team");
   }
 
+  get businessSlugAvailability() {
+    return this.path("/v1/businesses/slug-availability");
+  }
+
   get memberInvitations() {
     return this.path("/v1/businesses/member-invitations");
   }

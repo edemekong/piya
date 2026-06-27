@@ -159,19 +159,22 @@ export class BusinessTeamService {
     const businessRef = this.businessDocument(businessId);
 
     return db().runTransaction(async (transaction) => {
-      const [invitationSnapshot, memberSnapshot, userSnapshot, businessSnapshot] =
-        await Promise.all([
-          transaction.get(invitationRef),
-          transaction.get(memberRef),
-          transaction.get(userRef),
-          transaction.get(businessRef),
-        ]);
+      const [
+        invitationSnapshot,
+        memberSnapshot,
+        userSnapshot,
+        businessSnapshot,
+      ] = await Promise.all([
+        transaction.get(invitationRef),
+        transaction.get(memberRef),
+        transaction.get(userRef),
+        transaction.get(businessRef),
+      ]);
       if (!invitationSnapshot.exists) {
         return { status: "invitation-not-found" };
       }
 
-      const invitation =
-        invitationSnapshot.data() as MemberInvitationData;
+      const invitation = invitationSnapshot.data() as MemberInvitationData;
       const existingMember = memberSnapshot.exists
         ? (memberSnapshot.data() as MemberData)
         : null;
@@ -201,6 +204,7 @@ export class BusinessTeamService {
         businessId,
         name: user.name.trim() || email,
         email,
+        profileImageUrl: user.profileImageUrl,
         role: invitation.role,
         permission: invitation.role === "admin" ? "edit" : "view",
         createdAt: existingMember?.createdAt ?? now,
@@ -236,10 +240,7 @@ export class BusinessTeamService {
     });
   }
 
-  static async updateMemberRole(
-    member: MemberData,
-    input: MemberRoleBody,
-  ) {
+  static async updateMemberRole(member: MemberData, input: MemberRoleBody) {
     const updatedMember: MemberData = {
       ...member,
       role: input.role,
@@ -256,10 +257,7 @@ export class BusinessTeamService {
     invitationId: string,
     input: MemberRoleBody,
   ) {
-    const invitationRef = this.invitationDocumentById(
-      businessId,
-      invitationId,
-    );
+    const invitationRef = this.invitationDocumentById(businessId, invitationId);
     const snapshot = await invitationRef.get();
     if (!snapshot.exists) return null;
 
@@ -280,14 +278,8 @@ export class BusinessTeamService {
     await this.memberDocument(member.businessId, member.id).delete();
   }
 
-  static async deleteInvitation(
-    businessId: string,
-    invitationId: string,
-  ) {
-    const invitationRef = this.invitationDocumentById(
-      businessId,
-      invitationId,
-    );
+  static async deleteInvitation(businessId: string, invitationId: string) {
+    const invitationRef = this.invitationDocumentById(businessId, invitationId);
     const snapshot = await invitationRef.get();
     if (!snapshot.exists) return false;
 
@@ -327,10 +319,7 @@ export class BusinessTeamService {
     );
   }
 
-  static async removeUserMembership(
-    businessId: string,
-    memberId: string,
-  ) {
+  static async removeUserMembership(businessId: string, memberId: string) {
     const userRef = db().collection(COLLECTIONS.users).doc(memberId);
     const userSnapshot = await userRef.get();
     if (!userSnapshot.exists) return;
@@ -361,7 +350,10 @@ export class BusinessTeamService {
   }
 
   static async updateMemberProfiles(
-    user: Pick<UserData, "business" | "email" | "id" | "name">,
+    user: Pick<
+      UserData,
+      "business" | "email" | "id" | "name" | "profileImageUrl"
+    >,
   ) {
     const businessIds = user.business?.businessIds ?? [];
     if (businessIds.length === 0) return;
@@ -376,7 +368,11 @@ export class BusinessTeamService {
         if (!snapshot.exists) return false;
 
         const member = snapshot.data() as MemberData;
-        return member.name !== user.name || member.email !== email;
+        return (
+          member.name !== user.name ||
+          member.email !== email ||
+          member.profileImageUrl !== user.profileImageUrl
+        );
       })
       .map((snapshot) => snapshot.ref);
 
@@ -390,6 +386,7 @@ export class BusinessTeamService {
         {
           email,
           name: user.name,
+          profileImageUrl: user.profileImageUrl,
           updatedAt,
         },
         { merge: true },

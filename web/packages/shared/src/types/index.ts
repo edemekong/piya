@@ -22,6 +22,7 @@ export type {
   ApiResponseBody,
   AuthTokenPayload,
   BaseAPIServiceOptions,
+  BusinessSlugAvailabilityPayload,
   CreateUserInput,
   InviteMemberInput,
   MemberInvitationPayload,

@@ -1,5 +1,7 @@
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 
+const supportedPhoneCountryCodes = new Set(["GH", "KE", "NG", "US", "ZA"]);
+
 export class ValidationsUtils {
   static isValidEmail(email: string | undefined): boolean {
     if(!email) return false;
@@ -21,6 +23,25 @@ export class ValidationsUtils {
     }
     
     return false;
+  }
+
+  static isValidSupportedPhoneNumber(phone: string | undefined): boolean {
+    if (!phone || !/^\+[1-9]\d{1,14}$/.test(phone)) return false;
+
+    try {
+      const phoneNumber = parsePhoneNumberWithError(phone);
+      return Boolean(
+        phoneNumber.country &&
+          supportedPhoneCountryCodes.has(phoneNumber.country) &&
+          phoneNumber.isValid(),
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  static isValidHexColor(color: string | undefined): boolean {
+    return Boolean(color && /^#[0-9a-f]{6}$/i.test(color));
   }
 
   static getValidPhoneNumber(phone: string, code?: string): string | null {

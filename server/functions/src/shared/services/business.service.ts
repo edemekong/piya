@@ -157,6 +157,7 @@ export class BusinessService {
       businessId: business.id,
       name: user.name || data.name,
       email: user.email,
+      profileImageUrl: user.profileImageUrl,
       role: "owner",
       permission: "edit",
       createdAt: now,

@@ -37,6 +37,7 @@ interface MemberData extends BaseModel {
   businessId: string;
   name: string;
   email: string;
+  profileImageUrl?: string | null;
   role: MemberRoleType;
   permission: MemberPermissionType;
 }
