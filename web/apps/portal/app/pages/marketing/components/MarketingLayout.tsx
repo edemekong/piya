@@ -87,6 +87,8 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
             <a
               className="hidden text-subheadline font-semibold text-primary underline underline-offset-4 transition hover:text-primary-dark sm:inline-flex"
               href="https://dashboard.piya.store"
+              rel="noreferrer"
+              target="_blank"
             >
               Get started
             </a>

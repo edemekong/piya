@@ -242,7 +242,11 @@ export function LandingPage() {
             </div>
             <div className="mt-12 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild>
-                <a href="https://dashboard.piya.store">
+                <a
+                  href="https://dashboard.piya.store"
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   Create your account
                   <ArrowRight className="size-4" />
                 </a>
@@ -540,7 +544,11 @@ export function LandingPage() {
             </p>
           </div>
           <Button asChild className="bg-secondary text-primary hover:bg-secondary-light">
-            <a href="https://dashboard.piya.store">
+            <a
+              href="https://dashboard.piya.store"
+              rel="noreferrer"
+              target="_blank"
+            >
               Get started
               <ArrowRight className="size-4" />
             </a>
