@@ -22,10 +22,8 @@ corepack pnpm dev:portal
 
 ## Railway
 
-Create separate Railway services for admin and portal from the same repo. The checked-in
-`railway.toml` deploys the admin app.
-
-Use `web` as the service root directory.
+Create separate Railway services named `admin` and `portal`. The deployment
+scripts run from `web`, so Railway uploads `web` as the deployment root.
 
 Admin service:
 
@@ -34,7 +32,7 @@ railway link
 pnpm deploy:admin
 ```
 
-Railway config:
+Set its Railway Config File path to `/railway.admin.toml`:
 
 ```sh
 Build Command: pnpm build:admin
@@ -43,9 +41,15 @@ Start Command: pnpm start:admin
 
 Portal service:
 
+Set its Railway Config File path to `/railway.portal.toml`:
+
 ```sh
 Build Command: pnpm build:portal
 Start Command: pnpm start:portal
 ```
 
 Both Remix apps listen on Railway's `PORT` through `remix-serve`.
+
+If the services are later changed from CLI uploads to GitHub deployments from
+the repository root, use `/web` as the Root Directory and change the config
+paths to `/web/railway.admin.toml` and `/web/railway.portal.toml`.

@@ -10,7 +10,8 @@
     "build": "pnpm -r build",
     "build:admin": "pnpm --filter @piya/admin build",
     "build:portal": "pnpm --filter @piya/portal build",
-    "deploy:admin": "railway up",
+    "deploy:admin": "railway up --service admin --environment prod",
+    "deploy:portal": "railway up --service portal --environment prod",
     "start:admin": "pnpm --filter @piya/admin start",
     "start:portal": "pnpm --filter @piya/portal start",
     "typecheck": "pnpm -r typecheck"
