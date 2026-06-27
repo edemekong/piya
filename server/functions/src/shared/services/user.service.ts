@@ -3,9 +3,7 @@ import type { BusinessData } from "../model/business";
 import type { UserData } from "../model/user";
 import type { AccountSetupPersonalInfoBody } from "../schema/account-setup.schema";
 import type { UpdateUserBody } from "../schema/user.schema";
-import { ApiError } from "../utils/api-response";
 import { COLLECTIONS } from "../utils/collections";
-import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
 import { BusinessService } from "./business.service";
 import { StorageService } from "./storage.service";
@@ -70,19 +68,10 @@ class UserService {
       data.profileImageUrl ?? existingUser.profileImageUrl ?? "";
 
     if (data.profileImage) {
-      try {
-        profileImageUrl = await StorageService.uploadUserProfileImage(
-          userId,
-          StorageService.decodeBase64Image(data.profileImage),
-        );
-      } catch (error) {
-        const response = API_RESPONSE.invalidRequest;
-        throw new ApiError(
-          response.statusCode,
-          error instanceof Error ? error.message : response.message,
-          response.code,
-        );
-      }
+      profileImageUrl = await StorageService.uploadUserProfileImage(
+        userId,
+        StorageService.decodeBase64Image(data.profileImage),
+      );
     }
 
     const updatedUser: UserData = {

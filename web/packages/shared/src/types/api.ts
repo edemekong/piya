@@ -126,3 +126,34 @@ export type UpdateAccountSetupRequest = {
     input: AccountSetupInput<TStep>;
   };
 }[AccountSetupStep];
+
+export type TeamPayload = {
+  currentUserRole: import("./business.type").MemberRoleType;
+  invitations: import("../models").MemberInvitationData[];
+  members: import("../models").MemberData[];
+};
+
+export type InviteMemberInput = {
+  email: string;
+  role: import("./business.type").InvitableMemberRoleType;
+};
+
+export type UpdateTeamEntryRoleInput = {
+  role: import("./business.type").InvitableMemberRoleType;
+};
+
+export type MemberPayload = {
+  member: import("../models").MemberData;
+};
+
+export type MemberInvitationPayload = {
+  invitation: import("../models").MemberInvitationData;
+};
+
+export type UpdateMemberRoleRequest = UpdateTeamEntryRoleInput & {
+  memberId: string;
+};
+
+export type UpdateMemberInvitationRoleRequest = UpdateTeamEntryRoleInput & {
+  invitationId: string;
+};

@@ -79,6 +79,66 @@ const API_RESPONSE = {
     code: "BUSINESS_SLUG_UNAVAILABLE",
     message: "This Piya sub-domain is not available",
   },
+  teamFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "TEAM_FETCHED",
+    message: "Team fetched",
+  },
+  memberInvitationSent: {
+    statusCode: STATUS_CODES.created,
+    code: "MEMBER_INVITATION_SENT",
+    message: "Invitation sent",
+  },
+  memberInvitationAccepted: {
+    statusCode: STATUS_CODES.ok,
+    code: "MEMBER_INVITATION_ACCEPTED",
+    message: "Invitation accepted",
+  },
+  memberInvitationNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "MEMBER_INVITATION_NOT_FOUND",
+    message: "No pending invitation was found for this email",
+  },
+  memberInvitationExpired: {
+    statusCode: STATUS_CODES.gone,
+    code: "MEMBER_INVITATION_EXPIRED",
+    message: "This invitation has expired",
+  },
+  memberInvitationEmailFailed: {
+    statusCode: STATUS_CODES.badGateway,
+    code: "MEMBER_INVITATION_EMAIL_FAILED",
+    message: "The invitation was saved, but the email could not be sent",
+  },
+  memberAlreadyExists: {
+    statusCode: STATUS_CODES.conflict,
+    code: "MEMBER_ALREADY_EXISTS",
+    message: "This email already belongs to a team member",
+  },
+  memberUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "MEMBER_UPDATED",
+    message: "Team member updated",
+  },
+  memberDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "MEMBER_DELETED",
+    message: "Team member deleted",
+  },
+  memberInvitationDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "MEMBER_INVITATION_DELETED",
+    message: "Invitation deleted",
+  },
+  teamOwnerRequired: {
+    statusCode: STATUS_CODES.forbidden,
+    code: "TEAM_OWNER_REQUIRED",
+    message: "Only the business owner can manage team roles and members",
+  },
+  teamInvitePermissionRequired: {
+    statusCode: STATUS_CODES.forbidden,
+    code: "TEAM_INVITE_PERMISSION_REQUIRED",
+    message: "You do not have permission to invite team members",
+  },
   riderAccountSetupUnavailable: {
     statusCode: STATUS_CODES.unprocessableEntity,
     code: "RIDER_ACCOUNT_SETUP_UNAVAILABLE",

@@ -1,5 +1,6 @@
 import admin = require("firebase-admin");
 import { createHash } from "crypto";
+import { isDeepStrictEqual } from "node:util";
 import base64url from "base64url";
 import jwt from "jsonwebtoken";
 import { finalConfiguration } from "../../../configs/configurations";
@@ -58,6 +59,16 @@ export const uniqueItemList = (originalList: Array<any>) => {
 export const getUTCTimeNow = () => {
   return Date.now();
 };
+
+export function hasChangedFields<TData extends object>(
+  before: TData,
+  after: TData,
+  fields: readonly (keyof TData)[],
+) {
+  return fields.some(
+    (field) => !isDeepStrictEqual(before[field], after[field]),
+  );
+}
 
 export function getFirstName(fullName: string): string {
   let firstName = "";

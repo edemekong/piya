@@ -37,6 +37,34 @@ export class URLController {
     return this.path(`/v1/users/account-setup${query}`);
   }
 
+  get team() {
+    return this.path("/v1/businesses/team");
+  }
+
+  get memberInvitations() {
+    return this.path("/v1/businesses/member-invitations");
+  }
+
+  acceptMemberInvitation(businessId: string) {
+    return this.path(
+      `/v1/businesses/${encodeURIComponent(
+        businessId,
+      )}/member-invitations/accept`,
+    );
+  }
+
+  memberInvitation(invitationId: string) {
+    return this.path(
+      `/v1/businesses/member-invitations/${encodeURIComponent(invitationId)}`,
+    );
+  }
+
+  teamMember(memberId: string) {
+    return this.path(
+      `/v1/businesses/members/${encodeURIComponent(memberId)}`,
+    );
+  }
+
   user(id: string) {
     return this.path(`/v1/users/fetch/${encodeURIComponent(id)}`);
   }

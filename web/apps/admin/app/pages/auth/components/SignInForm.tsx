@@ -1,17 +1,19 @@
 import type * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@remix-run/react";
 import {
   ApiServiceError,
   authService,
   showToast,
   type AppDispatch,
+  teamService,
   userService,
 } from "@piya/shared";
 import { AppTextField, Button } from "@piya/ui";
 import { useDispatch } from "react-redux";
 import {
   getAccountSetupPathWithReturnTo,
+  getInvitationToFromSearch,
   getReturnToFromSearch,
   getSafeReturnTo,
 } from "@/utils/auth-routing";
@@ -22,6 +24,7 @@ export function SignInForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const invitationAcceptanceStartedRef = useRef(false);
   const [email, setEmail] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState<string[]>(Array(otpLength).fill(""));
@@ -32,6 +35,15 @@ export function SignInForm() {
   const otpCode = otp.join("");
   const newEmail = email.trim().toLowerCase();
   const canSubmit = !isSubmitting;
+  const invitationTo = getInvitationToFromSearch(location.search);
+
+  useEffect(() => {
+    const uid = authService.currentFirebaseUser?.uid;
+    if (!invitationTo || !uid || invitationAcceptanceStartedRef.current) return;
+
+    invitationAcceptanceStartedRef.current = true;
+    void completeSignedInUser(uid);
+  }, [invitationTo]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,21 +90,42 @@ export function SignInForm() {
         throw new Error("Unable to confirm your signed-in session.");
       }
 
-      const currentUserProfile = await getCurrentUserProfile(uid);
-      const userProfile =
-        currentUserProfile ?? (await userService.createUser({}));
-      const returnTo = getSafeReturnTo(getReturnToFromSearch(location.search));
-
-      navigate(
-        userProfile.accountSetupCompleted
-          ? returnTo
-          : getAccountSetupPathWithReturnTo(returnTo),
-        { replace: true },
-      );
+      invitationAcceptanceStartedRef.current = true;
+      await completeSignedInUser(uid);
     } catch (error) {
       const message = getAuthErrorMessage(error);
       showToast(dispatch, {
         message,
+        variant: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function completeSignedInUser(uid: string) {
+    setIsSubmitting(true);
+
+    try {
+      const currentUserProfile = await getCurrentUserProfile(uid);
+      const userProfile =
+        currentUserProfile ?? (await userService.createUser({}));
+
+      if (invitationTo) {
+        await teamService.acceptInvitation(invitationTo);
+      }
+
+      const returnTo = getSafeReturnTo(getReturnToFromSearch(location.search));
+      navigate(
+        userProfile.accountSetupCompleted
+          ? returnTo
+          : getAccountSetupPathWithReturnTo(returnTo, invitationTo),
+        { replace: true },
+      );
+    } catch (error) {
+      invitationAcceptanceStartedRef.current = false;
+      showToast(dispatch, {
+        message: getAuthErrorMessage(error),
         variant: "error",
       });
     } finally {

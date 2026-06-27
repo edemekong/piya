@@ -16,8 +16,22 @@ type UpdateBusinessIntegrationsResult = {
   channelSettings: ChannelSettingsData | null;
 };
 
+type UpdateBusinessIntegrationsOutcome =
+  | {
+      status: "updated";
+      data: UpdateBusinessIntegrationsResult;
+    }
+  | {
+      status:
+        | "business-not-found"
+        | "domain-not-configured"
+        | "email-domain-mismatch"
+        | "slug-unavailable";
+    };
+
 export {
   BusinessBrand,
   UpsertBusinessProfileResult,
+  UpdateBusinessIntegrationsOutcome,
   UpdateBusinessIntegrationsResult,
 };

@@ -11,28 +11,40 @@ export function getCurrentRoutePath(location: {
   return `${location.pathname}${location.search}`;
 }
 
-export function getAuthPathWithReturnTo(returnTo: string) {
+export function getAuthPathWithReturnTo(
+  returnTo: string,
+  invitationTo?: string | null,
+) {
   const safeReturnTo = getSafeReturnTo(returnTo, "");
+  const params = new URLSearchParams();
 
-  if (!safeReturnTo) {
-    return AUTH_PATH;
-  }
+  if (safeReturnTo) params.set("returnTo", safeReturnTo);
+  if (invitationTo) params.set("invitationTo", invitationTo);
 
-  return `${AUTH_PATH}?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  const query = params.toString();
+  return query ? `${AUTH_PATH}?${query}` : AUTH_PATH;
 }
 
-export function getAccountSetupPathWithReturnTo(returnTo: string) {
+export function getAccountSetupPathWithReturnTo(
+  returnTo: string,
+  invitationTo?: string | null,
+) {
   const safeReturnTo = getSafeReturnTo(returnTo, "");
+  const params = new URLSearchParams();
 
-  if (!safeReturnTo) {
-    return ACCOUNT_SETUP_PATH;
-  }
+  if (safeReturnTo) params.set("returnTo", safeReturnTo);
+  if (invitationTo) params.set("invitationTo", invitationTo);
 
-  return `${ACCOUNT_SETUP_PATH}?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  const query = params.toString();
+  return query ? `${ACCOUNT_SETUP_PATH}?${query}` : ACCOUNT_SETUP_PATH;
 }
 
 export function getReturnToFromSearch(search: string) {
   return new URLSearchParams(search).get("returnTo");
+}
+
+export function getInvitationToFromSearch(search: string) {
+  return new URLSearchParams(search).get("invitationTo");
 }
 
 export function getSafeReturnTo(

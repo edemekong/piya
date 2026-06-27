@@ -1,5 +1,7 @@
 export {
   domainApi,
+  useDeleteMemberInvitationMutation,
+  useDeleteMemberMutation,
   useGetAccountSetupQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
@@ -8,6 +10,10 @@ export {
   useGetGiftsQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
+  useGetTeamQuery,
+  useInviteMemberMutation,
+  useUpdateMemberInvitationRoleMutation,
+  useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
 } from "./domain-api";
 export {

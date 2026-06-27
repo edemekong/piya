@@ -1,6 +1,8 @@
 import type {
   BusinessCategoryTypes,
   BusinessStatusType,
+  InvitableMemberRoleType,
+  MemberInvitationStatusType,
   MemberPermissionType,
   MemberRoleType,
 } from "../types/business.type";
@@ -38,10 +40,21 @@ interface MemberData extends BaseModel {
   role: MemberRoleType;
   permission: MemberPermissionType;
 }
+interface MemberInvitationData extends BaseModel {
+  businessId: string;
+  email: string;
+  role: InvitableMemberRoleType;
+  status: MemberInvitationStatusType;
+  invitedBy: string;
+  expiresAt: number;
+  acceptedAt?: number | null;
+  acceptedBy?: string | null;
+}
 
 export {
   BusinessData,
   BusinessBranding,
   BusinessBrandingData,
   MemberData,
+  MemberInvitationData,
 };

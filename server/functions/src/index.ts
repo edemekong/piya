@@ -72,3 +72,8 @@ export const api = onRequest(
   },
   app,
 );
+
+export {
+  onBusinessMemberWritten,
+  onUserProfileUpdated,
+} from "./triggers";

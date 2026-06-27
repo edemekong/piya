@@ -18,12 +18,10 @@ import type {
 } from "../schema/account-setup.schema";
 import type {
   BusinessBrand,
-  UpdateBusinessIntegrationsResult,
+  UpdateBusinessIntegrationsOutcome,
   UpsertBusinessProfileResult,
 } from "../types/business-service.type";
-import { ApiError } from "../utils/api-response";
 import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
-import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
 import {
   getBusinessSlug,
@@ -148,7 +146,7 @@ export class BusinessService {
         businessIds: nextBusinessIds,
         businessRoleTypes: {
           ...user.business?.businessRoleTypes,
-          [business.id]: ["admin"],
+          [business.id]: ["owner"],
         },
       },
       updatedAt: now,
@@ -188,10 +186,10 @@ export class BusinessService {
   static async updateBusinessIntegrations(
     businessId: string,
     data: AccountSetupIntegrationBody,
-  ): Promise<UpdateBusinessIntegrationsResult | null> {
+  ): Promise<UpdateBusinessIntegrationsOutcome> {
     const businessRef = this.businessDocument(businessId);
     const snapshot = await businessRef.get();
-    if (!snapshot.exists) return null;
+    if (!snapshot.exists) return { status: "business-not-found" };
 
     const existingBusiness = snapshot.data() as BusinessData;
     const existingChannelSettings = await this.getChannelSettings(businessId);
@@ -200,6 +198,7 @@ export class BusinessService {
     const slug = requestedSlug
       ? await this.getAvailableBusinessSlug(businessId, requestedSlug)
       : null;
+    if (requestedSlug && !slug) return { status: "slug-unavailable" };
     const now = getUTCTimeNow();
     const business: BusinessData = {
       ...existingBusiness,
@@ -214,22 +213,12 @@ export class BusinessService {
       : undefined;
 
     if (requiresEmailDomain && !appDomain) {
-      const response = API_RESPONSE.serverError;
-      throw new ApiError(
-        response.statusCode,
-        response.message,
-        response.code,
-      );
+      return { status: "domain-not-configured" };
     }
 
     if (data.email && appDomain) {
       if (!slug || getBusinessSlug(data.email.fromEmailLocalPart) !== slug) {
-        const response = API_RESPONSE.invalidRequest;
-        throw new ApiError(
-          response.statusCode,
-          "The email From value must match the Piya sub-domain",
-          response.code,
-        );
+        return { status: "email-domain-mismatch" };
       }
 
       const email: EmailChannelSettings = {
@@ -271,18 +260,16 @@ export class BusinessService {
     }
     await batch.commit();
 
-    return { business, channelSettings };
+    return {
+      status: "updated",
+      data: { business, channelSettings },
+    };
   }
 
   static async getAvailableBusinessSlug(businessId: string, slug: string) {
     const normalizedSlug = getBusinessSlug(slug);
     if (!normalizedSlug || isReservedBusinessSlug(normalizedSlug)) {
-      const response = API_RESPONSE.businessSlugUnavailable;
-      throw new ApiError(
-        response.statusCode,
-        response.message,
-        response.code,
-      );
+      return null;
     }
 
     const existing = await this.businessCollection()
@@ -292,12 +279,7 @@ export class BusinessService {
     const existingBusinessId = existing.docs[0]?.id;
 
     if (existingBusinessId && existingBusinessId !== businessId) {
-      const response = API_RESPONSE.businessSlugUnavailable;
-      throw new ApiError(
-        response.statusCode,
-        response.message,
-        response.code,
-      );
+      return null;
     }
 
     return normalizedSlug;
@@ -384,50 +366,41 @@ export class BusinessService {
     businessId: string,
     data: AccountSetupBrandDetailsBody,
   ) {
-    try {
-      const logoFile = data.logoBase64
-        ? StorageService.decodeBase64Image(data.logoBase64)
-        : null;
-      const faviconFile = data.faviconBase64
-        ? StorageService.decodeBase64Image(data.faviconBase64)
-        : null;
-      const coverImageFile = data.coverImageBase64
-        ? StorageService.decodeBase64Image(data.coverImageBase64)
-        : null;
+    const logoFile = data.logoBase64
+      ? StorageService.decodeBase64Image(data.logoBase64)
+      : null;
+    const faviconFile = data.faviconBase64
+      ? StorageService.decodeBase64Image(data.faviconBase64)
+      : null;
+    const coverImageFile = data.coverImageBase64
+      ? StorageService.decodeBase64Image(data.coverImageBase64)
+      : null;
 
-      const [logo, favicon, coverImage] = await Promise.all([
-        logoFile
-          ? StorageService.uploadBusinessBrandImage(
-              businessId,
-              "logo",
-              logoFile,
-            )
-          : null,
-        faviconFile
-          ? StorageService.uploadBusinessBrandImage(
-              businessId,
-              "favicon",
-              faviconFile,
-            )
-          : null,
-        coverImageFile
-          ? StorageService.uploadBusinessBrandImage(
-              businessId,
-              "cover-image",
-              coverImageFile,
-            )
-          : null,
-      ]);
+    const [logo, favicon, coverImage] = await Promise.all([
+      logoFile
+        ? StorageService.uploadBusinessBrandImage(
+            businessId,
+            "logo",
+            logoFile,
+          )
+        : null,
+      faviconFile
+        ? StorageService.uploadBusinessBrandImage(
+            businessId,
+            "favicon",
+            faviconFile,
+          )
+        : null,
+      coverImageFile
+        ? StorageService.uploadBusinessBrandImage(
+            businessId,
+            "cover-image",
+            coverImageFile,
+          )
+        : null,
+    ]);
 
-      return { logo, favicon, coverImage };
-    } catch (error) {
-      const response = API_RESPONSE.invalidRequest;
-      throw new ApiError(
-        response.statusCode,
-        error instanceof Error ? error.message : response.message,
-        response.code,
-      );
-    }
+    return { logo, favicon, coverImage };
   }
 
   private static businessDocument(businessId: string) {

@@ -83,10 +83,26 @@ accountSetupRouter.patch(
     if (step === "personal-info") {
       const body = parseBody(accountSetupPersonalInfoSchema, req.body);
 
-      const updatedUser = await UserService.updateAccountSetupPersonalInfo(
-        currentUser.uid,
-        body,
-      );
+      let updatedUser;
+      try {
+        updatedUser = await UserService.updateAccountSetupPersonalInfo(
+          currentUser.uid,
+          body,
+        );
+      } catch (error) {
+        const response = API_RESPONSE.invalidRequest;
+        return ErrorResult(
+          res,
+          response.statusCode,
+          error instanceof Error ? error.message : response.message,
+          response.code,
+        );
+      }
+
+      if (!updatedUser) {
+        const error = API_RESPONSE.userNotFound;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
 
       const response = API_RESPONSE.accountSetupUpdated;
       return SuccessResult(
@@ -135,10 +151,21 @@ accountSetupRouter.patch(
         return ErrorResult(res, error.statusCode, error.message, error.code);
       }
 
-      const business = await BusinessService.updateBusinessBranding(
-        businessId,
-        body,
-      );
+      let business;
+      try {
+        business = await BusinessService.updateBusinessBranding(
+          businessId,
+          body,
+        );
+      } catch (error) {
+        const response = API_RESPONSE.invalidRequest;
+        return ErrorResult(
+          res,
+          response.statusCode,
+          error instanceof Error ? error.message : response.message,
+          response.code,
+        );
+      }
 
       if (!business) {
         const error = API_RESPONSE.businessNotFound;
@@ -164,13 +191,34 @@ accountSetupRouter.patch(
         return ErrorResult(res, error.statusCode, error.message, error.code);
       }
 
-      const result = await BusinessService.updateBusinessIntegrations(
+      const outcome = await BusinessService.updateBusinessIntegrations(
         businessId,
         body,
       );
 
-      if (!result) {
+      if (outcome.status === "business-not-found") {
         const error = API_RESPONSE.businessNotFound;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
+      if (outcome.status === "slug-unavailable") {
+        const error = API_RESPONSE.businessSlugUnavailable;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
+      if (outcome.status === "domain-not-configured") {
+        const error = API_RESPONSE.serverError;
+        return ErrorResult(res, error.statusCode, error.message, error.code);
+      }
+      if (outcome.status === "email-domain-mismatch") {
+        const error = API_RESPONSE.invalidRequest;
+        return ErrorResult(
+          res,
+          error.statusCode,
+          "The email From value must match the Piya sub-domain",
+          error.code,
+        );
+      }
+      if (outcome.status !== "updated") {
+        const error = API_RESPONSE.serverError;
         return ErrorResult(res, error.statusCode, error.message, error.code);
       }
 
@@ -178,7 +226,7 @@ accountSetupRouter.patch(
       return SuccessResult(
         res,
         response.message,
-        { ...result, user },
+        { ...outcome.data, user },
         response.statusCode,
         response.code,
       );

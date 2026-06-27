@@ -7,6 +7,7 @@ const COLLECTIONS = {
 const BUSINESS_SUBCOLLECTIONS = {
   branding: "branding",
   channelSettings: "channel_settings",
+  memberInvitations: "member_invitations",
   members: "members",
 } as const;
 

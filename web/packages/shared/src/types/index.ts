@@ -23,8 +23,15 @@ export type {
   AuthTokenPayload,
   BaseAPIServiceOptions,
   CreateUserInput,
+  InviteMemberInput,
+  MemberInvitationPayload,
+  MemberPayload,
+  TeamPayload,
   TokenProvider,
   UpdateAccountSetupRequest,
+  UpdateMemberInvitationRoleRequest,
+  UpdateMemberRoleRequest,
+  UpdateTeamEntryRoleInput,
   UpdateUserInput,
   UserPayload,
 } from "./api";
@@ -60,6 +67,8 @@ export type {
 export type {
   BusinessCategoryTypes,
   BusinessStatusType,
+  InvitableMemberRoleType,
+  MemberInvitationStatusType,
   MemberPermissionType,
   MemberRoleType,
 } from "./business.type";

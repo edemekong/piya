@@ -11,4 +11,8 @@ export type {
   AccountSetupIntegrationInput,
   AccountSetupPersonalInfoInput,
 } from "./types/api";
-export type { BusinessCategoryTypes } from "./types/business.type";
+export type {
+  BusinessCategoryTypes,
+  InvitableMemberRoleType,
+  MemberRoleType,
+} from "./types/business.type";

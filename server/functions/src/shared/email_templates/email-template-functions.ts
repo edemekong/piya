@@ -10,3 +10,12 @@ export function renderOTPVerificationEmail(data: {
     expiresIn: data.expiresIn || 30,
   });
 }
+
+export function renderMemberInvitationEmail(data: {
+  acceptUrl: string;
+  businessName: string;
+  expiresInDays: number;
+  role: string;
+}): string {
+  return renderTemplate("member-invitation", data);
+}

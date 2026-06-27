@@ -1,6 +1,8 @@
 type BusinessStatusType = "verified" | "pending" | "suspended";
-type MemberRoleType = "owner" | "manager";
+type MemberRoleType = "owner" | "admin" | "manager";
+type InvitableMemberRoleType = Exclude<MemberRoleType, "owner">;
 type MemberPermissionType = "edit" | "view";
+type MemberInvitationStatusType = "pending" | "accepted";
 
 type BusinessCategoryTypes =
   | "laundry"
@@ -25,6 +27,8 @@ type BusinessCategoryTypes =
 
 export type {
   BusinessStatusType,
+  InvitableMemberRoleType,
+  MemberInvitationStatusType,
   MemberRoleType,
   MemberPermissionType,
   BusinessCategoryTypes,

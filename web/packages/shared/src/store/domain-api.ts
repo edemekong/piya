@@ -10,7 +10,11 @@ import type {
   AccountSetupPayload,
   CommunicationAdminData,
   CommunicationRecipient,
+  InviteMemberInput,
+  TeamPayload,
   UpdateAccountSetupRequest,
+  UpdateMemberInvitationRoleRequest,
+  UpdateMemberRoleRequest,
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
 import { communicationsService } from "../services/communications.service";
@@ -19,6 +23,7 @@ import { discountsService } from "../services/discounts.service";
 import { giftsService } from "../services/gifts.service";
 import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
+import { teamService } from "../services/team.service";
 import { userService } from "../services/user.service";
 
 type DomainApiError = {
@@ -53,6 +58,7 @@ export const domainApi = createApi({
     "Gift",
     "Offering",
     "Order",
+    "Team",
   ],
   endpoints: (builder) => ({
     getAccountSetup: builder.query<AccountSetupPayload, void>({
@@ -79,6 +85,74 @@ export const domainApi = createApi({
         }
       },
       invalidatesTags: ["AccountSetup"],
+    }),
+    getTeam: builder.query<TeamPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await teamService.getTeam() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["Team"],
+    }),
+    inviteMember: builder.mutation<void, InviteMemberInput>({
+      queryFn: async (input) => {
+        try {
+          await teamService.inviteMember(input);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Team"],
+    }),
+    updateMemberRole: builder.mutation<void, UpdateMemberRoleRequest>({
+      queryFn: async ({ memberId, role }) => {
+        try {
+          await teamService.updateMemberRole(memberId, { role });
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Team"],
+    }),
+    updateMemberInvitationRole: builder.mutation<
+      void,
+      UpdateMemberInvitationRoleRequest
+    >({
+      queryFn: async ({ invitationId, role }) => {
+        try {
+          await teamService.updateInvitationRole(invitationId, { role });
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Team"],
+    }),
+    deleteMember: builder.mutation<void, string>({
+      queryFn: async (memberId) => {
+        try {
+          await teamService.deleteMember(memberId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Team"],
+    }),
+    deleteMemberInvitation: builder.mutation<void, string>({
+      queryFn: async (invitationId) => {
+        try {
+          await teamService.deleteInvitation(invitationId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Team"],
     }),
     getCommunications: builder.query<CommunicationAdminData[], void>({
       queryFn: () => ({ data: communicationsService.getCommunications() }),
@@ -116,6 +190,8 @@ export const domainApi = createApi({
 });
 
 export const {
+  useDeleteMemberInvitationMutation,
+  useDeleteMemberMutation,
   useGetAccountSetupQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
@@ -124,5 +200,9 @@ export const {
   useGetGiftsQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
+  useGetTeamQuery,
+  useInviteMemberMutation,
+  useUpdateMemberInvitationRoleMutation,
+  useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
 } = domainApi;

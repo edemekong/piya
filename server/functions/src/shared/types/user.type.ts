@@ -1,6 +1,6 @@
 import type { UserData } from "../model/user";
 
-type UserRoleType = "admin" | "manager";
+type UserRoleType = "owner" | "admin" | "manager";
 type UserGenderType = "male" | "female" | "other";
 type MiniUserData = Pick<UserData, "id" | "email" | "profileImageUrl">;
 

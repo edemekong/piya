@@ -31,11 +31,12 @@ import {
   ACCOUNT_SETUP_PATH,
   DEFAULT_AUTHENTICATED_PATH,
   getReturnToFromSearch,
+  getInvitationToFromSearch,
   getSafeReturnTo,
 } from "@/utils/auth-routing";
 import { useAdminAuthRedirect } from "@/utils/use-admin-auth-redirect";
 
-const setupSteps: SetupStep[] = [
+const businessSetupSteps: SetupStep[] = [
   {
     id: "personal-info",
     title: "Personal info",
@@ -115,7 +116,11 @@ export function AccountSetupPage() {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const navigate = useNavigate();
-  const activeStepId = getSetupStepId(location.search);
+  const invitationTo = getInvitationToFromSearch(location.search);
+  const setupSteps = invitationTo
+    ? businessSetupSteps.slice(0, 1)
+    : businessSetupSteps;
+  const activeStepId = getSetupStepId(location.search, setupSteps);
   const activeStep = setupSteps.findIndex((step) => step.id === activeStepId);
   const currentStepIndex = activeStep === -1 ? 0 : activeStep;
   const [draft, setDraft] = useState<SetupDraft>(initialSetupDraft);
@@ -317,6 +322,7 @@ export function AccountSetupPage() {
     setIsFinishingSetup(true);
 
     try {
+      await saveCurrentStep();
       await updateAccountSetup({ step: "complete", input: {} }).unwrap();
       const returnTo = getSafeReturnTo(
         getReturnToFromSearch(location.search),
@@ -580,7 +586,10 @@ function createSetupDraft(
   };
 }
 
-function getSetupStepId(search: string): SetupStepId {
+function getSetupStepId(
+  search: string,
+  setupSteps: SetupStep[],
+): SetupStepId {
   const step = new URLSearchParams(search).get("step");
 
   if (setupSteps.some((setupStep) => setupStep.id === step)) {

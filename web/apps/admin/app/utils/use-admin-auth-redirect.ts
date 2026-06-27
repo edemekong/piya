@@ -6,6 +6,7 @@ import {
   getAccountSetupPathWithReturnTo,
   getAuthPathWithReturnTo,
   getCurrentRoutePath,
+  getInvitationToFromSearch,
   getReturnToFromSearch,
   getSafeReturnTo,
 } from "./auth-routing";
@@ -32,6 +33,7 @@ export function useAdminAuthRedirect(mode: AuthRedirectMode) {
 
       const currentLocation = locationRef.current;
       const returnTo = getReturnToFromSearch(currentLocation.search);
+      const invitationTo = getInvitationToFromSearch(currentLocation.search);
       const currentRoutePath = getCurrentRoutePath(currentLocation);
 
       if (!firebaseUser) {
@@ -45,7 +47,7 @@ export function useAdminAuthRedirect(mode: AuthRedirectMode) {
 
         if (mode === "account-setup") {
           setStatus("redirecting");
-          navigate(getAuthPathWithReturnTo(returnTo ?? ""), {
+          navigate(getAuthPathWithReturnTo(returnTo ?? "", invitationTo), {
             replace: true,
           });
           return;
@@ -61,6 +63,11 @@ export function useAdminAuthRedirect(mode: AuthRedirectMode) {
       const accountSetupCompleted = currentUser?.accountSetupCompleted === true;
 
       if (mode === "guest") {
+        if (invitationTo) {
+          setStatus("ready");
+          return;
+        }
+
         setStatus("redirecting");
         navigate(
           accountSetupCompleted

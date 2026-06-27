@@ -35,7 +35,21 @@ interface VerificationData {
   phoneVerified: boolean;
   authProviders: string[];
 }
+
+const criticalUserFields = [
+  "name",
+  "email",
+  "phoneNumber",
+  "profileImageUrl",
+  "dob",
+  "gender",
+] as const satisfies readonly (keyof UserData)[];
+
+type CriticalUserField = (typeof criticalUserFields)[number];
+
 export {
+  CriticalUserField,
+  criticalUserFields,
   UserData,
   UserSettingsData,
   UserBusinessData,
