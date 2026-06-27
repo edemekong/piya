@@ -1,60 +1,132 @@
-import { MarketingLayout, MarketingSection } from "./components";
-
-const privacySections = [
-  {
-    title: "Who operates Piya",
-    body: "Piya is operated by Yina Store Ltd. This policy explains how Piya may collect, use, and protect information when businesses and their authorized users use the product.",
-  },
-  {
-    title: "Information we may collect",
-    body: "We may collect account details, business profile information, contact details supplied by a business, campaign settings, communication preferences, support messages, and technical information needed to operate and secure the service.",
-  },
-  {
-    title: "How information is used",
-    body: "Information may be used to provide the Piya service, manage business accounts, support customer communication workflows, respond to support requests, improve product reliability, and meet legal or security obligations.",
-  },
-  {
-    title: "Customer contact data",
-    body: "Businesses are responsible for the customer contact data they add to Piya and for having appropriate permission to communicate with those customers through email, SMS, WhatsApp, the customer app, or other connected channels.",
-  },
-  {
-    title: "Sharing and service providers",
-    body: "Piya may use service providers to host infrastructure, deliver messages, process support requests, or operate product features. We do not include unsupported claims about selling data or third-party certifications on this starter page.",
-  },
-  {
-    title: "Contact",
-    body: "For privacy questions or requests, contact support@piya.store.",
-  },
-];
+import { MarketingLayout } from "./components";
 
 export function PrivacyPage() {
   return (
     <MarketingLayout>
-      <MarketingSection
-        className="border-t-0"
-        description="This starter Privacy Policy is provided for early product and business review purposes and should be reviewed by legal counsel before broad commercial use."
-        eyebrow="Privacy Policy"
-        title="How Piya handles information"
-      >
-        <LegalContent sections={privacySections} />
-      </MarketingSection>
-    </MarketingLayout>
-  );
-}
+      <section className="border-t border-border bg-background">
+        <div className="mx-auto max-w-3xl px-5 py-16 sm:px-6 lg:py-20">
+          <p className="text-subheadline font-semibold text-primary">
+            Privacy Policy
+          </p>
+          <h1 className="mt-3 text-[38px] font-bold leading-[1.05] text-[#2F4B4F] sm:text-[52px]">
+            How Piya handles information
+          </h1>
+          <p className="mt-5 text-callout leading-8 text-text-secondary">
+            Last updated: June 27, 2026
+          </p>
 
-function LegalContent({
-  sections,
-}: {
-  sections: Array<{ title: string; body: string }>;
-}) {
-  return (
-    <div className="grid max-w-4xl gap-4">
-      {sections.map((section) => (
-        <article className="rounded-md border border-border bg-white p-5" key={section.title}>
-          <h2 className="text-headline font-semibold text-[#2F4B4F]">{section.title}</h2>
-          <p className="mt-2 text-callout leading-7 text-text-secondary">{section.body}</p>
-        </article>
-      ))}
-    </div>
+          <div className="mt-10 space-y-8 text-callout leading-8 text-text-secondary">
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Who we are
+              </h2>
+              <p className="mt-3">
+                Piya is a customer relationship, campaign, loyalty, and
+                communication workspace operated by F&amp;P Yina Stores LTD.
+                You can reach us at{" "}
+                <a
+                  className="font-semibold text-primary underline underline-offset-4"
+                  href="mailto:support@piya.store"
+                >
+                  support@piya.store
+                </a>
+                .
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Information we collect
+              </h2>
+              <p className="mt-3">
+                We collect the information needed to create accounts, operate
+                Piya, provide support, and protect the service. This may include:
+              </p>
+              <ul className="mt-3 list-disc space-y-2 pl-6">
+                <li>Account details such as name, email, phone number, and role.</li>
+                <li>Business profile details such as business name, locations, and channels.</li>
+                <li>Customer records added by a business, including names, contact details, tags, dates, preferences, and message history.</li>
+                <li>Campaign, offer, loyalty, product, service, and communication settings.</li>
+                <li>Support messages and basic technical information such as device, browser, log, and security data.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                How we use information
+              </h2>
+              <p className="mt-3">
+                We use information to provide the Piya service, manage business
+                accounts, process customer communication workflows, deliver
+                support, improve reliability, prevent misuse, secure accounts,
+                and meet legal or regulatory obligations.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Customer contact data
+              </h2>
+              <p className="mt-3">
+                Businesses control the customer data they add to Piya. Each
+                business is responsible for having the right permission or lawful
+                basis to store customer details and contact customers through
+                WhatsApp, email, SMS, the customer app, or any other connected
+                channel.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Sharing information
+              </h2>
+              <p className="mt-3">
+                We may share information with service providers that help us host
+                the product, deliver messages, process payments, provide support,
+                monitor reliability, or protect the service. We may also share
+                information if required by law, to enforce our terms, or to
+                protect users, customers, Piya, or the public.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Retention and security
+              </h2>
+              <p className="mt-3">
+                We keep information for as long as needed to provide Piya,
+                comply with legal obligations, resolve disputes, and maintain
+                security. We use administrative, technical, and organizational
+                safeguards designed to protect information, but no online service
+                can guarantee complete security.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Your choices
+              </h2>
+              <p className="mt-3">
+                You may ask us to access, correct, update, export, restrict, or
+                delete personal information where those rights apply. We may need
+                to verify your request and may retain information where required
+                for legal, security, or legitimate business reasons.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
+                Updates
+              </h2>
+              <p className="mt-3">
+                We may update this policy as Piya changes. If an update is
+                material, we will take reasonable steps to let users know through
+                the product, website, or email.
+              </p>
+            </section>
+          </div>
+        </div>
+      </section>
+    </MarketingLayout>
   );
 }

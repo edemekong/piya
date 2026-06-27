@@ -6,7 +6,7 @@ export const meta: MetaFunction = () => [
   {
     name: "description",
     content:
-      "Terms of Service for Piya, a product operated by Yina Store Ltd.",
+      "Terms of Service for Piya, a product operated by F&P Yina Stores LTD.",
   },
 ];
 

@@ -55,7 +55,6 @@ export function MarketingLayout({ children, className }: MarketingLayoutProps) {
             <FooterColumn
               links={[
                 { label: "Home", href: "/" },
-                { label: "About", href: "/about" },
                 { label: "Contact", href: "/contact" },
               ]}
               title="Company"
@@ -95,8 +94,8 @@ export function PiyaLogo({
       <img
         alt="Piya"
         className={cn(
-          "h-8 w-auto object-contain",
-          size === "hero" && "h-6 sm:h-8",
+          "h-6 w-auto object-contain",
+          size === "hero" && "h-4 sm:h-6",
         )}
         src="/assets/logo-text-dark.png"
       />
