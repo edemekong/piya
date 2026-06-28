@@ -5,6 +5,7 @@ import type {
   GiftData,
   OfferingData,
   OrderData,
+  UserData,
 } from "../models";
 import type {
   AccountSetupPayload,
@@ -24,6 +25,7 @@ import type {
   UpdateAccountSetupRequest,
   UpdateMemberInvitationRoleRequest,
   UpdateMemberRoleRequest,
+  UpdateUserInput,
   WhatsAppConnectionPayload,
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
@@ -98,6 +100,16 @@ export const domainApi = createApi({
           return {
             data: await userService.updateAccountSetupStep(step, input),
           };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup"],
+    }),
+    updateCurrentUser: builder.mutation<UserData, UpdateUserInput>({
+      queryFn: async (input) => {
+        try {
+          return { data: await userService.updateUser(input) };
         } catch (error) {
           return { error: getDomainApiError(error) };
         }
@@ -364,4 +376,5 @@ export const {
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
+  useUpdateCurrentUserMutation,
 } = domainApi;

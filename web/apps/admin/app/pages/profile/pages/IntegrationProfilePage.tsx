@@ -159,10 +159,16 @@ export function IntegrationProfilePage() {
     fromEmailLocalPart: "",
     replyToEmail: "",
   });
-  const { data: accountSetup } = useGetAccountSetupQuery();
-  const { data: availabilityPayload } = useGetPrimaryAvailabilityQuery();
-  const { data: deliveryPricingPayload } = useGetPrimaryDeliveryPricingQuery();
-  const { data: whatsappConnection } = useGetWhatsAppConnectionQuery();
+  const { data: accountSetup, isLoading: isLoadingAccountSetup } =
+    useGetAccountSetupQuery();
+  const { data: availabilityPayload, isLoading: isLoadingAvailability } =
+    useGetPrimaryAvailabilityQuery();
+  const {
+    data: deliveryPricingPayload,
+    isLoading: isLoadingDeliveryPricing,
+  } = useGetPrimaryDeliveryPricingQuery();
+  const { data: whatsappConnection, isLoading: isLoadingWhatsApp } =
+    useGetWhatsAppConnectionQuery();
   const [updateAccountSetup] = useUpdateAccountSetupMutation();
   const [updateAvailability, { isLoading: isSavingAvailability }] =
     useUpdatePrimaryAvailabilityMutation();
@@ -179,6 +185,11 @@ export function IntegrationProfilePage() {
   const currentAvailabilitySchedule =
     availabilitySchedule ?? savedAvailabilitySchedule;
   const deliveryPricing = deliveryPricingPayload?.deliveryPricing;
+  const isLoadingIntegrations =
+    isLoadingAccountSetup ||
+    isLoadingAvailability ||
+    isLoadingDeliveryPricing ||
+    isLoadingWhatsApp;
 
   React.useEffect(() => {
     if (!accountSetup) return;
@@ -234,6 +245,28 @@ export function IntegrationProfilePage() {
 
   async function saveDeliveryPricing(input: UpdateDeliveryPricingInput) {
     await updateDeliveryPricing(input).unwrap();
+  }
+
+  if (isLoadingIntegrations) {
+    return (
+      <ProfileSectionShell
+        description={section.description}
+        icon={section.icon}
+        title={section.label}
+      >
+        <div
+          aria-live="polite"
+          className="flex min-h-40 items-center justify-center"
+          role="status"
+        >
+          <span
+            aria-hidden="true"
+            className="size-7 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          />
+          <span className="sr-only">Loading integrations</span>
+        </div>
+      </ProfileSectionShell>
+    );
   }
 
   return (

@@ -25,6 +25,7 @@ export {
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
+  useUpdateCurrentUserMutation,
 } from "./domain-api";
 export {
   makeAppStore,

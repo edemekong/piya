@@ -99,11 +99,11 @@ export default function WhatsAppCallbackRoute() {
 
           <div className="flex flex-wrap gap-3">
             <Button asChild type="button" variant="secondary">
-              <Link to="/profile?section=channels">Back to profile</Link>
+              <Link to="/profile?page=channels">Back to profile</Link>
             </Button>
             {!isLoading ? (
               <Button asChild type="button">
-                <Link to="/profile?section=channels">Open integrations</Link>
+                <Link to="/profile?page=channels">Open integrations</Link>
               </Button>
             ) : null}
           </div>

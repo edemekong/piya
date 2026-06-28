@@ -9,6 +9,7 @@ export type {
   AccountSetupBusinessProfileInput,
   AccountSetupEmailIntegrationInput,
   AccountSetupIntegrationInput,
+  AccountSetupPayload,
   AccountSetupPersonalInfoInput,
 } from "./types/api";
 export type {

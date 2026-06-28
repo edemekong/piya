@@ -1,4 +1,21 @@
-import { Button } from "@piya/ui";
+import * as React from "react";
+import {
+  showToast,
+  type AccountSetupBusinessProfileInput,
+  type AccountSetupPayload,
+  type AppDispatch,
+  type BusinessCategoryTypes,
+  useUpdateAccountSetupMutation,
+} from "@piya/shared";
+import {
+  Button,
+  PhoneNumberField,
+  SettingsCard,
+  SettingsSection as ProfileSectionShell,
+  isValidSupportedPhoneNumber,
+} from "@piya/ui";
+import { useDispatch } from "react-redux";
+import { businessCategories } from "@/pages/auth/utils/account-setup-options";
 import { profileMenuItems } from "../profileSections";
 import {
   FieldGrid,
@@ -6,52 +23,149 @@ import {
   ProfileSelect,
   ProfileTextarea,
 } from "../components/ProfileFields";
-import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
+import { getProfileErrorMessage } from "../profileErrorMessage";
 
 const section = profileMenuItems.find((item) => item.value === "business")!;
 
-const businessCategories = [
-  { label: "Laundry", value: "laundry" },
-  { label: "Fashion tailoring", value: "fashion_tailoring" },
-  { label: "Salon", value: "salon" },
-  { label: "Barbershop", value: "barbershop" },
-  { label: "Spa", value: "spa" },
-  { label: "Beauty studio", value: "beauty_studio" },
-  { label: "Car wash", value: "car_wash" },
-  { label: "Logistics delivery", value: "logistics_delivery" },
-  { label: "Restaurant", value: "restaurant" },
-  { label: "Food vendor", value: "food_vendor" },
-  { label: "Supermarket", value: "supermarket" },
-  { label: "Farm produce", value: "farm_produce" },
-  { label: "Fashion store", value: "fashion_store" },
-  { label: "Electronics store", value: "electronics_store" },
-  { label: "Photography", value: "photography" },
-  { label: "Consulting", value: "consulting" },
-  { label: "Real estate agent", value: "real_estate_agent" },
-  { label: "Hotel guesthouse", value: "hotel_guesthouse" },
-  { label: "Shortlet apartment", value: "shortlet_apartment" },
-];
+type BusinessProfilePageProps = {
+  accountSetup: AccountSetupPayload;
+};
 
-export function BusinessProfilePage() {
+export function BusinessProfilePage({
+  accountSetup,
+}: BusinessProfilePageProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const business = accountSetup.business;
+  const [businessProfile, setBusinessProfile] =
+    React.useState<AccountSetupBusinessProfileInput>(() => ({
+      name: business?.name ?? "",
+      category: business?.category ?? "fashion_store",
+      description: business?.description ?? "",
+      email: business?.email ?? "",
+      phoneNumber: business?.phoneNumber ?? "",
+      logo: business?.logo ?? "",
+    }));
+  const [updateAccountSetup, updateState] = useUpdateAccountSetupMutation();
+
+  function updateBusinessProfile<
+    TField extends keyof AccountSetupBusinessProfileInput,
+  >(field: TField, value: AccountSetupBusinessProfileInput[TField]) {
+    setBusinessProfile((current) => ({ ...current, [field]: value }));
+  }
+
+  async function saveBusinessProfile() {
+    if (!businessProfile.name.trim()) {
+      showToast(dispatch, {
+        message: "Enter a business name.",
+        variant: "error",
+      });
+      return;
+    }
+
+    if (!businessProfile.description.trim()) {
+      showToast(dispatch, {
+        message: "Enter a business description.",
+        variant: "error",
+      });
+      return;
+    }
+
+    if (
+      businessProfile.phoneNumber &&
+      !isValidSupportedPhoneNumber(businessProfile.phoneNumber)
+    ) {
+      showToast(dispatch, {
+        message: "Enter a valid business phone number.",
+        variant: "error",
+      });
+      return;
+    }
+
+    try {
+      const result = await updateAccountSetup({
+        step: "business-profile",
+        input: {
+          ...businessProfile,
+          name: businessProfile.name.trim(),
+          description: businessProfile.description.trim(),
+          email: businessProfile.email || undefined,
+          phoneNumber: businessProfile.phoneNumber || undefined,
+        },
+      }).unwrap();
+      const savedBusiness = result.business;
+
+      if (savedBusiness) {
+        setBusinessProfile((current) => ({
+          ...current,
+          name: savedBusiness.name,
+          category: savedBusiness.category,
+          description: savedBusiness.description,
+          email: savedBusiness.email ?? "",
+          phoneNumber: savedBusiness.phoneNumber ?? "",
+          logo: savedBusiness.logo ?? "",
+        }));
+      }
+
+      showToast(dispatch, {
+        message: "Business details saved.",
+        variant: "success",
+      });
+    } catch (error) {
+      showToast(dispatch, {
+        message: getProfileErrorMessage(
+          error,
+          "Unable to save your business details.",
+        ),
+        variant: "error",
+      });
+    }
+  }
+
   return (
     <ProfileSectionShell
-      actions={<Button size="sm">Save changes</Button>}
+      actions={
+        <Button
+          buttonState={updateState.isLoading ? "loading" : "enabled"}
+          loadingLabel="Saving business details"
+          onClick={() => void saveBusinessProfile()}
+          size="sm"
+        >
+          Save changes
+        </Button>
+      }
       description={section.description}
       icon={section.icon}
       title={section.label}
     >
       <SettingsCard title="Business identity">
         <FieldGrid>
-          <ProfileField label="Business name" value="Piya Store" />
+          <ProfileField
+            label="Business name"
+            onChange={(event) =>
+              updateBusinessProfile("name", event.target.value)
+            }
+            required
+            value={businessProfile.name}
+          />
           <ProfileSelect
             label="Business category"
+            onChange={(event) =>
+              updateBusinessProfile(
+                "category",
+                event.target.value as BusinessCategoryTypes,
+              )
+            }
             options={businessCategories}
-            value="fashion_store"
+            value={businessProfile.category}
           />
         </FieldGrid>
         <ProfileTextarea
           label="Business description"
-          value="Customer commerce, ordering, and messaging in one admin workspace."
+          onChange={(event) =>
+            updateBusinessProfile("description", event.target.value)
+          }
+          required
+          value={businessProfile.description}
         />
       </SettingsCard>
 
@@ -59,13 +173,19 @@ export function BusinessProfilePage() {
         <FieldGrid>
           <ProfileField
             label="Business email"
+            onChange={(event) =>
+              updateBusinessProfile("email", event.target.value)
+            }
             type="email"
-            value="hello@piya.store"
+            value={businessProfile.email ?? ""}
           />
-          <ProfileField
+          <PhoneNumberField
             label="Business phone"
-            type="tel"
-            value="+234 802 000 0000"
+            onChange={(phoneNumber) =>
+              updateBusinessProfile("phoneNumber", phoneNumber)
+            }
+            placeholder="Enter business phone"
+            value={businessProfile.phoneNumber ?? ""}
           />
         </FieldGrid>
       </SettingsCard>

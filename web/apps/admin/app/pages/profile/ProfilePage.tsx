@@ -1,5 +1,13 @@
 import * as React from "react";
 import { useSearchParams } from "@remix-run/react";
+import {
+  showToast,
+  type AccountSetupPayload,
+  type AppDispatch,
+  useGetAccountSetupQuery,
+} from "@piya/shared";
+import { Button } from "@piya/ui";
+import { useDispatch } from "react-redux";
 import { ProfileSidebar } from "./components";
 import {
   BrandingProfilePage,
@@ -10,19 +18,48 @@ import {
   PersonalProfilePage,
   SecurityProfilePage,
 } from "./pages";
+import { getProfileErrorMessage } from "./profileErrorMessage";
 import type { ProfileSection } from "./profileSections";
 
 export function ProfilePage() {
-  const [searchParams] = useSearchParams();
-  const [activeSection, setActiveSection] =
-    React.useState<ProfileSection>("personal");
+  const dispatch = useDispatch<AppDispatch>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = getProfilePage(searchParams.get("page"));
+  const {
+    data: accountSetup,
+    error: accountSetupError,
+    isFetching,
+    isLoading,
+    refetch,
+  } = useGetAccountSetupQuery();
 
   React.useEffect(() => {
-    const section = searchParams.get("section");
-    if (isProfileSection(section)) {
-      setActiveSection(section);
-    }
-  }, [searchParams]);
+    if (isProfileSection(searchParams.get("page"))) return;
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("section");
+    nextSearchParams.set("page", "personal");
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  React.useEffect(() => {
+    if (!accountSetupError) return;
+
+    showToast(dispatch, {
+      message: getProfileErrorMessage(
+        accountSetupError,
+        "Unable to load your profile.",
+      ),
+      variant: "error",
+    });
+  }, [accountSetupError, dispatch]);
+
+  function showProfilePage(page: ProfileSection) {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("section");
+    nextSearchParams.set("page", page);
+    setSearchParams(nextSearchParams);
+  }
 
   return (
     <div className="grid gap-6">
@@ -36,9 +73,41 @@ export function ProfilePage() {
       <div className="grid items-start gap-6 lg:grid-cols-[280px_1fr]">
         <ProfileSidebar
           activeSection={activeSection}
-          onSectionChange={setActiveSection}
+          onSectionChange={showProfilePage}
         />
-        <ProfileSectionContent section={activeSection} />
+        {isLoading ? (
+          <div
+            aria-live="polite"
+            className="flex min-h-40 items-center justify-center rounded-md border border-border bg-white p-6"
+            role="status"
+          >
+            <span
+              aria-hidden="true"
+              className="size-7 animate-spin rounded-full border-2 border-primary border-t-transparent"
+            />
+            <span className="sr-only">Loading your profile</span>
+          </div>
+        ) : accountSetup ? (
+          <ProfileSectionContent
+            accountSetup={accountSetup}
+            section={activeSection}
+          />
+        ) : (
+          <div className="grid gap-4 rounded-md border border-border bg-white p-6">
+            <p className="text-callout text-error">
+              Unable to load your profile.
+            </p>
+            <Button
+              buttonState={isFetching ? "loading" : "enabled"}
+              className="w-fit"
+              loadingLabel="Loading profile"
+              onClick={() => void refetch()}
+              size="sm"
+            >
+              Try again
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -56,12 +125,22 @@ function isProfileSection(section: string | null): section is ProfileSection {
   );
 }
 
-function ProfileSectionContent({ section }: { section: ProfileSection }) {
+function getProfilePage(page: string | null): ProfileSection {
+  return isProfileSection(page) ? page : "personal";
+}
+
+function ProfileSectionContent({
+  accountSetup,
+  section,
+}: {
+  accountSetup: AccountSetupPayload;
+  section: ProfileSection;
+}) {
   switch (section) {
     case "business":
-      return <BusinessProfilePage />;
+      return <BusinessProfilePage accountSetup={accountSetup} />;
     case "branding":
-      return <BrandingProfilePage />;
+      return <BrandingProfilePage accountSetup={accountSetup} />;
     case "members":
       return <MembersProfilePage />;
     case "channels":
@@ -69,9 +148,9 @@ function ProfileSectionContent({ section }: { section: ProfileSection }) {
     case "security":
       return <SecurityProfilePage />;
     case "notifications":
-      return <NotificationsProfilePage />;
+      return <NotificationsProfilePage accountSetup={accountSetup} />;
     case "personal":
     default:
-      return <PersonalProfilePage />;
+      return <PersonalProfilePage accountSetup={accountSetup} />;
   }
 }
