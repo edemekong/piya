@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { AuthMiddleware } from "../middlewares/middleware";
 import { STATUS_CODES } from "../shared/utils/constants";
+import { AvailabilityRouter } from "./availability/route";
 import { AuthRouter } from "./auth/route";
 import { BusinessRouter } from "./businesses/route";
 import { DevRouter } from "./dev/route";
@@ -24,6 +25,7 @@ V1Router.use("/whatsapp", PublicWhatsAppRouter);
 
 V1Router.use(AuthMiddleware);
 V1Router.use("/businesses", BusinessRouter);
+V1Router.use("/availability", AvailabilityRouter);
 V1Router.use("/users", UserRouter);
 V1Router.use("/whatsapp", ProtectedWhatsAppRouter);
 

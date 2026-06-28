@@ -33,6 +33,7 @@ export { SegmentedTabs } from "./components/segmented-tabs";
 export { SettingsCard } from "./components/settings-card";
 export { SettingsSection } from "./components/settings-section";
 export { StatCard } from "./components/stat-card";
+export { AppTimePicker } from "./components/time-picker";
 export { ToastViewport } from "./components/toast";
 export { cn } from "./lib/cn";
 export { appColors } from "./theme/colors";
@@ -76,6 +77,7 @@ export type {
 export type { SettingsCardProps } from "./components/settings-card";
 export type { SettingsSectionProps } from "./components/settings-section";
 export type { StatCardProps } from "./components/stat-card";
+export type { AppTimePickerProps } from "./components/time-picker";
 export type {
   ToastNotification,
   ToastVariant,

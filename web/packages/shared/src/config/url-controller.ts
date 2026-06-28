@@ -49,6 +49,10 @@ export class URLController {
     return this.path("/v1/lead-requests");
   }
 
+  get primaryAvailability() {
+    return this.path("/v1/availability/primary");
+  }
+
   get whatsappConnection() {
     return this.path("/v1/whatsapp/connection");
   }

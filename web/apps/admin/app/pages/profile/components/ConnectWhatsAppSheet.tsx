@@ -58,7 +58,6 @@ function ConnectWhatsAppSheet({
   return (
     <AppSheet
       ariaLabel="connect WhatsApp"
-      description="Connect a WhatsApp Business number so customers can receive messages and reply back."
       footer={
         <>
           <Button onClick={onClose} type="button" variant="secondary">

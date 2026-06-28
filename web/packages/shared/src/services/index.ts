@@ -20,6 +20,10 @@ export {
   ApiServiceError,
   BaseAPIService,
 } from "./base-api.service";
+export {
+  AvailabilityService,
+  availabilityService,
+} from "./availability.service";
 export { AuthService, authService } from "./auth.service";
 export { BusinessService, businessService } from "./business.service";
 export * from "./communications.service";

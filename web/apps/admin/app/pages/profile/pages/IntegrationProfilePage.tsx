@@ -11,12 +11,17 @@ import {
 import { SegmentedTabs } from "@piya/ui";
 import {
   type AccountSetupEmailIntegrationInput,
+  type AvailabilityScheduleDraft,
+  availabilityDataToScheduleDraft,
   type WhatsAppChannelSettings,
   useGetAccountSetupQuery,
+  useGetPrimaryAvailabilityQuery,
   useGetWhatsAppConnectionQuery,
   useUpdateAccountSetupMutation,
+  useUpdatePrimaryAvailabilityMutation,
   useDisconnectWhatsAppConnectionMutation,
 } from "@piya/shared";
+import { ConnectAvailabilitySheet } from "../components/ConnectAvailabilitySheet";
 import { ConnectDomainSheet } from "../components/ConnectDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
@@ -32,7 +37,7 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
-  action?: "domain" | "email" | "whatsapp";
+  action?: "availability-hours" | "domain" | "email" | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -108,7 +113,7 @@ const integrationsByTab: Record<
         subtitle: "Sync events and consultations with your external calendar.",
       },
       {
-        connected: true,
+        action: "availability-hours",
         name: "Set up available hours",
         subtitle: "Choose the days and times clients can book with you.",
       },
@@ -133,6 +138,10 @@ export function IntegrationProfilePage() {
   const [isDomainSheetOpen, setIsDomainSheetOpen] = React.useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = React.useState(false);
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = React.useState(false);
+  const [isAvailabilitySheetOpen, setIsAvailabilitySheetOpen] =
+    React.useState(false);
+  const [availabilitySchedule, setAvailabilitySchedule] =
+    React.useState<AvailabilityScheduleDraft>();
   const [slug, setSlug] = React.useState("");
   const [email, setEmail] =
     React.useState<AccountSetupEmailIntegrationInput>({
@@ -140,13 +149,21 @@ export function IntegrationProfilePage() {
       replyToEmail: "",
     });
   const { data: accountSetup } = useGetAccountSetupQuery();
+  const { data: availabilityPayload } = useGetPrimaryAvailabilityQuery();
   const { data: whatsappConnection } = useGetWhatsAppConnectionQuery();
   const [updateAccountSetup] = useUpdateAccountSetupMutation();
+  const [updateAvailability, { isLoading: isSavingAvailability }] =
+    useUpdatePrimaryAvailabilityMutation();
   const [disconnectWhatsApp, { isLoading: isDisconnectingWhatsApp }] =
     useDisconnectWhatsAppConnectionMutation();
   const activeIntegration = integrationsByTab[activeTab];
   const whatsappSettings =
     whatsappConnection?.connection ?? accountSetup?.channelSettings?.whatsapp;
+  const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
+    availabilityPayload?.availability,
+  );
+  const currentAvailabilitySchedule =
+    availabilitySchedule ?? savedAvailabilitySchedule;
 
   React.useEffect(() => {
     if (!accountSetup) return;
@@ -193,6 +210,13 @@ export function IntegrationProfilePage() {
     setEmailConnected(true);
   }
 
+  async function saveAvailability(schedule: AvailabilityScheduleDraft) {
+    const result = await updateAvailability(schedule).unwrap();
+    setAvailabilitySchedule(
+      availabilityDataToScheduleDraft(result.availability) ?? schedule,
+    );
+  }
+
   return (
     <>
       <ProfileSectionShell
@@ -219,6 +243,8 @@ export function IntegrationProfilePage() {
                         ? emailConnected
                         : connection.action === "whatsapp"
                           ? isWhatsAppConnected(whatsappSettings)
+                          : connection.action === "availability-hours"
+                            ? Boolean(currentAvailabilitySchedule)
                         : connection.connected,
                 }}
                 key={connection.name}
@@ -229,6 +255,8 @@ export function IntegrationProfilePage() {
                       ? () => setIsEmailSheetOpen(true)
                       : connection.action === "whatsapp"
                         ? () => setIsWhatsAppSheetOpen(true)
+                        : connection.action === "availability-hours"
+                          ? () => setIsAvailabilitySheetOpen(true)
                         : undefined
                 }
               />
@@ -257,6 +285,13 @@ export function IntegrationProfilePage() {
         onClose={() => setIsWhatsAppSheetOpen(false)}
         onDisconnect={() => disconnectWhatsApp().unwrap()}
         open={isWhatsAppSheetOpen}
+      />
+      <ConnectAvailabilitySheet
+        initialSchedule={currentAvailabilitySchedule}
+        isSaving={isSavingAvailability}
+        onClose={() => setIsAvailabilitySheetOpen(false)}
+        onSave={saveAvailability}
+        open={isAvailabilitySheetOpen}
       />
     </>
   );

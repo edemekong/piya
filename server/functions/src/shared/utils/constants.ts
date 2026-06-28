@@ -64,6 +64,16 @@ const API_RESPONSE = {
     code: "ACCOUNT_SETUP_COMPLETED",
     message: "Account setup completed",
   },
+  availabilityFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "AVAILABILITY_FETCHED",
+    message: "Availability fetched",
+  },
+  availabilityUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "AVAILABILITY_UPDATED",
+    message: "Availability updated",
+  },
   accountSetupIncomplete: {
     statusCode: STATUS_CODES.unprocessableEntity,
     code: "ACCOUNT_SETUP_INCOMPLETE",

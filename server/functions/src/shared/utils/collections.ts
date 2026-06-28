@@ -6,6 +6,7 @@ const COLLECTIONS = {
 } as const;
 
 const BUSINESS_SUBCOLLECTIONS = {
+  availability: "availability",
   branding: "branding",
   channelSettings: "channel_settings",
   memberInvitations: "member_invitations",

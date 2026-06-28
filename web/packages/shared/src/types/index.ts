@@ -58,6 +58,12 @@ export type {
   AvailabilityIntervalType,
   AvailabilityStatusType,
 } from "./availability.type";
+export type {
+  AvailabilityDay,
+  AvailabilityPayload,
+  AvailabilityScheduleDraft,
+  AvailabilityTimeSlot,
+} from "./availability";
 
 export type {
   BookingParticipantRoleType,

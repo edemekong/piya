@@ -10,8 +10,15 @@ import {
 } from "lucide-react";
 import { SegmentedTabs, SettingsCard } from "@piya/ui";
 import { useState } from "react";
-import { getBusinessSlug } from "@piya/shared";
 import {
+  availabilityDataToScheduleDraft,
+  type AvailabilityScheduleDraft,
+  getBusinessSlug,
+  useGetPrimaryAvailabilityQuery,
+  useUpdatePrimaryAvailabilityMutation,
+} from "@piya/shared";
+import {
+  ConnectAvailabilitySheet,
   ConnectDomainSheet,
   ConnectEmailSheet,
   ConnectWhatsAppSheet,
@@ -25,7 +32,7 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
-  action?: "domain" | "email" | "whatsapp";
+  action?: "availability-hours" | "domain" | "email" | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -101,7 +108,7 @@ const integrationsByTab: Record<
         subtitle: "Sync events and consultations with your external calendar.",
       },
       {
-        connected: true,
+        action: "availability-hours",
         name: "Set up available hours",
         subtitle: "Choose the days and times clients can book with you.",
       },
@@ -129,7 +136,18 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
   const [isDomainSheetOpen, setIsDomainSheetOpen] = useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = useState(false);
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = useState(false);
+  const [isAvailabilitySheetOpen, setIsAvailabilitySheetOpen] = useState(false);
+  const [availabilitySchedule, setAvailabilitySchedule] =
+    useState<AvailabilityScheduleDraft>();
+  const { data: availabilityPayload } = useGetPrimaryAvailabilityQuery();
+  const [updateAvailability, { isLoading: isSavingAvailability }] =
+    useUpdatePrimaryAvailabilityMutation();
   const activeIntegration = integrationsByTab[activeTab];
+  const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
+    availabilityPayload?.availability,
+  );
+  const currentAvailabilitySchedule =
+    availabilitySchedule ?? savedAvailabilitySchedule;
   const suggestedSlug =
     draft.integration.slug || getBusinessSlug(draft.businessProfile.name);
   const suggestedFromEmailLocalPart =
@@ -168,6 +186,13 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
     }));
   }
 
+  async function saveAvailability(schedule: AvailabilityScheduleDraft) {
+    const result = await updateAvailability(schedule).unwrap();
+    setAvailabilitySchedule(
+      availabilityDataToScheduleDraft(result.availability) ?? schedule,
+    );
+  }
+
   return (
     <>
       <div className="max-w-[820px] space-y-4">
@@ -185,7 +210,9 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
                   ? draft.integration.domainConnected
                   : connection.action === "email"
                     ? draft.integration.emailConnected
-                    : connection.connected;
+                    : connection.action === "availability-hours"
+                      ? Boolean(currentAvailabilitySchedule)
+                      : connection.connected;
 
               return (
                 <ConnectionCard
@@ -198,6 +225,8 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
                         ? () => setIsEmailSheetOpen(true)
                         : connection.action === "whatsapp"
                           ? () => setIsWhatsAppSheetOpen(true)
+                          : connection.action === "availability-hours"
+                            ? () => setIsAvailabilitySheetOpen(true)
                         : undefined
                   }
                 />
@@ -225,6 +254,13 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
         onClose={() => setIsWhatsAppSheetOpen(false)}
         onDisconnect={() => undefined}
         open={isWhatsAppSheetOpen}
+      />
+      <ConnectAvailabilitySheet
+        initialSchedule={currentAvailabilitySchedule}
+        isSaving={isSavingAvailability}
+        onClose={() => setIsAvailabilitySheetOpen(false)}
+        onSave={saveAvailability}
+        open={isAvailabilitySheetOpen}
       />
     </>
   );

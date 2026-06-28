@@ -8,6 +8,8 @@ import type {
 } from "../models";
 import type {
   AccountSetupPayload,
+  AvailabilityPayload,
+  AvailabilityScheduleDraft,
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
@@ -23,6 +25,7 @@ import type {
   WhatsAppConnectionPayload,
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
+import { availabilityService } from "../services/availability.service";
 import { businessService } from "../services/business.service";
 import { communicationsService } from "../services/communications.service";
 import { contactsService } from "../services/contacts.service";
@@ -60,6 +63,7 @@ export const domainApi = createApi({
   reducerPath: "domainApi",
   tagTypes: [
     "AccountSetup",
+    "Availability",
     "Communication",
     "CommunicationRecipient",
     "Contact",
@@ -95,6 +99,31 @@ export const domainApi = createApi({
         }
       },
       invalidatesTags: ["AccountSetup"],
+    }),
+    getPrimaryAvailability: builder.query<AvailabilityPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await availabilityService.getPrimaryAvailability() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["Availability"],
+    }),
+    updatePrimaryAvailability: builder.mutation<
+      AvailabilityPayload,
+      AvailabilityScheduleDraft
+    >({
+      queryFn: async (input) => {
+        try {
+          return {
+            data: await availabilityService.updatePrimaryAvailability(input),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup", "Availability"],
     }),
     checkBusinessSlugAvailability: builder.query<
       BusinessSlugAvailabilityPayload,
@@ -283,6 +312,7 @@ export const {
   useDeleteMemberMutation,
   useDisconnectWhatsAppConnectionMutation,
   useGetAccountSetupQuery,
+  useGetPrimaryAvailabilityQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
   useGetContactsQuery,
@@ -294,6 +324,7 @@ export const {
   useGetWhatsAppConnectionQuery,
   useInviteMemberMutation,
   useSendWhatsAppMessageMutation,
+  useUpdatePrimaryAvailabilityMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,

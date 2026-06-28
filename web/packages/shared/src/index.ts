@@ -12,6 +12,12 @@ export type {
   AccountSetupPersonalInfoInput,
 } from "./types/api";
 export type {
+  AvailabilityDay,
+  AvailabilityPayload,
+  AvailabilityScheduleDraft,
+  AvailabilityTimeSlot,
+} from "./types/availability";
+export type {
   BusinessCategoryTypes,
   InvitableMemberRoleType,
   MemberRoleType,

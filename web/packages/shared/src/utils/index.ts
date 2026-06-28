@@ -4,6 +4,7 @@ export function invariant(condition: unknown, message: string): asserts conditio
   }
 }
 
+export * from "./availability";
 export * from "./business-slug";
 export * from "./communication";
 export * from "./date";
