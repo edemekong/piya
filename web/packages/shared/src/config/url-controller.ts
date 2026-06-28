@@ -53,6 +53,10 @@ export class URLController {
     return this.path("/v1/availability/primary");
   }
 
+  get primaryDeliveryPricing() {
+    return this.path("/v1/delivery-pricing/primary");
+  }
+
   get whatsappConnection() {
     return this.path("/v1/whatsapp/connection");
   }
@@ -76,21 +80,19 @@ export class URLController {
   acceptMemberInvitation(businessId: string) {
     return this.path(
       `/v1/businesses/${encodeURIComponent(
-        businessId,
-      )}/member-invitations/accept`,
+        businessId
+      )}/member-invitations/accept`
     );
   }
 
   memberInvitation(invitationId: string) {
     return this.path(
-      `/v1/businesses/member-invitations/${encodeURIComponent(invitationId)}`,
+      `/v1/businesses/member-invitations/${encodeURIComponent(invitationId)}`
     );
   }
 
   teamMember(memberId: string) {
-    return this.path(
-      `/v1/businesses/members/${encodeURIComponent(memberId)}`,
-    );
+    return this.path(`/v1/businesses/members/${encodeURIComponent(memberId)}`);
   }
 
   user(id: string) {
@@ -98,6 +100,9 @@ export class URLController {
   }
 
   private path(pathname: string) {
-    return `${requireConfigValue(this.urlPrefix, "VITE_API_BASE_URL")}${pathname}`;
+    return `${requireConfigValue(
+      this.urlPrefix,
+      "VITE_API_BASE_URL"
+    )}${pathname}`;
   }
 }

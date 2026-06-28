@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "../lib/cn";
 
 type SelectOption =
@@ -41,7 +42,10 @@ export type AppTextFieldProps = Omit<
   suffix?: React.ReactNode;
 };
 
-export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps>(
+export const AppTextField = React.forwardRef<
+  HTMLInputElement,
+  AppTextFieldProps
+>(
   (
     {
       className,
@@ -55,7 +59,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
       value,
       ...props
     },
-    ref,
+    ref
   ) => {
     const valueProps =
       onChange || value === undefined
@@ -70,15 +74,13 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
             className={cn(
               "flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white",
               error && "border-error focus-within:border-error",
-              success &&
-                !error &&
-                "border-success focus-within:border-success",
+              success && !error && "border-success focus-within:border-success"
             )}
           >
             <input
               className={cn(
                 "min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40",
-                customInputClassName,
+                customInputClassName
               )}
               ref={ref}
               required={required}
@@ -93,7 +95,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
               inputClassName,
               error && "border-error focus:border-error",
               success && !error && "border-success focus:border-success",
-              customInputClassName,
+              customInputClassName
             )}
             ref={ref}
             required={required}
@@ -112,7 +114,7 @@ export const AppTextField = React.forwardRef<HTMLInputElement, AppTextFieldProps
         ) : null}
       </label>
     );
-  },
+  }
 );
 
 AppTextField.displayName = "AppTextField";
@@ -140,7 +142,7 @@ export const AppTextareaField = React.forwardRef<
       value,
       ...props
     },
-    ref,
+    ref
   ) => {
     const valueProps =
       onChange || value === undefined
@@ -159,7 +161,7 @@ export const AppTextareaField = React.forwardRef<
         />
       </label>
     );
-  },
+  }
 );
 
 AppTextareaField.displayName = "AppTextareaField";
@@ -192,18 +194,28 @@ export function AppSelectField({
   return (
     <label className={cn("grid gap-2", className)}>
       <FieldLabel label={label} required={required} />
-      <select
-        className={cn(inputClassName, "pr-10", selectClassName)}
-        required={required}
-        {...valueProps}
-        {...props}
-      >
-        {options.map((option) => (
-          <option key={getOptionValue(option)} value={getOptionValue(option)}>
-            {getOptionLabel(option)}
-          </option>
-        ))}
-      </select>
+      <span className="relative">
+        <select
+          className={cn(
+            inputClassName,
+            "w-full appearance-none pr-12",
+            selectClassName
+          )}
+          required={required}
+          {...valueProps}
+          {...props}
+        >
+          {options.map((option) => (
+            <option key={getOptionValue(option)} value={getOptionValue(option)}>
+              {getOptionLabel(option)}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/55"
+        />
+      </span>
     </label>
   );
 }

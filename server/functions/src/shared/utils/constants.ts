@@ -74,6 +74,21 @@ const API_RESPONSE = {
     code: "AVAILABILITY_UPDATED",
     message: "Availability updated",
   },
+  deliveryPricingFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "DELIVERY_PRICING_FETCHED",
+    message: "Delivery pricing fetched",
+  },
+  deliveryPricingUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "DELIVERY_PRICING_UPDATED",
+    message: "Delivery pricing updated",
+  },
+  deliveryPricingUpdatePermissionRequired: {
+    statusCode: STATUS_CODES.forbidden,
+    code: "DELIVERY_PRICING_UPDATE_PERMISSION_REQUIRED",
+    message: "You do not have permission to update delivery pricing",
+  },
   accountSetupIncomplete: {
     statusCode: STATUS_CODES.unprocessableEntity,
     code: "ACCOUNT_SETUP_INCOMPLETE",

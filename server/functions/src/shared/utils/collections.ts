@@ -9,6 +9,7 @@ const BUSINESS_SUBCOLLECTIONS = {
   availability: "availability",
   branding: "branding",
   channelSettings: "channel_settings",
+  deliveryPricing: "delivery_pricing",
   memberInvitations: "member_invitations",
   members: "members",
 } as const;

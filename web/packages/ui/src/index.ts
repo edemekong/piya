@@ -2,6 +2,7 @@ export { AppText } from "./components/app-text";
 export { AppAvatar } from "./components/avatar";
 export { AppSheet } from "./components/app-sheet";
 export { Badge } from "./components/badge";
+export { AppCheckbox } from "./components/checkbox";
 export {
   AppBackButton,
   AppBackIconButton,
@@ -57,6 +58,7 @@ export type {
   LinkedTextProps,
 } from "./components/button";
 export type { AppAvatarProps } from "./components/avatar";
+export type { AppCheckboxProps } from "./components/checkbox";
 export type { AppDatePickerProps } from "./components/date-picker";
 export type { AppSheetProps } from "./components/app-sheet";
 export type { EmptyStateProps } from "./components/empty-state";

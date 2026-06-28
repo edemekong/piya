@@ -16,14 +16,15 @@ export function createApiClient({ baseUrl, axiosInstance }: ApiClientOptions) {
   };
 }
 
-export {
-  ApiServiceError,
-  BaseAPIService,
-} from "./base-api.service";
+export { ApiServiceError, BaseAPIService } from "./base-api.service";
 export {
   AvailabilityService,
   availabilityService,
 } from "./availability.service";
+export {
+  DeliveryPricingService,
+  deliveryPricingService,
+} from "./delivery-pricing.service";
 export { AuthService, authService } from "./auth.service";
 export { BusinessService, businessService } from "./business.service";
 export * from "./communications.service";
@@ -36,10 +37,7 @@ export {
   getFirebaseStorage,
 } from "./firebase.service";
 export * from "./gifts.service";
-export {
-  LeadRequestService,
-  leadRequestService,
-} from "./lead-request.service";
+export { LeadRequestService, leadRequestService } from "./lead-request.service";
 export * from "./offerings.service";
 export * from "./orders.service";
 export { BusinessTeamService, teamService } from "./team.service";

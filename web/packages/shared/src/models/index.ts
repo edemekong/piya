@@ -18,6 +18,7 @@ export * from "./chat";
 export * from "./communication";
 export * from "./contact";
 export * from "./delivery";
+export * from "./delivery-pricing";
 export * from "./discount";
 export * from "./document";
 export * from "./gift";

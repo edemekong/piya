@@ -18,6 +18,10 @@ export type {
   AvailabilityTimeSlot,
 } from "./types/availability";
 export type {
+  DeliveryPricingPayload,
+  UpdateDeliveryPricingInput,
+} from "./types/delivery-pricing";
+export type {
   BusinessCategoryTypes,
   InvitableMemberRoleType,
   MemberRoleType,

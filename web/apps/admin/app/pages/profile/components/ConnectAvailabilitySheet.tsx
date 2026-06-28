@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Plus, Trash2 } from "lucide-react";
 import {
   addAvailabilitySlotMinutes,
   availabilityDayLabels,
@@ -12,6 +12,7 @@ import {
   type AvailabilityTimeSlot,
 } from "@piya/shared";
 import {
+  AppCheckbox,
   AppIconButton,
   AppSelectField,
   AppSheet,
@@ -36,7 +37,7 @@ function ConnectAvailabilitySheet({
   open,
 }: ConnectAvailabilitySheetProps) {
   const [schedule, setSchedule] = React.useState<AvailabilityScheduleDraft>(
-    () => initialSchedule ?? createDefaultAvailabilitySchedule(),
+    () => initialSchedule ?? createDefaultAvailabilitySchedule()
   );
 
   React.useEffect(() => {
@@ -65,7 +66,7 @@ function ConnectAvailabilitySheet({
     setSchedule((current) => ({
       ...current,
       days: current.days.map((item) =>
-        item.day === day ? { ...item, ...updates } : item,
+        item.day === day ? { ...item, ...updates } : item
       ),
     }));
   }
@@ -91,11 +92,11 @@ function ConnectAvailabilitySheet({
   function updateSlot(
     day: AvailabilityDay,
     slotId: string,
-    updates: Partial<AvailabilityTimeSlot>,
+    updates: Partial<AvailabilityTimeSlot>
   ) {
     updateDay(day.day, {
       slots: day.slots.map((slot) =>
-        slot.id === slotId ? { ...slot, ...updates } : slot,
+        slot.id === slotId ? { ...slot, ...updates } : slot
       ),
     });
   }
@@ -141,9 +142,7 @@ function ConnectAvailabilitySheet({
         />
 
         <section className="grid gap-3">
-          <h3 className="text-body font-normal text-[#2F4B4F]">
-            Weekly hours
-          </h3>
+          <h3 className="text-body font-normal text-[#2F4B4F]">Weekly hours</h3>
 
           <div className="grid">
             {schedule.days.map((day) => (
@@ -186,7 +185,7 @@ function AvailabilityDayRow({
   onToggle: (enabled: boolean) => void;
   onUpdateSlot: (
     slotId: string,
-    updates: Partial<AvailabilityTimeSlot>,
+    updates: Partial<AvailabilityTimeSlot>
   ) => void;
 }) {
   const label = availabilityDayLabels[day.day - 1];
@@ -198,19 +197,11 @@ function AvailabilityDayRow({
   return (
     <div className="mb-3 grid gap-3 py-2 last:mb-0 sm:grid-cols-[9rem_1fr]">
       <div className="flex items-center gap-3">
-        <button
-          aria-pressed={day.enabled}
-          className={cn(
-            "flex size-5 shrink-0 items-center justify-center rounded-sm border transition",
-            day.enabled
-              ? "border-primary bg-secondary text-primary"
-              : "border-[#2F4B4F]/30 bg-white text-transparent hover:border-primary/50",
-          )}
-          onClick={() => onToggle(!day.enabled)}
-          type="button"
-        >
-          <Check className="size-3.5 stroke-[3]" />
-        </button>
+        <AppCheckbox
+          checked={day.enabled}
+          label={`${day.enabled ? "Disable" : "Enable"} ${label}`}
+          onCheckedChange={onToggle}
+        />
         <span className="font-semibold text-[#2F4B4F]">{label}</span>
       </div>
 

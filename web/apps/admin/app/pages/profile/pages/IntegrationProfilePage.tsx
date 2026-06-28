@@ -12,16 +12,20 @@ import { SegmentedTabs } from "@piya/ui";
 import {
   type AccountSetupEmailIntegrationInput,
   type AvailabilityScheduleDraft,
+  type UpdateDeliveryPricingInput,
   availabilityDataToScheduleDraft,
   type WhatsAppChannelSettings,
   useGetAccountSetupQuery,
   useGetPrimaryAvailabilityQuery,
+  useGetPrimaryDeliveryPricingQuery,
   useGetWhatsAppConnectionQuery,
   useUpdateAccountSetupMutation,
   useUpdatePrimaryAvailabilityMutation,
+  useUpdatePrimaryDeliveryPricingMutation,
   useDisconnectWhatsAppConnectionMutation,
 } from "@piya/shared";
 import { ConnectAvailabilitySheet } from "../components/ConnectAvailabilitySheet";
+import { ConnectDeliveryPricingSheet } from "../components/ConnectDeliveryPricingSheet";
 import { ConnectDomainSheet } from "../components/ConnectDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
@@ -37,7 +41,12 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
-  action?: "availability-hours" | "domain" | "email" | "whatsapp";
+  action?:
+    | "availability-hours"
+    | "delivery-prices"
+    | "domain"
+    | "email"
+    | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -123,6 +132,7 @@ const integrationsByTab: Record<
     title: "Delivery integration",
     connections: [
       {
+        action: "delivery-prices",
         name: "Set delivery prices",
         subtitle:
           "Configure price per kilometer for each available delivery vehicle.",
@@ -140,30 +150,35 @@ export function IntegrationProfilePage() {
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = React.useState(false);
   const [isAvailabilitySheetOpen, setIsAvailabilitySheetOpen] =
     React.useState(false);
+  const [isDeliveryPricingSheetOpen, setIsDeliveryPricingSheetOpen] =
+    React.useState(false);
   const [availabilitySchedule, setAvailabilitySchedule] =
     React.useState<AvailabilityScheduleDraft>();
   const [slug, setSlug] = React.useState("");
-  const [email, setEmail] =
-    React.useState<AccountSetupEmailIntegrationInput>({
-      fromEmailLocalPart: "",
-      replyToEmail: "",
-    });
+  const [email, setEmail] = React.useState<AccountSetupEmailIntegrationInput>({
+    fromEmailLocalPart: "",
+    replyToEmail: "",
+  });
   const { data: accountSetup } = useGetAccountSetupQuery();
   const { data: availabilityPayload } = useGetPrimaryAvailabilityQuery();
+  const { data: deliveryPricingPayload } = useGetPrimaryDeliveryPricingQuery();
   const { data: whatsappConnection } = useGetWhatsAppConnectionQuery();
   const [updateAccountSetup] = useUpdateAccountSetupMutation();
   const [updateAvailability, { isLoading: isSavingAvailability }] =
     useUpdatePrimaryAvailabilityMutation();
+  const [updateDeliveryPricing, { isLoading: isSavingDeliveryPricing }] =
+    useUpdatePrimaryDeliveryPricingMutation();
   const [disconnectWhatsApp, { isLoading: isDisconnectingWhatsApp }] =
     useDisconnectWhatsAppConnectionMutation();
   const activeIntegration = integrationsByTab[activeTab];
   const whatsappSettings =
     whatsappConnection?.connection ?? accountSetup?.channelSettings?.whatsapp;
   const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
-    availabilityPayload?.availability,
+    availabilityPayload?.availability
   );
   const currentAvailabilitySchedule =
     availabilitySchedule ?? savedAvailabilitySchedule;
+  const deliveryPricing = deliveryPricingPayload?.deliveryPricing;
 
   React.useEffect(() => {
     if (!accountSetup) return;
@@ -213,8 +228,12 @@ export function IntegrationProfilePage() {
   async function saveAvailability(schedule: AvailabilityScheduleDraft) {
     const result = await updateAvailability(schedule).unwrap();
     setAvailabilitySchedule(
-      availabilityDataToScheduleDraft(result.availability) ?? schedule,
+      availabilityDataToScheduleDraft(result.availability) ?? schedule
     );
+  }
+
+  async function saveDeliveryPricing(input: UpdateDeliveryPricingInput) {
+    await updateDeliveryPricing(input).unwrap();
   }
 
   return (
@@ -240,24 +259,30 @@ export function IntegrationProfilePage() {
                     connection.action === "domain"
                       ? domainConnected
                       : connection.action === "email"
-                        ? emailConnected
-                        : connection.action === "whatsapp"
-                          ? isWhatsAppConnected(whatsappSettings)
-                          : connection.action === "availability-hours"
-                            ? Boolean(currentAvailabilitySchedule)
-                        : connection.connected,
+                      ? emailConnected
+                      : connection.action === "whatsapp"
+                      ? isWhatsAppConnected(whatsappSettings)
+                      : connection.action === "availability-hours"
+                      ? Boolean(currentAvailabilitySchedule)
+                      : connection.action === "delivery-prices"
+                      ? Object.values(deliveryPricing?.vehicles ?? {}).some(
+                          (vehicle) => vehicle.enabled
+                        )
+                      : connection.connected,
                 }}
                 key={connection.name}
                 onClick={
                   connection.action === "domain"
                     ? () => setIsDomainSheetOpen(true)
                     : connection.action === "email"
-                      ? () => setIsEmailSheetOpen(true)
-                      : connection.action === "whatsapp"
-                        ? () => setIsWhatsAppSheetOpen(true)
-                        : connection.action === "availability-hours"
-                          ? () => setIsAvailabilitySheetOpen(true)
-                        : undefined
+                    ? () => setIsEmailSheetOpen(true)
+                    : connection.action === "whatsapp"
+                    ? () => setIsWhatsAppSheetOpen(true)
+                    : connection.action === "availability-hours"
+                    ? () => setIsAvailabilitySheetOpen(true)
+                    : connection.action === "delivery-prices"
+                    ? () => setIsDeliveryPricingSheetOpen(true)
+                    : undefined
                 }
               />
             ))}
@@ -292,6 +317,13 @@ export function IntegrationProfilePage() {
         onClose={() => setIsAvailabilitySheetOpen(false)}
         onSave={saveAvailability}
         open={isAvailabilitySheetOpen}
+      />
+      <ConnectDeliveryPricingSheet
+        initialPricing={deliveryPricing}
+        isSaving={isSavingDeliveryPricing}
+        onClose={() => setIsDeliveryPricingSheetOpen(false)}
+        onSave={saveDeliveryPricing}
+        open={isDeliveryPricingSheetOpen}
       />
     </>
   );

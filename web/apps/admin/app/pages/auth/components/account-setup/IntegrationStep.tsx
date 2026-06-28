@@ -13,12 +13,16 @@ import { useState } from "react";
 import {
   availabilityDataToScheduleDraft,
   type AvailabilityScheduleDraft,
+  type UpdateDeliveryPricingInput,
   getBusinessSlug,
   useGetPrimaryAvailabilityQuery,
+  useGetPrimaryDeliveryPricingQuery,
   useUpdatePrimaryAvailabilityMutation,
+  useUpdatePrimaryDeliveryPricingMutation,
 } from "@piya/shared";
 import {
   ConnectAvailabilitySheet,
+  ConnectDeliveryPricingSheet,
   ConnectDomainSheet,
   ConnectEmailSheet,
   ConnectWhatsAppSheet,
@@ -32,7 +36,12 @@ type IntegrationTab =
   | "delivery";
 
 type IntegrationConnection = {
-  action?: "availability-hours" | "domain" | "email" | "whatsapp";
+  action?:
+    | "availability-hours"
+    | "delivery-prices"
+    | "domain"
+    | "email"
+    | "whatsapp";
   connected?: boolean;
   name: string;
   subtitle: string;
@@ -118,6 +127,7 @@ const integrationsByTab: Record<
     title: "Delivery integration",
     connections: [
       {
+        action: "delivery-prices",
         name: "Set delivery prices",
         subtitle:
           "Configure price per kilometer for each available delivery vehicle.",
@@ -137,17 +147,23 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
   const [isEmailSheetOpen, setIsEmailSheetOpen] = useState(false);
   const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = useState(false);
   const [isAvailabilitySheetOpen, setIsAvailabilitySheetOpen] = useState(false);
+  const [isDeliveryPricingSheetOpen, setIsDeliveryPricingSheetOpen] =
+    useState(false);
   const [availabilitySchedule, setAvailabilitySchedule] =
     useState<AvailabilityScheduleDraft>();
   const { data: availabilityPayload } = useGetPrimaryAvailabilityQuery();
+  const { data: deliveryPricingPayload } = useGetPrimaryDeliveryPricingQuery();
   const [updateAvailability, { isLoading: isSavingAvailability }] =
     useUpdatePrimaryAvailabilityMutation();
+  const [updateDeliveryPricing, { isLoading: isSavingDeliveryPricing }] =
+    useUpdatePrimaryDeliveryPricingMutation();
   const activeIntegration = integrationsByTab[activeTab];
   const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
-    availabilityPayload?.availability,
+    availabilityPayload?.availability
   );
   const currentAvailabilitySchedule =
     availabilitySchedule ?? savedAvailabilitySchedule;
+  const deliveryPricing = deliveryPricingPayload?.deliveryPricing;
   const suggestedSlug =
     draft.integration.slug || getBusinessSlug(draft.businessProfile.name);
   const suggestedFromEmailLocalPart =
@@ -189,8 +205,12 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
   async function saveAvailability(schedule: AvailabilityScheduleDraft) {
     const result = await updateAvailability(schedule).unwrap();
     setAvailabilitySchedule(
-      availabilityDataToScheduleDraft(result.availability) ?? schedule,
+      availabilityDataToScheduleDraft(result.availability) ?? schedule
     );
+  }
+
+  async function saveDeliveryPricing(input: UpdateDeliveryPricingInput) {
+    await updateDeliveryPricing(input).unwrap();
   }
 
   return (
@@ -209,10 +229,14 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
                 connection.action === "domain"
                   ? draft.integration.domainConnected
                   : connection.action === "email"
-                    ? draft.integration.emailConnected
-                    : connection.action === "availability-hours"
-                      ? Boolean(currentAvailabilitySchedule)
-                      : connection.connected;
+                  ? draft.integration.emailConnected
+                  : connection.action === "availability-hours"
+                  ? Boolean(currentAvailabilitySchedule)
+                  : connection.action === "delivery-prices"
+                  ? Object.values(deliveryPricing?.vehicles ?? {}).some(
+                      (vehicle) => vehicle.enabled
+                    )
+                  : connection.connected;
 
               return (
                 <ConnectionCard
@@ -222,12 +246,14 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
                     connection.action === "domain"
                       ? () => setIsDomainSheetOpen(true)
                       : connection.action === "email"
-                        ? () => setIsEmailSheetOpen(true)
-                        : connection.action === "whatsapp"
-                          ? () => setIsWhatsAppSheetOpen(true)
-                          : connection.action === "availability-hours"
-                            ? () => setIsAvailabilitySheetOpen(true)
-                        : undefined
+                      ? () => setIsEmailSheetOpen(true)
+                      : connection.action === "whatsapp"
+                      ? () => setIsWhatsAppSheetOpen(true)
+                      : connection.action === "availability-hours"
+                      ? () => setIsAvailabilitySheetOpen(true)
+                      : connection.action === "delivery-prices"
+                      ? () => setIsDeliveryPricingSheetOpen(true)
+                      : undefined
                   }
                 />
               );
@@ -261,6 +287,13 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
         onClose={() => setIsAvailabilitySheetOpen(false)}
         onSave={saveAvailability}
         open={isAvailabilitySheetOpen}
+      />
+      <ConnectDeliveryPricingSheet
+        initialPricing={deliveryPricing}
+        isSaving={isSavingDeliveryPricing}
+        onClose={() => setIsDeliveryPricingSheetOpen(false)}
+        onSave={saveDeliveryPricing}
+        open={isDeliveryPricingSheetOpen}
       />
     </>
   );

@@ -15,10 +15,12 @@ import type {
   CommunicationRecipient,
   CompleteWhatsAppConnectionInput,
   CreateLeadRequestInput,
+  DeliveryPricingPayload,
   InviteMemberInput,
   SendWhatsAppMessageInput,
   SendWhatsAppMessagePayload,
   TeamPayload,
+  UpdateDeliveryPricingInput,
   UpdateAccountSetupRequest,
   UpdateMemberInvitationRoleRequest,
   UpdateMemberRoleRequest,
@@ -26,6 +28,7 @@ import type {
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
 import { availabilityService } from "../services/availability.service";
+import { deliveryPricingService } from "../services/delivery-pricing.service";
 import { businessService } from "../services/business.service";
 import { communicationsService } from "../services/communications.service";
 import { contactsService } from "../services/contacts.service";
@@ -64,6 +67,7 @@ export const domainApi = createApi({
   tagTypes: [
     "AccountSetup",
     "Availability",
+    "DeliveryPricing",
     "Communication",
     "CommunicationRecipient",
     "Contact",
@@ -125,6 +129,35 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["AccountSetup", "Availability"],
     }),
+    getPrimaryDeliveryPricing: builder.query<DeliveryPricingPayload, void>({
+      queryFn: async () => {
+        try {
+          return {
+            data: await deliveryPricingService.getPrimaryDeliveryPricing(),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["DeliveryPricing"],
+    }),
+    updatePrimaryDeliveryPricing: builder.mutation<
+      DeliveryPricingPayload,
+      UpdateDeliveryPricingInput
+    >({
+      queryFn: async (input) => {
+        try {
+          return {
+            data: await deliveryPricingService.updatePrimaryDeliveryPricing(
+              input
+            ),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup", "DeliveryPricing"],
+    }),
     checkBusinessSlugAvailability: builder.query<
       BusinessSlugAvailabilityPayload,
       string
@@ -132,10 +165,7 @@ export const domainApi = createApi({
       queryFn: async (slug, api) => {
         try {
           return {
-            data: await businessService.checkSlugAvailability(
-              slug,
-              api.signal,
-            ),
+            data: await businessService.checkSlugAvailability(slug, api.signal),
           };
         } catch (error) {
           return { error: getDomainApiError(error) };
@@ -273,14 +303,18 @@ export const domainApi = createApi({
       queryFn: () => ({ data: communicationsService.getCommunications() }),
       providesTags: ["Communication"],
     }),
-    getCommunicationRecipients: builder.query<CommunicationRecipient[], string>({
-      queryFn: (communicationId) => ({
-        data: communicationsService.getCommunicationRecipients(communicationId),
-      }),
-      providesTags: (_result, _error, communicationId) => [
-        { id: communicationId, type: "CommunicationRecipient" },
-      ],
-    }),
+    getCommunicationRecipients: builder.query<CommunicationRecipient[], string>(
+      {
+        queryFn: (communicationId) => ({
+          data: communicationsService.getCommunicationRecipients(
+            communicationId
+          ),
+        }),
+        providesTags: (_result, _error, communicationId) => [
+          { id: communicationId, type: "CommunicationRecipient" },
+        ],
+      }
+    ),
     getContacts: builder.query<ContactData[], void>({
       queryFn: () => ({ data: contactsService.getContacts() }),
       providesTags: ["Contact"],
@@ -313,6 +347,7 @@ export const {
   useDisconnectWhatsAppConnectionMutation,
   useGetAccountSetupQuery,
   useGetPrimaryAvailabilityQuery,
+  useGetPrimaryDeliveryPricingQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
   useGetContactsQuery,
@@ -325,6 +360,7 @@ export const {
   useInviteMemberMutation,
   useSendWhatsAppMessageMutation,
   useUpdatePrimaryAvailabilityMutation,
+  useUpdatePrimaryDeliveryPricingMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
