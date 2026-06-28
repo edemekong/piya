@@ -1,5 +1,14 @@
 # Piya Agent Guide
 
+## Mandatory Task Agreement
+
+- Before changing files or taking state-changing actions, inspect the relevant context and make sure the request, intended result, boundaries, and verification path are understood.
+- Ask focused questions wherever requirements, behavior, ownership, or scope are unclear. Help the user evaluate options and make recommendations when useful.
+- Even when a request appears unambiguous, restate the proposed scope and obtain explicit user agreement before implementation.
+- Read-only inspection needed to understand the task is allowed before agreement. Do not edit files, install dependencies, commit, push, deploy, or make other state-changing actions before agreement.
+- Treat the agreed scope as fixed throughout the task. Do not add cleanup, refactors, features, abstractions, renames, dependency changes, or unrelated fixes that were not approved.
+- If new information requires a scope change, pause, explain the change and tradeoffs, and obtain explicit user agreement before continuing.
+
 ## First Move
 
 - Inspect the files in the area being changed before proposing or editing.
@@ -121,3 +130,14 @@ Run this after backend function changes:
 cd server/functions
 npm run build
 ```
+
+## Completion And Git Handoff
+
+- After completing and verifying a file-changing task, summarize the exact changes and checks, then ask whether the user wants Git actions performed.
+- Offer these choices when applicable:
+  - commit the approved task changes on the current branch;
+  - create a new branch, commit the approved task changes, push it, and open a draft pull request with `gh`;
+  - leave the changes uncommitted.
+- Do not stage unrelated user changes. Review the diff and stage only files or hunks belonging to the agreed task.
+- Do not commit, create a branch, push, or open a pull request until the user explicitly chooses that action.
+- Use `git` to create local branches and commits. Use `gh` for GitHub operations such as opening the draft pull request.
