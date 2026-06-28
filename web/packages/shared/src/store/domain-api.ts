@@ -11,12 +11,16 @@ import type {
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
+  CompleteWhatsAppConnectionInput,
   CreateLeadRequestInput,
   InviteMemberInput,
+  SendWhatsAppMessageInput,
+  SendWhatsAppMessagePayload,
   TeamPayload,
   UpdateAccountSetupRequest,
   UpdateMemberInvitationRoleRequest,
   UpdateMemberRoleRequest,
+  WhatsAppConnectionPayload,
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
 import { businessService } from "../services/business.service";
@@ -29,6 +33,7 @@ import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
 import { teamService } from "../services/team.service";
 import { userService } from "../services/user.service";
+import { whatsappService } from "../services/whatsapp.service";
 
 type DomainApiError = {
   message: string;
@@ -63,6 +68,7 @@ export const domainApi = createApi({
     "Offering",
     "Order",
     "Team",
+    "WhatsAppConnection",
   ],
   endpoints: (builder) => ({
     getAccountSetup: builder.query<AccountSetupPayload, void>({
@@ -185,6 +191,55 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["Team"],
     }),
+    getWhatsAppConnection: builder.query<WhatsAppConnectionPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await whatsappService.getConnection() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["WhatsAppConnection"],
+    }),
+    completeWhatsAppConnection: builder.mutation<
+      WhatsAppConnectionPayload,
+      CompleteWhatsAppConnectionInput
+    >({
+      queryFn: async (input) => {
+        try {
+          return { data: await whatsappService.completeConnection(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup", "WhatsAppConnection"],
+    }),
+    disconnectWhatsAppConnection: builder.mutation<
+      WhatsAppConnectionPayload,
+      void
+    >({
+      queryFn: async () => {
+        try {
+          return { data: await whatsappService.disconnectConnection() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["AccountSetup", "WhatsAppConnection"],
+    }),
+    sendWhatsAppMessage: builder.mutation<
+      SendWhatsAppMessagePayload,
+      SendWhatsAppMessageInput
+    >({
+      queryFn: async (input) => {
+        try {
+          return { data: await whatsappService.sendMessage(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["WhatsAppConnection"],
+    }),
     getCommunications: builder.query<CommunicationAdminData[], void>({
       queryFn: () => ({ data: communicationsService.getCommunications() }),
       providesTags: ["Communication"],
@@ -223,8 +278,10 @@ export const domainApi = createApi({
 export const {
   useLazyCheckBusinessSlugAvailabilityQuery,
   useCreateLeadRequestMutation,
+  useCompleteWhatsAppConnectionMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
+  useDisconnectWhatsAppConnectionMutation,
   useGetAccountSetupQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
@@ -234,7 +291,9 @@ export const {
   useGetOfferingsQuery,
   useGetOrdersQuery,
   useGetTeamQuery,
+  useGetWhatsAppConnectionQuery,
   useInviteMemberMutation,
+  useSendWhatsAppMessageMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,

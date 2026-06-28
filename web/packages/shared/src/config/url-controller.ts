@@ -49,6 +49,22 @@ export class URLController {
     return this.path("/v1/lead-requests");
   }
 
+  get whatsappConnection() {
+    return this.path("/v1/whatsapp/connection");
+  }
+
+  get completeWhatsAppConnection() {
+    return this.path("/v1/whatsapp/connection/complete");
+  }
+
+  get disconnectWhatsAppConnection() {
+    return this.path("/v1/whatsapp/connection/disconnect");
+  }
+
+  get whatsappMessages() {
+    return this.path("/v1/whatsapp/messages");
+  }
+
   get memberInvitations() {
     return this.path("/v1/businesses/member-invitations");
   }

@@ -40,3 +40,4 @@ export * from "./offerings.service";
 export * from "./orders.service";
 export { BusinessTeamService, teamService } from "./team.service";
 export { UserService, userService } from "./user.service";
+export { WhatsAppService, whatsappService } from "./whatsapp.service";

@@ -48,7 +48,14 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-app.use(express.json({ limit: "20mb" }));
+app.use(
+  express.json({
+    limit: "20mb",
+    verify: (req, _res, buffer) => {
+      (req as express.Request).rawBody = Buffer.from(buffer);
+    },
+  }),
+);
 app.use(express.urlencoded({ limit: "20mb", extended: true }));
 
 app.use(TenantMiddleware);

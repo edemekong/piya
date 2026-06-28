@@ -139,6 +139,51 @@ const API_RESPONSE = {
     code: "LEAD_REQUEST_CREATED",
     message: "Lead request created",
   },
+  whatsappWebhookVerified: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_WEBHOOK_VERIFIED",
+    message: "WhatsApp webhook verified",
+  },
+  whatsappWebhookRejected: {
+    statusCode: STATUS_CODES.forbidden,
+    code: "WHATSAPP_WEBHOOK_REJECTED",
+    message: "WhatsApp webhook verification failed",
+  },
+  whatsappWebhookReceived: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_WEBHOOK_RECEIVED",
+    message: "WhatsApp webhook received",
+  },
+  whatsappConnectionFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_CONNECTION_FETCHED",
+    message: "WhatsApp connection fetched",
+  },
+  whatsappConnectionCompleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_CONNECTION_COMPLETED",
+    message: "WhatsApp connection completed",
+  },
+  whatsappConnectionDisconnected: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_CONNECTION_DISCONNECTED",
+    message: "WhatsApp connection disconnected",
+  },
+  whatsappMessageSent: {
+    statusCode: STATUS_CODES.ok,
+    code: "WHATSAPP_MESSAGE_SENT",
+    message: "WhatsApp message sent",
+  },
+  whatsappConnectionNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "WHATSAPP_CONNECTION_NOT_FOUND",
+    message: "WhatsApp is not connected for this business",
+  },
+  whatsappConfigurationMissing: {
+    statusCode: STATUS_CODES.serviceUnavailable,
+    code: "WHATSAPP_CONFIGURATION_MISSING",
+    message: "WhatsApp configuration is missing",
+  },
   teamOwnerRequired: {
     statusCode: STATUS_CODES.forbidden,
     code: "TEAM_OWNER_REQUIRED",

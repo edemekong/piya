@@ -11,8 +11,11 @@ import {
 import { SegmentedTabs } from "@piya/ui";
 import {
   type AccountSetupEmailIntegrationInput,
+  type WhatsAppChannelSettings,
   useGetAccountSetupQuery,
+  useGetWhatsAppConnectionQuery,
   useUpdateAccountSetupMutation,
+  useDisconnectWhatsAppConnectionMutation,
 } from "@piya/shared";
 import { ConnectDomainSheet } from "../components/ConnectDomainSheet";
 import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
@@ -137,8 +140,13 @@ export function IntegrationProfilePage() {
       replyToEmail: "",
     });
   const { data: accountSetup } = useGetAccountSetupQuery();
+  const { data: whatsappConnection } = useGetWhatsAppConnectionQuery();
   const [updateAccountSetup] = useUpdateAccountSetupMutation();
+  const [disconnectWhatsApp, { isLoading: isDisconnectingWhatsApp }] =
+    useDisconnectWhatsAppConnectionMutation();
   const activeIntegration = integrationsByTab[activeTab];
+  const whatsappSettings =
+    whatsappConnection?.connection ?? accountSetup?.channelSettings?.whatsapp;
 
   React.useEffect(() => {
     if (!accountSetup) return;
@@ -209,6 +217,8 @@ export function IntegrationProfilePage() {
                       ? domainConnected
                       : connection.action === "email"
                         ? emailConnected
+                        : connection.action === "whatsapp"
+                          ? isWhatsAppConnected(whatsappSettings)
                         : connection.connected,
                 }}
                 key={connection.name}
@@ -242,11 +252,18 @@ export function IntegrationProfilePage() {
         open={isEmailSheetOpen}
       />
       <ConnectWhatsAppSheet
+        connection={whatsappSettings}
+        isDisconnecting={isDisconnectingWhatsApp}
         onClose={() => setIsWhatsAppSheetOpen(false)}
+        onDisconnect={() => disconnectWhatsApp().unwrap()}
         open={isWhatsAppSheetOpen}
       />
     </>
   );
+}
+
+function isWhatsAppConnected(connection?: WhatsAppChannelSettings | null) {
+  return connection?.status === "active" && Boolean(connection.phoneNumberId);
 }
 
 function ConnectionCard({

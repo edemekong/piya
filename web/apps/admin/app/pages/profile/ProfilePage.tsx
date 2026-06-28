@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSearchParams } from "@remix-run/react";
 import { ProfileSidebar } from "./components";
 import {
   BrandingProfilePage,
@@ -12,8 +13,16 @@ import {
 import type { ProfileSection } from "./profileSections";
 
 export function ProfilePage() {
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] =
     React.useState<ProfileSection>("personal");
+
+  React.useEffect(() => {
+    const section = searchParams.get("section");
+    if (isProfileSection(section)) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
 
   return (
     <div className="grid gap-6">
@@ -32,6 +41,18 @@ export function ProfilePage() {
         <ProfileSectionContent section={activeSection} />
       </div>
     </div>
+  );
+}
+
+function isProfileSection(section: string | null): section is ProfileSection {
+  return (
+    section === "personal" ||
+    section === "business" ||
+    section === "branding" ||
+    section === "members" ||
+    section === "channels" ||
+    section === "notifications" ||
+    section === "security"
   );
 }
 

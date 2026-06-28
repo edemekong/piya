@@ -7,6 +7,7 @@ declare global {
     interface Request {
       tenant?: { businessId: string; hostname: string };
       currentUser?: UserRecord;
+      rawBody?: Buffer;
     }
   }
 }

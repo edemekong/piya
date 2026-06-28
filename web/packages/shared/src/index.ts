@@ -16,3 +16,10 @@ export type {
   InvitableMemberRoleType,
   MemberRoleType,
 } from "./types/business.type";
+export type {
+  CompleteWhatsAppConnectionInput,
+  SendWhatsAppMessageInput,
+  SendWhatsAppMessagePayload,
+  WhatsAppConnectionPayload,
+  WhatsAppWebhookEventPayload,
+} from "./types/whatsapp.type";

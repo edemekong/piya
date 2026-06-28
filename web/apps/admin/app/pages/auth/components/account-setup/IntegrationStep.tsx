@@ -14,6 +14,7 @@ import { getBusinessSlug } from "@piya/shared";
 import {
   ConnectDomainSheet,
   ConnectEmailSheet,
+  ConnectWhatsAppSheet,
 } from "@/pages/profile/components";
 import type { SetupDraft } from "@/pages/auth/utils/account-setup-types";
 
@@ -127,6 +128,7 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
   const [activeTab, setActiveTab] = useState<IntegrationTab>("domain");
   const [isDomainSheetOpen, setIsDomainSheetOpen] = useState(false);
   const [isEmailSheetOpen, setIsEmailSheetOpen] = useState(false);
+  const [isWhatsAppSheetOpen, setIsWhatsAppSheetOpen] = useState(false);
   const activeIntegration = integrationsByTab[activeTab];
   const suggestedSlug =
     draft.integration.slug || getBusinessSlug(draft.businessProfile.name);
@@ -194,6 +196,8 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
                       ? () => setIsDomainSheetOpen(true)
                       : connection.action === "email"
                         ? () => setIsEmailSheetOpen(true)
+                        : connection.action === "whatsapp"
+                          ? () => setIsWhatsAppSheetOpen(true)
                         : undefined
                   }
                 />
@@ -216,6 +220,11 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
         onClose={() => setIsEmailSheetOpen(false)}
         onConnect={connectEmail}
         open={isEmailSheetOpen}
+      />
+      <ConnectWhatsAppSheet
+        onClose={() => setIsWhatsAppSheetOpen(false)}
+        onDisconnect={() => undefined}
+        open={isWhatsAppSheetOpen}
       />
     </>
   );

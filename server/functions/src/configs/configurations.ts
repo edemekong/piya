@@ -14,6 +14,11 @@ const PAYSTACK_SECRET_KEY = defineString("PAYSTACK_SECRET_KEY");
 const PAYSTACK_PUBLIC_KEY = defineString("PAYSTACK_PUBLIC_KEY");
 const PORTAL_URL = defineString("PORTAL_URL");
 const DASHBOARD_URL = defineString("DASHBOARD_URL");
+const META_APP_SECRET = defineString("META_APP_SECRET");
+const META_SYSTEM_USER_ACCESS_TOKEN = defineString("META_SYSTEM_USER_ACCESS_TOKEN");
+const WHATSAPP_WEBHOOK_VERIFY_TOKEN = defineString(
+  "WHATSAPP_WEBHOOK_VERIFY_TOKEN",
+);
 
 const defaultAppBranding = {
   name: "Piya",
@@ -46,6 +51,10 @@ const finalConfig = {
   PAYSTACK_BASE_URL: "https://api.paystack.co" as string,
   PORTAL_URL: undefined as string | undefined,
   DASHBOARD_URL: undefined as string | undefined,
+  META_APP_SECRET: undefined as string | undefined,
+  META_SYSTEM_USER_ACCESS_TOKEN: undefined as string | undefined,
+  META_GRAPH_API_BASE_URL: "https://graph.facebook.com/v23.0" as string,
+  WHATSAPP_WEBHOOK_VERIFY_TOKEN: undefined as string | undefined,
   appBranding: defaultAppBranding,
 };
 
@@ -68,6 +77,11 @@ onInit(() => {
   finalConfig.PAYSTACK_PUBLIC_KEY = PAYSTACK_PUBLIC_KEY.value();
   finalConfig.PORTAL_URL = PORTAL_URL.value();
   finalConfig.DASHBOARD_URL = DASHBOARD_URL.value();
+  finalConfig.META_APP_SECRET = META_APP_SECRET.value();
+  finalConfig.META_SYSTEM_USER_ACCESS_TOKEN =
+    META_SYSTEM_USER_ACCESS_TOKEN.value();
+  finalConfig.WHATSAPP_WEBHOOK_VERIFY_TOKEN =
+    WHATSAPP_WEBHOOK_VERIFY_TOKEN.value();
 
   finalConfig.SERVICE_ACCOUNT = SERVICE_ACCOUNT;
 });

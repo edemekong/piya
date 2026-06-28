@@ -22,12 +22,16 @@ interface WhatsAppChannelSettings {
   provider: Extract<ChannelProviderType, "whatsapp_cloud">;
   status: ChannelProviderStatusType;
   businessAccountId?: string | null;
+  wabaId?: string | null;
   phoneNumberId?: string | null;
   phoneNumber?: string | null;
   displayPhoneNumber?: string | null;
   displayName?: string | null;
   qualityRating?: string | null;
   credentialReference?: string | null;
+  connectedAt?: number | null;
+  disconnectedAt?: number | null;
+  lastSyncedAt?: number | null;
   lastError?: string | null;
 }
 interface SMSChannelSettings {

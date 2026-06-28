@@ -11,6 +11,11 @@ export const appConfig = {
     : getEnvString("VITE_API_BASE_URL"),
   useFirebaseEmulators,
   mapApiKey: getEnvString("VITE_GOOGLE_MAPS_API_KEY"),
+  metaAppId: getEnvString("VITE_META_APP_ID"),
+  whatsappEmbeddedSignupConfigId: getEnvString(
+    "VITE_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID",
+  ),
+  whatsappRedirectUri: getEnvString("VITE_WHATSAPP_REDIRECT_URI"),
   firebase: {
     apiKey: getEnvString("VITE_FIREBASE_API_KEY"),
     authDomain: getEnvString("VITE_FIREBASE_AUTH_DOMAIN"),

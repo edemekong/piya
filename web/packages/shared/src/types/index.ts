@@ -165,3 +165,11 @@ export type {
   VerifyAuthOTPReason,
   VerifyAuthOTPResult,
 } from "./auth";
+
+export type {
+  CompleteWhatsAppConnectionInput,
+  SendWhatsAppMessageInput,
+  SendWhatsAppMessagePayload,
+  WhatsAppConnectionPayload,
+  WhatsAppWebhookEventPayload,
+} from "./whatsapp.type";
