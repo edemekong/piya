@@ -12,7 +12,7 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
-import { AppAvatar, AppCheckbox, AppPopup, cn } from "@piya/ui";
+import { AppAvatar, AppCheckbox, AppPopup, Button, cn } from "@piya/ui";
 import {
   showToast,
   useGetBadgesQuery,
@@ -106,6 +106,7 @@ export function ContactsTable({
   const areAllPageContactsSelected =
     contacts.length > 0 &&
     contacts.every((contact) => selectedContactIds.has(contact.id));
+  const selectedContactCount = selectedContactIds.size;
   const badgesById = React.useMemo(() => {
     return new Map((badgePayload?.badges ?? []).map((badge) => [badge.id, badge]));
   }, [badgePayload]);
@@ -330,11 +331,7 @@ export function ContactsTable({
         <span className="text-footnote text-[#2F4B4F]/65">
           {isLoading
             ? "Loading contacts…"
-            : `Page ${page} · ${contacts.length} contacts${
-                selectedContactIds.size > 0
-                  ? ` · ${selectedContactIds.size} selected`
-                  : ""
-              }`}
+            : `Page ${page} · ${contacts.length} contacts`}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -357,6 +354,38 @@ export function ContactsTable({
           </button>
         </div>
       </footer>
+      {selectedContactCount > 0 ? (
+        <div
+          aria-live="polite"
+          className="fixed bottom-0 left-24 right-0 z-40 border-t border-primary/20 bg-secondary px-8 py-4 shadow-[0_-12px_30px_rgba(16,42,45,0.12)] lg:px-14"
+        >
+          <div className="mx-auto flex w-full max-w-web flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-callout font-semibold text-primary">
+              {selectedContactCount} selected contact
+              {selectedContactCount === 1 ? "" : "s"}
+            </span>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <Button
+                className="bg-white"
+                icon={<PackagePlus />}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                Create order
+              </Button>
+              <Button
+                className="bg-primary text-white hover:bg-primary/90"
+                icon={<Send />}
+                size="sm"
+                type="button"
+              >
+                Send request
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <BadgeManagerSheet
         onClose={() => setIsBadgeSheetOpen(false)}
         open={isBadgeSheetOpen}
