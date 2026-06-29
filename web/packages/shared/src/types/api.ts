@@ -61,6 +61,48 @@ export type CreateLeadRequestInput =
   | CreateDemoLeadRequestInput
   | CreateRemindMeLeadRequestInput;
 
+export type CreateContactInput = {
+  name: string;
+  email?: string | null;
+  phoneNumber?: string | null;
+  address?: import("../models").LocationData | null;
+  dob?: string | null;
+  gender?: import("./user.type").UserGenderType | null;
+  tags: string[];
+};
+
+export type ContactListQuery = {
+  query?: string;
+  status?: import("./contact.type").ContactStatusType;
+  bmdFrom?: string;
+  bmdTo?: string;
+  tagId?: string;
+  limit?: number;
+  cursor?: string;
+};
+
+export type ContactsPayload = {
+  contacts: import("../models").ContactData[];
+  nextCursor: string | null;
+  hasNextPage: boolean;
+};
+
+export type ContactPayload = {
+  contact: import("../models").ContactData;
+};
+
+export type ContactTagsPayload = {
+  tags: import("../models").ContactTagData[];
+};
+
+export type LocationPredictionsPayload = {
+  predictions: import("../models").LocationPrediction[];
+};
+
+export type LocationPayload = {
+  location: import("../models").LocationData;
+};
+
 export type AuthTokenPayload = {
   authToken: string;
 };

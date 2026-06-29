@@ -1,7 +1,10 @@
 export {
   domainApi,
   useLazyCheckBusinessSlugAvailabilityQuery,
+  useLazyGetLocationDetailsQuery,
+  useLazySearchLocationsQuery,
   useCompleteWhatsAppConnectionMutation,
+  useCreateContactMutation,
   useCreateLeadRequestMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
@@ -11,6 +14,7 @@ export {
   useGetPrimaryDeliveryPricingQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
+  useGetContactTagsQuery,
   useGetContactsQuery,
   useGetDiscountsQuery,
   useGetGiftsQuery,

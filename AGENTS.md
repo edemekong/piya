@@ -1,11 +1,12 @@
 # Piya Agent Guide
 
-## Mandatory Task Agreement
+## Task Agreement
 
 - Before changing files or taking state-changing actions, inspect the relevant context and make sure the request, intended result, boundaries, and verification path are understood.
+- A clear, direct user request is sufficient authorization for a small, localized, reversible change. Examples include copy edits, spacing or styling adjustments, and isolated UI behavior changes. After inspecting the relevant context, implement these without requiring a separate scope restatement or approval round.
 - Ask focused questions wherever requirements, behavior, ownership, or scope are unclear. Help the user evaluate options and make recommendations when useful.
-- Even when a request appears unambiguous, restate the proposed scope and obtain explicit user agreement before implementation.
-- Read-only inspection needed to understand the task is allowed before agreement. Do not edit files, install dependencies, commit, push, deploy, or make other state-changing actions before agreement.
+- Restate the proposed scope and obtain explicit user agreement before significant changes. Significant changes include broad or cross-cutting work, ambiguous behavior or ownership, architecture changes, auth or security work, model/schema/data changes, migrations, dependency changes, destructive actions, external side effects, deployments, and Git or GitHub write actions.
+- Read-only inspection needed to understand the task is allowed before agreement. Where explicit agreement is required, do not edit files, install dependencies, commit, push, deploy, or take other state-changing actions until it is received.
 - Treat the agreed scope as fixed throughout the task. Do not add cleanup, refactors, features, abstractions, renames, dependency changes, or unrelated fixes that were not approved.
 - If new information requires a scope change, pause, explain the change and tradeoffs, and obtain explicit user agreement before continuing.
 

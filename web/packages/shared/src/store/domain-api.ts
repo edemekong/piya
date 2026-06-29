@@ -1,8 +1,11 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
   ContactData,
+  ContactTagData,
   DiscountData,
   GiftData,
+  LocationData,
+  LocationPrediction,
   OfferingData,
   OrderData,
   UserData,
@@ -15,6 +18,9 @@ import type {
   CommunicationAdminData,
   CommunicationRecipient,
   CompleteWhatsAppConnectionInput,
+  ContactListQuery,
+  ContactsPayload,
+  CreateContactInput,
   CreateLeadRequestInput,
   DeliveryPricingPayload,
   InviteMemberInput,
@@ -37,6 +43,7 @@ import { contactsService } from "../services/contacts.service";
 import { discountsService } from "../services/discounts.service";
 import { giftsService } from "../services/gifts.service";
 import { leadRequestService } from "../services/lead-request.service";
+import { locationsService } from "../services/locations.service";
 import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
 import { teamService } from "../services/team.service";
@@ -73,6 +80,7 @@ export const domainApi = createApi({
     "Communication",
     "CommunicationRecipient",
     "Contact",
+    "ContactTag",
     "Discount",
     "Gift",
     "Offering",
@@ -327,9 +335,60 @@ export const domainApi = createApi({
         ],
       }
     ),
-    getContacts: builder.query<ContactData[], void>({
-      queryFn: () => ({ data: contactsService.getContacts() }),
+    getContacts: builder.query<ContactsPayload, ContactListQuery>({
+      queryFn: async (input) => {
+        try {
+          return { data: await contactsService.getContacts(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
       providesTags: ["Contact"],
+    }),
+    getContactTags: builder.query<ContactTagData[], void>({
+      queryFn: async () => {
+        try {
+          return { data: await contactsService.getContactTags() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["ContactTag"],
+    }),
+    createContact: builder.mutation<ContactData, CreateContactInput>({
+      queryFn: async (input) => {
+        try {
+          return { data: await contactsService.createContact(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Contact", "ContactTag"],
+    }),
+    searchLocations: builder.query<LocationPrediction[], string>({
+      queryFn: async (input, api) => {
+        try {
+          return {
+            data: await locationsService.searchLocations({ input }, api.signal),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+    }),
+    getLocationDetails: builder.query<LocationData, string>({
+      queryFn: async (placeId, api) => {
+        try {
+          return {
+            data: await locationsService.getLocationDetails(
+              { placeId },
+              api.signal
+            ),
+          };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
     }),
     getDiscounts: builder.query<DiscountData[], void>({
       queryFn: () => ({ data: discountsService.getDiscounts() }),
@@ -352,6 +411,9 @@ export const domainApi = createApi({
 
 export const {
   useLazyCheckBusinessSlugAvailabilityQuery,
+  useLazyGetLocationDetailsQuery,
+  useLazySearchLocationsQuery,
+  useCreateContactMutation,
   useCreateLeadRequestMutation,
   useCompleteWhatsAppConnectionMutation,
   useDeleteMemberInvitationMutation,
@@ -362,6 +424,7 @@ export const {
   useGetPrimaryDeliveryPricingQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
+  useGetContactTagsQuery,
   useGetContactsQuery,
   useGetDiscountsQuery,
   useGetGiftsQuery,

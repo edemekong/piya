@@ -1,5 +1,5 @@
 ---
-description: Clarify, agree, execute, verify, and hand off a strictly scoped Piya task.
+description: Inspect, clarify when needed, execute, verify, and hand off a scoped Piya task.
 ---
 
 # Task Workflow
@@ -12,9 +12,11 @@ description: Clarify, agree, execute, verify, and hand off a strictly scoped Piy
 
 ## Agreement
 
-- Ask focused questions until the requirements and scope are clear.
+- Classify the task as a small localized change or a significant change.
+- Treat a clear, direct request as authorization for small, localized, reversible edits such as copy, spacing, styling, or isolated UI behavior. Do not add a separate approval round for these changes.
+- Ask focused questions when requirements, behavior, ownership, or scope are unclear.
 - Suggest options or improvements when they help the user make an informed decision.
-- Restate the proposed scope, including explicit exclusions, and obtain user agreement before changing files or state.
+- For significant, ambiguous, broad, cross-cutting, security-sensitive, destructive, dependency, model/data, deployment, or Git changes, restate the proposed scope, including explicit exclusions, and obtain user agreement before changing files or state.
 
 ## Execution
 

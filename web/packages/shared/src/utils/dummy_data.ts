@@ -231,7 +231,7 @@ export const dummyContacts: ContactData[] = [
       country: "Nigeria",
       postalCode: "105102",
     },
-    badge: { type: "gold", points: 4820, updatedAt: contactNow - day * 7 },
+    badge: { badgeId: "gold", points: 4820, updatedAt: contactNow - day * 7 },
     dob: "1991-04-18",
     bmd: "04-18",
     preference: {
@@ -272,7 +272,7 @@ export const dummyContacts: ContactData[] = [
       country: "Nigeria",
       postalCode: "101233",
     },
-    badge: { type: "bronze", points: 680, updatedAt: contactNow - day },
+    badge: { badgeId: "bronze", points: 680, updatedAt: contactNow - day },
     dob: null,
     bmd: null,
     preference: {
@@ -313,7 +313,7 @@ export const dummyContacts: ContactData[] = [
       country: "United States",
       postalCode: "94107",
     },
-    badge: { type: "silver", points: 2360, updatedAt: contactNow - day * 22 },
+    badge: { badgeId: "silver", points: 2360, updatedAt: contactNow - day * 22 },
     dob: "1988-11-02",
     bmd: "11-02",
     preference: {
@@ -354,7 +354,7 @@ export const dummyContacts: ContactData[] = [
       country: "Ghana",
       postalCode: "GA-184",
     },
-    badge: { type: "regular", points: 120, updatedAt: contactNow - day * 35 },
+    badge: { badgeId: "regular", points: 120, updatedAt: contactNow - day * 35 },
     dob: null,
     bmd: null,
     preference: {

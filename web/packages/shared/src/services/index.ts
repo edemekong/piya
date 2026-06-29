@@ -38,6 +38,7 @@ export {
 } from "./firebase.service";
 export * from "./gifts.service";
 export { LeadRequestService, leadRequestService } from "./lead-request.service";
+export { LocationsService, locationsService } from "./locations.service";
 export * from "./offerings.service";
 export * from "./orders.service";
 export { BusinessTeamService, teamService } from "./team.service";

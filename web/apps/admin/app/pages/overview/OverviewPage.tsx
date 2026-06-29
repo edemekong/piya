@@ -14,7 +14,8 @@ import {
 } from "./components";
 
 export function OverviewPage() {
-  const { data: contacts = [] } = useGetContactsQuery();
+  const { data: contactsPage } = useGetContactsQuery({ limit: 50 });
+  const contacts = contactsPage?.contacts ?? [];
   const [isCommunicationSheetOpen, setIsCommunicationSheetOpen] =
     React.useState(false);
 

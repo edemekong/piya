@@ -1,3 +1,3 @@
 type ContactStatusType = "active" | "inactive" | "lead" | "blocked";
-type ContactBadgeType = "regular" | "bronze" | "silver" | "gold" | "platinum";
+type ContactBadgeType = string;
 export type { ContactBadgeType, ContactStatusType };

@@ -7,11 +7,14 @@ const COLLECTIONS = {
 
 const BUSINESS_SUBCOLLECTIONS = {
   availability: "availability",
+  badges: "badges",
   branding: "branding",
   channelSettings: "channel_settings",
+  contacts: "contacts",
   deliveryPricing: "delivery_pricing",
   memberInvitations: "member_invitations",
   members: "members",
+  tags: "tags",
 } as const;
 
 export { BUSINESS_SUBCOLLECTIONS, COLLECTIONS };

@@ -22,12 +22,15 @@ import {
 import { getOrderFulfillment } from "@piya/shared/utils";
 
 export function OrdersPage() {
-  const { data: queriedContacts = [] } = useGetContactsQuery();
+  const { data: contactsPage } = useGetContactsQuery({ limit: 50 });
+  const queriedContacts = contactsPage?.contacts ?? [];
   const { data: queriedOfferings = [] } = useGetOfferingsQuery();
   const { data: queriedOrders = [] } = useGetOrdersQuery();
   const [orders, setOrders] = React.useState<OrderData[]>([]);
   const [isCreateSheetOpen, setIsCreateSheetOpen] = React.useState(false);
-  const [selectedOrder, setSelectedOrder] = React.useState<OrderData | null>(null);
+  const [selectedOrder, setSelectedOrder] = React.useState<OrderData | null>(
+    null
+  );
   const [selectedContact, setSelectedContact] =
     React.useState<ContactData | null>(null);
   const [selectedOffering, setSelectedOffering] =
@@ -45,10 +48,10 @@ export function OrdersPage() {
 
   function openContactSheet(
     order: OrderData,
-    initialTab: ContactViewParentTab = "overview",
+    initialTab: ContactViewParentTab = "overview"
   ) {
     const existingContact = queriedContacts.find(
-      (contact) => contact.id === order.contact.id,
+      (contact) => contact.id === order.contact.id
     );
     setContactSheetTab(initialTab);
     setSelectedContact(existingContact ?? createContactFromOrder(order));
@@ -158,7 +161,7 @@ function createContactFromOrder(order: OrderData): ContactData {
         }
       : null,
     badge: {
-      type: "regular",
+      badgeId: "regular",
       points: 0,
       updatedAt: now,
     },

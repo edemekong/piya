@@ -19,13 +19,10 @@ import {
   cn,
 } from "@piya/ui";
 import type { ContactData } from "@piya/shared/models";
+import { useGetContactTagsQuery } from "@piya/shared";
 import { formatMoney } from "@piya/shared/utils";
 
-export type ContactOverviewTab =
-  | "events"
-  | "orders"
-  | "contact-info"
-  | "notes";
+export type ContactOverviewTab = "events" | "orders" | "contact-info" | "notes";
 
 const overviewTabs: {
   icon: React.ReactNode;
@@ -37,7 +34,11 @@ const overviewTabs: {
     label: "Events",
     value: "events",
   },
-  { icon: <ShoppingBag className="size-4" />, label: "Orders", value: "orders" },
+  {
+    icon: <ShoppingBag className="size-4" />,
+    label: "Orders",
+    value: "orders",
+  },
   {
     icon: <ContactRound className="size-4" />,
     label: "Contact info",
@@ -76,7 +77,7 @@ export function ContactOverviewPanel({
             </h3>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="text-callout font-semibold capitalize text-primary">
-                {contact.badge.type}
+                {contact.badge.badgeId}
               </span>
               <span className="text-footnote text-[#2F4B4F]/60">
                 {contact.badge.points.toLocaleString()} points
@@ -85,7 +86,11 @@ export function ContactOverviewPanel({
           </div>
         </div>
         <div className="flex w-full items-center gap-2 sm:w-auto">
-          <Button className="flex-1 sm:flex-none" icon={<NotebookPen />} size="sm">
+          <Button
+            className="flex-1 sm:flex-none"
+            icon={<NotebookPen />}
+            size="sm"
+          >
             Add note
           </Button>
           <Button
@@ -104,7 +109,10 @@ export function ContactOverviewPanel({
           label="Lifetime value"
           value={formatMoney(contact.counts.lifetimeValue)}
         />
-        <StatCard label="Orders" value={contact.counts.totalOrders.toString()} />
+        <StatCard
+          label="Orders"
+          value={contact.counts.totalOrders.toString()}
+        />
         <StatCard
           label="Last interaction"
           value={formatDate(contact.lastInteractionAt)}
@@ -119,7 +127,7 @@ export function ContactOverviewPanel({
                 "inline-flex items-center gap-2 border-b-2 px-3 py-3 text-callout font-semibold transition",
                 activeTab === tab.value
                   ? "border-primary text-primary"
-                  : "border-transparent text-[#2F4B4F]/60 hover:text-[#2F4B4F]",
+                  : "border-transparent text-[#2F4B4F]/60 hover:text-[#2F4B4F]"
               )}
               key={tab.value}
               onClick={() => onTabChange(tab.value)}
@@ -134,7 +142,9 @@ export function ContactOverviewPanel({
 
       {activeTab === "events" ? <AuditLogPanel /> : null}
       {activeTab === "orders" ? <OrdersPanel /> : null}
-      {activeTab === "contact-info" ? <ContactInfoPanel contact={contact} /> : null}
+      {activeTab === "contact-info" ? (
+        <ContactInfoPanel contact={contact} />
+      ) : null}
       {activeTab === "notes" ? <NotesPanel /> : null}
     </div>
   );
@@ -149,6 +159,8 @@ function OrdersPanel() {
 }
 
 function ContactInfoPanel({ contact }: { contact: ContactData }) {
+  const { data: reusableTags = [] } = useGetContactTagsQuery();
+  const tagNames = new Map(reusableTags.map((tag) => [tag.id, tag.name]));
   const address = contact.address
     ? [
         contact.address.address,
@@ -162,7 +174,11 @@ function ContactInfoPanel({ contact }: { contact: ContactData }) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <InfoCard icon={<Mail className="size-4" />} label="Email" value={contact.email} />
+      <InfoCard
+        icon={<Mail className="size-4" />}
+        label="Email"
+        value={contact.email}
+      />
       <InfoCard
         icon={<Phone className="size-4" />}
         label="Phone"
@@ -170,7 +186,10 @@ function ContactInfoPanel({ contact }: { contact: ContactData }) {
       />
       <InfoCard label="Country code" value={contact.countryCode} />
       <InfoCard label="Date of birth" value={contact.dob ?? "Not provided"} />
-      <InfoCard label="Anniversary" value={contact.anniversary ?? "Not provided"} />
+      <InfoCard
+        label="Anniversary"
+        value={contact.anniversary ?? "Not provided"}
+      />
       <InfoCard className="sm:col-span-2" label="Address" value={address} />
       <div className="rounded-md border border-border bg-fill/40 p-4 sm:col-span-2">
         <div className="flex items-center gap-2 text-footnote font-semibold text-[#2F4B4F]/65">
@@ -179,12 +198,20 @@ function ContactInfoPanel({ contact }: { contact: ContactData }) {
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {contact.tags.map((tag) => (
-            <Badge key={tag}>{tag}</Badge>
+            <Badge key={tag}>{tagNames.get(tag) ?? formatTagId(tag)}</Badge>
           ))}
         </div>
       </div>
     </div>
   );
+}
+
+function formatTagId(tagId: string) {
+  return tagId
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function NotesPanel() {

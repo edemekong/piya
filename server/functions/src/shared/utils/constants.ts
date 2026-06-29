@@ -74,6 +74,51 @@ const API_RESPONSE = {
     code: "AVAILABILITY_UPDATED",
     message: "Availability updated",
   },
+  contactsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "CONTACTS_FETCHED",
+    message: "Contacts fetched",
+  },
+  contactCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "CONTACT_CREATED",
+    message: "Contact created",
+  },
+  contactTagsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "CONTACT_TAGS_FETCHED",
+    message: "Contact tags fetched",
+  },
+  contactAlreadyExists: {
+    statusCode: STATUS_CODES.conflict,
+    code: "CONTACT_ALREADY_EXISTS",
+    message: "A contact with this email or phone number already exists",
+  },
+  locationPredictionsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "LOCATION_PREDICTIONS_FETCHED",
+    message: "Location predictions fetched",
+  },
+  locationFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "LOCATION_FETCHED",
+    message: "Location fetched",
+  },
+  locationNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "LOCATION_NOT_FOUND",
+    message: "Location not found",
+  },
+  locationConfigurationMissing: {
+    statusCode: STATUS_CODES.serviceUnavailable,
+    code: "LOCATION_CONFIGURATION_MISSING",
+    message: "Location search is not configured",
+  },
+  locationProviderUnavailable: {
+    statusCode: STATUS_CODES.badGateway,
+    code: "LOCATION_PROVIDER_UNAVAILABLE",
+    message: "Location search is temporarily unavailable",
+  },
   deliveryPricingFetched: {
     statusCode: STATUS_CODES.ok,
     code: "DELIVERY_PRICING_FETCHED",

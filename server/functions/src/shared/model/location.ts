@@ -1,10 +1,12 @@
 interface LocationData {
   address: string;
+  streetAddress?: string;
   city: string;
   state: string;
   serviceLocationId?: string | null;
   country: string;
   postalCode?: string;
+  displayName?: string;
   geoPoint?: GeoPointData;
 }
 

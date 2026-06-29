@@ -57,6 +57,22 @@ export class URLController {
     return this.path("/v1/delivery-pricing/primary");
   }
 
+  get contacts() {
+    return this.path("/v1/contacts");
+  }
+
+  get contactTags() {
+    return this.path("/v1/contacts/tags");
+  }
+
+  get locationSearch() {
+    return this.path("/v1/locations/search");
+  }
+
+  get locationDetails() {
+    return this.path("/v1/locations/details");
+  }
+
   get whatsappConnection() {
     return this.path("/v1/whatsapp/connection");
   }

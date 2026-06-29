@@ -6,4 +6,8 @@ export {
 } from "./ContactOverviewPanel";
 export { ContactPreferencePanel } from "./ContactPreferencePanel";
 export { ContactViewSheet } from "./ContactViewSheet";
+export {
+  ContactFiltersPopover,
+  type ContactFilters,
+} from "./ContactFiltersPopover";
 export { ContactsTable } from "./ContactsTable";

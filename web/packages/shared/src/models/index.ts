@@ -9,6 +9,7 @@ export const businessModules = [
 export type BusinessModule = (typeof businessModules)[number];
 
 export * from "./availability";
+export * from "./badge";
 export * from "./base";
 export * from "./booking";
 export * from "./business";
@@ -17,6 +18,7 @@ export * from "./channel-settings";
 export * from "./chat";
 export * from "./communication";
 export * from "./contact";
+export * from "./contact-tag";
 export * from "./delivery";
 export * from "./delivery-pricing";
 export * from "./discount";

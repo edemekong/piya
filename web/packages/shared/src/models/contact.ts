@@ -1,12 +1,10 @@
-import type {
-  ContactBadgeType,
-  ContactStatusType,
-} from "../types/contact.type";
+import type { ContactStatusType } from "../types/contact.type";
+import type { UserGenderType } from "../types/user.type";
 import type { BaseModel } from "./base";
 import type { LocationData } from "./location";
 
 interface ContactData extends BaseModel {
-  userId: string;
+  userId?: string | null;
   code: string;
   createdBy: string;
   businessId: string;
@@ -14,21 +12,23 @@ interface ContactData extends BaseModel {
   profileImageUrl?: string | null;
   email?: string | null;
   phoneNumber?: string | null;
-  countryCode: string;
+  countryCode?: string | null;
   address?: LocationData | null;
   badge: ContactBadge;
   dob?: string | null;
+  gender?: UserGenderType | null;
   bmd?: string | null;
   preference: ContactPreference;
   status: ContactStatusType;
   lastInteractionAt: number;
   anniversary?: string | null;
   tags: string[];
+  searchTokens?: string[];
   counts: ContactCounts;
   metadata?: Record<string, any> | null;
 }
 interface ContactBadge {
-  type: ContactBadgeType;
+  badgeId: string;
   points: number;
   updatedAt: number;
 }
