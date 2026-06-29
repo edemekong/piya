@@ -1,5 +1,6 @@
 export { AppText } from "./components/app-text";
 export { AppAvatar } from "./components/avatar";
+export { AppPopup } from "./components/app-popup";
 export { AppSheet } from "./components/app-sheet";
 export { Badge } from "./components/badge";
 export { AppCheckbox } from "./components/checkbox";
@@ -58,6 +59,7 @@ export type {
   LinkedTextProps,
 } from "./components/button";
 export type { AppAvatarProps } from "./components/avatar";
+export type { AppPopupPlacement, AppPopupProps } from "./components/app-popup";
 export type { AppCheckboxProps } from "./components/checkbox";
 export type { AppDatePickerProps } from "./components/date-picker";
 export type { AppSheetProps } from "./components/app-sheet";

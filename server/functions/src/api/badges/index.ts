@@ -1,0 +1,1 @@
+export { BadgeRouter } from "./route";

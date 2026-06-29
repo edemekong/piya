@@ -5,7 +5,6 @@ import {
   MapPin,
   Plus,
   Search,
-  Upload,
   X,
 } from "lucide-react";
 import {
@@ -36,6 +35,7 @@ import {
   MAX_CONTACT_TAGS,
 } from "../constants";
 import type { AddContactSheetProps } from "../types";
+import { CsvContactImportWorkflow } from "./CsvContactImportWorkflow";
 
 export function AddContactSheet({
   mode,
@@ -72,7 +72,7 @@ export function AddContactSheet({
         onClick={onClose}
         type="button"
       />
-      <aside className="relative flex h-full w-full max-w-xl flex-col bg-white text-[#2F4B4F] shadow-xl">
+      <aside className="relative flex h-full w-full max-w-2xl flex-col bg-white text-[#2F4B4F] shadow-xl">
         <div className="flex items-start justify-between border-b border-border p-6">
           <div>
             <h2 className="text-title-2 font-semibold text-[#2F4B4F]">
@@ -109,33 +109,42 @@ export function AddContactSheet({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div
+          className={cn(
+            "flex-1 p-6",
+            mode === "manual"
+              ? "overflow-y-auto"
+              : "min-h-0 overflow-hidden"
+          )}
+        >
           {mode === "manual" ? (
             <ManualContactForm onSave={saveContact} />
           ) : (
-            <CsvContactForm />
+            <CsvContactImportWorkflow onClose={onClose} />
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-border p-6">
-          <Button
-            className="bg-fill text-[#2F4B4F] hover:bg-fill-secondary"
-            onClick={onClose}
-            type="button"
-            variant="secondary"
-          >
-            Cancel
-          </Button>
-          <Button
-            buttonState={createContactState.isLoading ? "loading" : "enabled"}
-            form={mode === "manual" ? MANUAL_CONTACT_FORM_ID : undefined}
-            icon={mode === "csv" ? <Upload /> : <CheckCircle2 />}
-            loadingLabel="Saving contact"
-            type={mode === "manual" ? "submit" : "button"}
-          >
-            {mode === "csv" ? "Import contacts" : "Save contact"}
-          </Button>
-        </div>
+        {mode === "manual" ? (
+          <div className="flex items-center justify-end gap-3 border-t border-border p-6">
+            <Button
+              className="bg-fill text-[#2F4B4F] hover:bg-fill-secondary"
+              onClick={onClose}
+              type="button"
+              variant="secondary"
+            >
+              Cancel
+            </Button>
+            <Button
+              buttonState={createContactState.isLoading ? "loading" : "enabled"}
+              form={MANUAL_CONTACT_FORM_ID}
+              icon={<CheckCircle2 />}
+              loadingLabel="Saving contact"
+              type="submit"
+            >
+              Save contact
+            </Button>
+          </div>
+        ) : null}
       </aside>
     </div>
   );
@@ -208,51 +217,35 @@ function ManualContactForm({
         id={MANUAL_CONTACT_FORM_ID}
         onSubmit={(event) => void submitManualContact(event)}
       >
-        <AppTextField
-          label="Full name"
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Enter full name"
-          required
-          value={name}
-        />
-        <AppTextField
-          label="Email address"
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Enter email address"
-          type="email"
-          value={email}
-        />
-        <PhoneNumberField
-          label="Phone number"
-          onChange={setPhoneNumber}
-          placeholder="Enter phone number"
-          value={phoneNumber}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AppTextField
+            label="Full name"
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Enter full name"
+            required
+            value={name}
+          />
+          <PhoneNumberField
+            label="Phone number"
+            onChange={setPhoneNumber}
+            placeholder="Enter phone number"
+            value={phoneNumber}
+          />
+        </div>
         {submitAttempted && !hasContactMethod ? (
           <p className="-mt-2 text-footnote leading-relaxed text-error">
             Enter an email address or phone number.
           </p>
         ) : null}
 
-        <TagField onChange={setTags} tags={tags} />
-
-        <AddressField
-          onClick={() => setIsAddressDialogOpen(true)}
-          value={address?.address ?? ""}
-        />
-
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid min-w-0 gap-2">
-            <span className="text-footnote font-normal text-[#2F4B4F]">
-              Date of birth
-            </span>
-            <AppDatePicker
-              ariaLabel="Choose date of birth"
-              onChange={setDob}
-              placeholder="Select date"
-              value={dob}
-            />
-          </label>
+          <AppTextField
+            label="Email address"
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Enter email address"
+            type="email"
+            value={email}
+          />
           <AppSelectField
             label="Gender"
             onChange={(event) =>
@@ -266,6 +259,26 @@ function ManualContactForm({
             value={gender}
           />
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="grid min-w-0 gap-2">
+            <span className="text-footnote font-normal text-[#2F4B4F]">
+              Date of birth
+            </span>
+            <AppDatePicker
+              ariaLabel="Choose date of birth"
+              onChange={setDob}
+              placeholder="Select date"
+              value={dob}
+            />
+          </label>
+          <TagField onChange={setTags} tags={tags} />
+        </div>
+
+        <AddressField
+          onClick={() => setIsAddressDialogOpen(true)}
+          value={address?.address ?? ""}
+        />
       </form>
 
       <AddressSearchDialog
@@ -674,29 +687,4 @@ function getRequestErrorMessage(error: unknown, fallback: string) {
   }
 
   return fallback;
-}
-
-function CsvContactForm() {
-  return (
-    <div className="grid gap-5">
-      <label className="flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-primary bg-fill px-6 py-10 text-center transition hover:bg-secondary/30">
-        <Upload className="size-9 text-primary" />
-        <span className="mt-4 text-headline font-semibold text-[#2F4B4F]">
-          Upload CSV file
-        </span>
-        <span className="mt-2 max-w-sm text-callout text-[#2F4B4F]/65">
-          Use columns for name, email, phone number, country code, and tags.
-        </span>
-        <input accept=".csv,text/csv" className="sr-only" type="file" />
-      </label>
-
-      <div className="rounded-md border border-border bg-fill p-4">
-        <p className="text-headline font-semibold text-[#2F4B4F]">CSV format</p>
-        <p className="mt-2 text-callout text-[#2F4B4F]/70">
-          Required columns: name and either email or phone number. Optional
-          columns: country code, status, and tags.
-        </p>
-      </div>
-    </div>
-  );
 }

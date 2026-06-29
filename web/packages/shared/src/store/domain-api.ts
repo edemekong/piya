@@ -1,5 +1,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
+  BadgeData,
   ContactData,
   ContactTagData,
   DiscountData,
@@ -14,6 +15,8 @@ import type {
   AccountSetupPayload,
   AvailabilityPayload,
   AvailabilityScheduleDraft,
+  BadgeInput,
+  BadgesPayload,
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
@@ -36,6 +39,7 @@ import type {
 } from "../types";
 import { ApiServiceError } from "../services/base-api.service";
 import { availabilityService } from "../services/availability.service";
+import { badgesService } from "../services/badges.service";
 import { deliveryPricingService } from "../services/delivery-pricing.service";
 import { businessService } from "../services/business.service";
 import { communicationsService } from "../services/communications.service";
@@ -76,6 +80,7 @@ export const domainApi = createApi({
   tagTypes: [
     "AccountSetup",
     "Availability",
+    "Badge",
     "DeliveryPricing",
     "Communication",
     "CommunicationRecipient",
@@ -355,6 +360,52 @@ export const domainApi = createApi({
       },
       providesTags: ["ContactTag"],
     }),
+    getBadges: builder.query<BadgesPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await badgesService.getBadges() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["Badge"],
+    }),
+    createBadge: builder.mutation<BadgeData, BadgeInput>({
+      queryFn: async (input) => {
+        try {
+          const payload = await badgesService.createBadge(input);
+          return { data: payload.badge };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Badge"],
+    }),
+    updateBadge: builder.mutation<
+      BadgeData,
+      { badgeId: string; input: BadgeInput }
+    >({
+      queryFn: async ({ badgeId, input }) => {
+        try {
+          const payload = await badgesService.updateBadge(badgeId, input);
+          return { data: payload.badge };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Badge"],
+    }),
+    deleteBadge: builder.mutation<void, string>({
+      queryFn: async (badgeId) => {
+        try {
+          await badgesService.deleteBadge(badgeId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Badge"],
+    }),
     createContact: builder.mutation<ContactData, CreateContactInput>({
       queryFn: async (input) => {
         try {
@@ -414,10 +465,12 @@ export const {
   useLazyGetLocationDetailsQuery,
   useLazySearchLocationsQuery,
   useCreateContactMutation,
+  useCreateBadgeMutation,
   useCreateLeadRequestMutation,
   useCompleteWhatsAppConnectionMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
+  useDeleteBadgeMutation,
   useDisconnectWhatsAppConnectionMutation,
   useGetAccountSetupQuery,
   useGetPrimaryAvailabilityQuery,
@@ -426,6 +479,7 @@ export const {
   useGetCommunicationsQuery,
   useGetContactTagsQuery,
   useGetContactsQuery,
+  useGetBadgesQuery,
   useGetDiscountsQuery,
   useGetGiftsQuery,
   useGetOfferingsQuery,
@@ -440,4 +494,5 @@ export const {
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
   useUpdateCurrentUserMutation,
+  useUpdateBadgeMutation,
 } = domainApi;

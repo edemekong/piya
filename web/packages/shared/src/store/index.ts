@@ -4,8 +4,10 @@ export {
   useLazyGetLocationDetailsQuery,
   useLazySearchLocationsQuery,
   useCompleteWhatsAppConnectionMutation,
+  useCreateBadgeMutation,
   useCreateContactMutation,
   useCreateLeadRequestMutation,
+  useDeleteBadgeMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useDisconnectWhatsAppConnectionMutation,
@@ -14,6 +16,7 @@ export {
   useGetPrimaryDeliveryPricingQuery,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
+  useGetBadgesQuery,
   useGetContactTagsQuery,
   useGetContactsQuery,
   useGetDiscountsQuery,
@@ -29,6 +32,7 @@ export {
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
+  useUpdateBadgeMutation,
   useUpdateCurrentUserMutation,
 } from "./domain-api";
 export {

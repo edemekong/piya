@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   ChevronLeft,
   ChevronRight,
+  Copy,
   Mail,
   MoreVertical,
   NotebookPen,
@@ -11,9 +12,16 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
-import { AppAvatar, AppCheckbox, Badge, cn } from "@piya/ui";
-import type { ContactData, ContactTagData } from "@piya/shared/models";
+import { AppAvatar, AppCheckbox, AppPopup, cn } from "@piya/ui";
+import {
+  showToast,
+  useGetBadgesQuery,
+  type AppDispatch,
+} from "@piya/shared";
+import type { BadgeData, ContactData, ContactTagData } from "@piya/shared/models";
 import type { ContactStatusType } from "@piya/shared/types";
+import { useDispatch } from "react-redux";
+import { BadgeManagerSheet } from "./BadgeManagerSheet";
 import {
   ContactFiltersPopover,
   type ContactFilters,
@@ -79,15 +87,28 @@ export function ContactsTable({
   status,
   tagId,
 }: ContactsTableProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: badgePayload } = useGetBadgesQuery();
   const [openMenuContactId, setOpenMenuContactId] = React.useState<
     string | null
   >(null);
+  const [contactMenuAnchorElement, setContactMenuAnchorElement] =
+    React.useState<HTMLButtonElement | null>(null);
+  const [hoveredBadge, setHoveredBadge] = React.useState<{
+    anchorElement: HTMLElement;
+    name: string;
+    points: number;
+  } | null>(null);
   const [selectedContactIds, setSelectedContactIds] = React.useState<
     Set<string>
   >(new Set());
+  const [isBadgeSheetOpen, setIsBadgeSheetOpen] = React.useState(false);
   const areAllPageContactsSelected =
     contacts.length > 0 &&
     contacts.every((contact) => selectedContactIds.has(contact.id));
+  const badgesById = React.useMemo(() => {
+    return new Map((badgePayload?.badges ?? []).map((badge) => [badge.id, badge]));
+  }, [badgePayload]);
 
   function setContactSelected(contactId: string, selected: boolean) {
     setSelectedContactIds((current) => {
@@ -109,31 +130,50 @@ export function ContactsTable({
     });
   }
 
+  function openContactMenu(
+    contactId: string,
+    button: HTMLButtonElement,
+  ) {
+    const nextOpen = openMenuContactId !== contactId;
+
+    setContactMenuAnchorElement(button);
+    setOpenMenuContactId(nextOpen ? contactId : null);
+  }
+
   return (
     <section className="rounded-md bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-border p-5">
-        <div className="relative w-full max-w-lg">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/50" />
-          <input
-            className="h-11 w-full rounded-sm border border-border bg-fill pl-10 pr-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search contacts"
-            type="search"
-            value={searchValue}
+      <div className="flex flex-wrap items-center gap-3 border-b border-border p-5">
+        <div className="flex w-full max-w-xl items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/50" />
+            <input
+              className="h-11 w-full rounded-sm border border-border bg-fill pl-10 pr-3 text-callout text-[#2F4B4F] outline-none transition focus:border-primary focus:bg-white"
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Search contacts"
+              type="search"
+              value={searchValue}
+            />
+          </div>
+          <ContactFiltersPopover
+            contactTags={contactTags}
+            onApply={onFiltersApply}
+            value={{ status, tagId }}
           />
         </div>
-        <ContactFiltersPopover
-          contactTags={contactTags}
-          onApply={onFiltersApply}
-          value={{ status, tagId }}
-        />
+        <button
+          className="ml-auto text-callout font-semibold text-[#2F4B4F]/55 underline underline-offset-4 transition hover:text-[#2F4B4F]"
+          onClick={() => setIsBadgeSheetOpen(true)}
+          type="button"
+        >
+          View badges
+        </button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full min-w-[820px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border bg-fill/70 text-caption-1 uppercase text-[#2F4B4F]/65">
-              <th className="w-12 px-5 py-4">
+            <tr className="border-b border-border bg-fill/70 text-caption-1 text-[#2F4B4F]/65">
+              <th className="w-10 py-4 pl-4 pr-2">
                 <AppCheckbox
                   checked={areAllPageContactsSelected}
                   disabled={contacts.length === 0}
@@ -141,7 +181,7 @@ export function ContactsTable({
                   onCheckedChange={setPageContactsSelected}
                 />
               </th>
-              <th className="px-5 py-4 font-semibold">Name</th>
+              <th className="py-4 pl-2 pr-5 font-semibold">Name</th>
               <th className="px-5 py-4 font-semibold">Contact</th>
               <th className="px-5 py-4 font-semibold">Status</th>
               <th className="px-5 py-4 font-semibold">Last interaction</th>
@@ -185,7 +225,7 @@ export function ContactsTable({
                 role="button"
                 tabIndex={0}
               >
-                <td className="w-12 px-5 py-4">
+                <td className="w-10 py-4 pl-4 pr-2">
                   <div
                     onClick={(event) => event.stopPropagation()}
                     onKeyDown={(event) => event.stopPropagation()}
@@ -199,31 +239,56 @@ export function ContactsTable({
                     />
                   </div>
                 </td>
-                <td className="px-5 py-4">
+                <td className="py-4 pl-2 pr-5">
                   <div className="flex items-center gap-3">
                     <AppAvatar
                       className="size-10"
                       imageUrl={contact.profileImageUrl}
                       name={contact.name}
                     />
-                    <div>
-                      <p className="font-semibold text-[#2F4B4F]">
-                        {contact.name}
+                    <div className="min-w-0">
+                      <p className="flex min-w-0 items-center gap-1.5 font-semibold text-[#2F4B4F]">
+                        <span className="truncate">{contact.name}</span>
+                        <ContactBadgeIcon
+                          badge={badgesById.get(contact.badge.badgeId)}
+                          badgeId={contact.badge.badgeId}
+                          onTooltipClose={() => setHoveredBadge(null)}
+                          onTooltipOpen={setHoveredBadge}
+                          points={contact.badge.points}
+                        />
                       </p>
-                      <Badge className="mt-1 h-5 bg-fill px-2 text-[10px] capitalize text-[#2F4B4F]/70">
-                        {contact.badge.badgeId}
-                      </Badge>
+                      {contact.address ? (
+                        <p className="mt-1 truncate text-footnote text-[#2F4B4F]/55">
+                          {formatContactAddress(contact.address)}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </td>
                 <td className="px-5 py-4 text-callout text-[#2F4B4F]/75">
                   <div className="grid gap-1">
-                    <span className="inline-flex items-center gap-2">
-                      <Mail className="size-4" /> {contact.email}
-                    </span>
-                    <span className="inline-flex items-center gap-2">
-                      <Phone className="size-4" /> {contact.phoneNumber}
-                    </span>
+                    <ContactValueLine
+                      icon={Mail}
+                      label={`${contact.name} email`}
+                      onCopy={() =>
+                        showToast(dispatch, {
+                          message: "Email copied.",
+                          variant: "success",
+                        })
+                      }
+                      value={contact.email}
+                    />
+                    <ContactValueLine
+                      icon={Phone}
+                      label={`${contact.name} phone number`}
+                      onCopy={() =>
+                        showToast(dispatch, {
+                          message: "Phone number copied.",
+                          variant: "success",
+                        })
+                      }
+                      value={contact.phoneNumber}
+                    />
                   </div>
                 </td>
                 <td className="px-5 py-4">
@@ -247,40 +312,13 @@ export function ContactsTable({
                       className="flex size-9 items-center justify-center rounded-full text-[#2F4B4F]/65 transition hover:bg-fill hover:text-[#2F4B4F]"
                       onClick={(event) => {
                         event.stopPropagation();
-                        setOpenMenuContactId((currentId) =>
-                          currentId === contact.id ? null : contact.id
-                        );
+                        openContactMenu(contact.id, event.currentTarget);
                       }}
                       type="button"
                     >
                       <MoreVertical className="size-5" />
                     </button>
 
-                    {openMenuContactId === contact.id ? (
-                      <div
-                        className="absolute right-0 top-10 z-20 w-44 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg"
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        {contactActions.map((action) => {
-                          const Icon = action.icon;
-
-                          return (
-                            <button
-                              className={cn(
-                                "flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left transition last:border-b-0 hover:bg-fill",
-                                action.label === "Delete" && "text-error"
-                              )}
-                              key={action.label}
-                              onClick={() => setOpenMenuContactId(null)}
-                              type="button"
-                            >
-                              <Icon className="size-4" />
-                              {action.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : null}
                   </div>
                 </td>
               </tr>
@@ -319,7 +357,134 @@ export function ContactsTable({
           </button>
         </div>
       </footer>
+      <BadgeManagerSheet
+        onClose={() => setIsBadgeSheetOpen(false)}
+        open={isBadgeSheetOpen}
+      />
+      {hoveredBadge ? (
+        <AppPopup
+          anchorElement={hoveredBadge.anchorElement}
+          className="w-max max-w-48 rounded-md bg-[#102A2D] px-3 py-2 text-center text-[11px] font-semibold leading-snug text-white shadow-lg"
+          onClose={() => setHoveredBadge(null)}
+          open={Boolean(hoveredBadge)}
+          placement="bottom-start"
+        >
+          {hoveredBadge.name}
+          <span className="mt-0.5 block font-normal text-white/75">
+            {hoveredBadge.points.toLocaleString()} pts earned
+          </span>
+        </AppPopup>
+      ) : null}
+      {openMenuContactId ? (
+        <AppPopup
+          anchorElement={contactMenuAnchorElement}
+          className="w-44 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg"
+          onClose={() => setOpenMenuContactId(null)}
+          open={Boolean(openMenuContactId)}
+          placement="bottom-end"
+        >
+          {contactActions.map((action) => {
+            const Icon = action.icon;
+
+            return (
+              <button
+                className={cn(
+                  "flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left transition last:border-b-0 hover:bg-fill",
+                  action.label === "Delete" && "text-error",
+                )}
+                key={action.label}
+                onClick={() => {
+                  setOpenMenuContactId(null);
+                }}
+                type="button"
+              >
+                <Icon className="size-4" />
+                {action.label}
+              </button>
+            );
+          })}
+        </AppPopup>
+      ) : null}
     </section>
+  );
+}
+
+function ContactBadgeIcon({
+  badge,
+  badgeId,
+  onTooltipClose,
+  onTooltipOpen,
+  points,
+}: {
+  badge?: BadgeData;
+  badgeId: string;
+  onTooltipClose: () => void;
+  onTooltipOpen: (tooltip: {
+    anchorElement: HTMLElement;
+    name: string;
+    points: number;
+  }) => void;
+  points: number;
+}) {
+  const name = badge?.name ?? formatBadgeId(badgeId);
+
+  function showTooltip(element: HTMLElement) {
+    onTooltipOpen({
+      anchorElement: element,
+      name,
+      points,
+    });
+  }
+
+  return (
+    <span
+      className="inline-flex shrink-0"
+      onBlur={onTooltipClose}
+      onFocus={(event) => showTooltip(event.currentTarget)}
+      onMouseEnter={(event) => showTooltip(event.currentTarget)}
+      onMouseLeave={onTooltipClose}
+      tabIndex={0}
+    >
+      <img
+        alt={name}
+        className="size-5 object-contain"
+        src={getBadgeIconSrc(badge?.icon)}
+      />
+    </span>
+  );
+}
+
+function ContactValueLine({
+  icon: Icon,
+  label,
+  onCopy,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onCopy: () => void;
+  value?: string | null;
+}) {
+  if (!value) {
+    return <span className="text-[#2F4B4F]/45">Not set</span>;
+  }
+
+  return (
+    <span className="inline-flex min-w-0 items-center gap-2">
+      <Icon className="size-4 shrink-0" />
+      <span className="min-w-0 truncate">{value}</span>
+      <button
+        aria-label={`Copy ${label}`}
+        className="inline-flex size-7 shrink-0 items-center justify-center rounded-full text-[#2F4B4F]/45 transition hover:bg-fill hover:text-[#2F4B4F]"
+        onClick={(event) => {
+          event.stopPropagation();
+          void copyToClipboard(value, onCopy);
+        }}
+        type="button"
+      >
+        <Copy className="size-3.5" />
+      </button>
+    </span>
   );
 }
 
@@ -329,4 +494,39 @@ function formatDate(timestamp: number) {
     month: "short",
     year: "numeric",
   }).format(timestamp);
+}
+
+function getBadgeIconSrc(icon?: string | null) {
+  return `/assets/badges/${icon || "sage-round-seal"}.png`;
+}
+
+function formatBadgeId(badgeId: string) {
+  return badgeId
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatContactAddress(address: NonNullable<ContactData["address"]>) {
+  return [
+    address.displayName,
+    address.streetAddress,
+    address.city,
+    address.state,
+    address.country,
+  ]
+    .filter(Boolean)
+    .filter((part, index, parts) => parts.indexOf(part) === index)
+    .join(", ");
+}
+
+async function copyToClipboard(value: string, onCopy: () => void) {
+  if (!navigator.clipboard) return;
+  try {
+    await navigator.clipboard.writeText(value);
+    onCopy();
+  } catch {
+    // Copy can be blocked by browser permissions or insecure contexts.
+  }
 }

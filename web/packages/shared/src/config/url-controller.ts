@@ -61,6 +61,14 @@ export class URLController {
     return this.path("/v1/contacts");
   }
 
+  get badges() {
+    return this.path("/v1/badges");
+  }
+
+  badge(id: string) {
+    return this.path(`/v1/badges/${encodeURIComponent(id)}`);
+  }
+
   get contactTags() {
     return this.path("/v1/contacts/tags");
   }

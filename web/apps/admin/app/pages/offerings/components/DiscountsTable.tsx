@@ -22,7 +22,7 @@ export function DiscountsTable({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[900px] border-collapse text-left">
         <thead>
-          <tr className="border-b border-border text-caption-1 uppercase text-[#2F4B4F]/60">
+          <tr className="border-b border-border text-caption-1 text-[#2F4B4F]/60">
             <th className="py-3 pr-4 font-semibold">Discount</th>
             <th className="px-4 py-3 font-semibold">Reward</th>
             <th className="px-4 py-3 font-semibold">Code</th>

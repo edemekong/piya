@@ -21,6 +21,7 @@ export {
   AvailabilityService,
   availabilityService,
 } from "./availability.service";
+export { BadgesService, badgesService } from "./badges.service";
 export {
   DeliveryPricingService,
   deliveryPricingService,

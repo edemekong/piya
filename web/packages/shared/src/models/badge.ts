@@ -1,5 +1,6 @@
 interface BadgeRule {
   metric: string;
+  currency?: string | null;
   value?: number | null;
 }
 

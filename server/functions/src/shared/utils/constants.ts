@@ -89,6 +89,36 @@ const API_RESPONSE = {
     code: "CONTACT_TAGS_FETCHED",
     message: "Contact tags fetched",
   },
+  badgesFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "BADGES_FETCHED",
+    message: "Badges fetched",
+  },
+  badgeCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "BADGE_CREATED",
+    message: "Badge created",
+  },
+  badgeUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "BADGE_UPDATED",
+    message: "Badge updated",
+  },
+  badgeDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "BADGE_DELETED",
+    message: "Badge deleted",
+  },
+  badgeNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "BADGE_NOT_FOUND",
+    message: "Badge not found",
+  },
+  defaultBadgeImmutable: {
+    statusCode: STATUS_CODES.forbidden,
+    code: "DEFAULT_BADGE_IMMUTABLE",
+    message: "Default badges cannot be edited or deleted",
+  },
   contactAlreadyExists: {
     statusCode: STATUS_CODES.conflict,
     code: "CONTACT_ALREADY_EXISTS",

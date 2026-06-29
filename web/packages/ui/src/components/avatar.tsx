@@ -6,13 +6,27 @@ export type AppAvatarProps = React.HTMLAttributes<HTMLSpanElement> & {
   name: string;
 };
 
-export function AppAvatar({ className, imageUrl, name, ...props }: AppAvatarProps) {
+export function AppAvatar({
+  className,
+  imageUrl,
+  name,
+  style,
+  ...props
+}: AppAvatarProps) {
+  const fallbackStyle = imageUrl
+    ? style
+    : {
+        ...style,
+        backgroundColor: getAvatarColor(name),
+      };
+
   return (
     <span
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-white",
+        "flex shrink-0 items-center justify-center rounded-full font-semibold text-white",
         className,
       )}
+      style={fallbackStyle}
       {...props}
     >
       {imageUrl ? (
@@ -26,4 +40,15 @@ export function AppAvatar({ className, imageUrl, name, ...props }: AppAvatarProp
       )}
     </span>
   );
+}
+
+function getAvatarColor(name: string) {
+  const normalizedName = name.trim().toLocaleLowerCase();
+  let hash = 0;
+
+  for (let index = 0; index < normalizedName.length; index += 1) {
+    hash = (hash * 31 + normalizedName.charCodeAt(index)) % 360;
+  }
+
+  return `hsl(${hash} 58% 42%)`;
 }

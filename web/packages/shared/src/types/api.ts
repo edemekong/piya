@@ -95,6 +95,19 @@ export type ContactTagsPayload = {
   tags: import("../models").ContactTagData[];
 };
 
+export type BadgesPayload = {
+  badges: import("../models").BadgeData[];
+};
+
+export type BadgePayload = {
+  badge: import("../models").BadgeData;
+};
+
+export type BadgeInput = Pick<
+  import("../models").BadgeData,
+  "description" | "icon" | "name" | "rule"
+>;
+
 export type LocationPredictionsPayload = {
   predictions: import("../models").LocationPrediction[];
 };

@@ -7,7 +7,7 @@ import {
   UserRoundCheck,
   X,
 } from "lucide-react";
-import { Button, cn } from "@piya/ui";
+import { AppPopup, Button, cn } from "@piya/ui";
 import type { ContactTagData } from "@piya/shared/models";
 import type { ContactStatusType } from "@piya/shared/types";
 
@@ -49,33 +49,9 @@ export function ContactFiltersPopover({
     React.useState<ContactFilterKey>("status");
   const [draft, setDraft] = React.useState<ContactFilters>(value);
   const [open, setOpen] = React.useState(false);
-  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const [anchorElement, setAnchorElement] =
+    React.useState<HTMLButtonElement | null>(null);
   const activeFilterCount = [value.status, value.tagId].filter(Boolean).length;
-
-  React.useEffect(() => {
-    if (!open) return;
-
-    function closeOnOutsidePress(event: PointerEvent) {
-      if (
-        rootRef.current &&
-        event.target instanceof Node &&
-        !rootRef.current.contains(event.target)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
-    }
-
-    document.addEventListener("pointerdown", closeOnOutsidePress);
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [open]);
 
   function applyFilters() {
     onApply(draft);
@@ -90,7 +66,7 @@ export function ContactFiltersPopover({
   }
 
   return (
-    <div className="relative shrink-0" ref={rootRef}>
+    <div className="relative shrink-0">
       <button
         aria-expanded={open}
         aria-label="Filter contacts"
@@ -98,9 +74,11 @@ export function ContactFiltersPopover({
           "relative flex size-11 items-center justify-center rounded-sm border border-border bg-fill text-[#2F4B4F]/70 transition hover:bg-secondary/40 hover:text-[#2F4B4F]",
           open && "border-primary bg-secondary/30 text-primary"
         )}
-        onClick={() => {
-          if (!open) setDraft(value);
-          setOpen((current) => !current);
+        onClick={(event) => {
+          const nextOpen = !open;
+          if (nextOpen) setDraft(value);
+          setAnchorElement(event.currentTarget);
+          setOpen(nextOpen);
         }}
         type="button"
       >
@@ -112,8 +90,13 @@ export function ContactFiltersPopover({
         ) : null}
       </button>
 
-      {open ? (
-        <div className="absolute right-0 top-full z-40 mt-2 w-[min(520px,calc(100vw-2rem))] overflow-hidden rounded-md border border-border bg-white shadow-xl">
+      <AppPopup
+        anchorElement={anchorElement}
+        className="w-[min(520px,calc(100vw-2rem))] overflow-hidden rounded-md border border-border bg-white shadow-xl"
+        onClose={() => setOpen(false)}
+        open={open}
+        placement="bottom-end"
+      >
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
               <h3 className="text-headline font-semibold text-[#2F4B4F]">
@@ -212,8 +195,7 @@ export function ContactFiltersPopover({
               </Button>
             </div>
           </div>
-        </div>
-      ) : null}
+      </AppPopup>
     </div>
   );
 }
