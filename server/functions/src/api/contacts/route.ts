@@ -1,7 +1,9 @@
 import { Router, type Response } from "express";
 import {
+  bulkCreateContactsSchema,
   createContactSchema,
   getContactsQuerySchema,
+  type BulkCreateContactsBody,
   type CreateContactBody,
   type GetContactsQuery,
 } from "../../shared/schema/contact.schema";
@@ -78,6 +80,30 @@ ContactRouter.post(
       res,
       response.message,
       { contact: result.contact },
+      response.statusCode,
+      response.code
+    );
+  })
+);
+
+ContactRouter.post(
+  "/bulk",
+  validateRequest({ body: bulkCreateContactsSchema }),
+  asyncHandler(async (req, res) => {
+    const membership = await getMembership(req.currentUser?.uid);
+    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+
+    const result = await ContactService.bulkCreateContacts({
+      businessId: membership.businessId,
+      createdBy: membership.user.id,
+      input: req.body as BulkCreateContactsBody,
+    });
+    const response = API_RESPONSE.contactsBulkCreated;
+
+    return SuccessResult(
+      res,
+      response.message,
+      result,
       response.statusCode,
       response.code
     );

@@ -1,5 +1,7 @@
 import type {
   BaseAPIServiceOptions,
+  BulkCreateContactsInput,
+  BulkCreateContactsPayload,
   ContactListQuery,
   ContactPayload,
   ContactTagsPayload,
@@ -47,6 +49,17 @@ export class ContactsService extends BaseAPIService {
     );
 
     return data.contact;
+  }
+
+  bulkCreateContacts(input: BulkCreateContactsInput) {
+    return this.post<BulkCreateContactsPayload, BulkCreateContactsInput>(
+      this.urlController.bulkContacts,
+      {
+        body: input,
+        maxRetries: 0,
+        withToken: true,
+      }
+    );
   }
 }
 

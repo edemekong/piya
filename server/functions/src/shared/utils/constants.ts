@@ -84,6 +84,11 @@ const API_RESPONSE = {
     code: "CONTACT_CREATED",
     message: "Contact created",
   },
+  contactsBulkCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "CONTACTS_BULK_CREATED",
+    message: "Contacts imported",
+  },
   contactTagsFetched: {
     statusCode: STATUS_CODES.ok,
     code: "CONTACT_TAGS_FETCHED",

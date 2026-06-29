@@ -80,6 +80,15 @@ const createContactSchema = z
     path: ["email"],
   });
 
+const bulkCreateContactsSchema = z
+  .object({
+    contacts: z.array(createContactSchema).min(1).max(1000),
+    token: z.unknown().optional(),
+    user: z.unknown().optional(),
+  })
+  .strict()
+  .transform(({ token: _token, user: _user, ...payload }) => payload);
+
 const getContactsQuerySchema = z
   .object({
     query: z.string().trim().max(120).optional(),
@@ -104,11 +113,14 @@ const getContactsQuerySchema = z
   .transform(({ token: _token, ...query }) => query);
 
 type CreateContactBody = z.infer<typeof createContactSchema>;
+type BulkCreateContactsBody = z.infer<typeof bulkCreateContactsSchema>;
 type GetContactsQuery = z.infer<typeof getContactsQuerySchema>;
 
 export {
+  bulkCreateContactsSchema,
   createContactSchema,
   getContactsQuerySchema,
+  BulkCreateContactsBody,
   CreateContactBody,
   GetContactsQuery,
 };

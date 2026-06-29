@@ -71,6 +71,26 @@ export type CreateContactInput = {
   tags: string[];
 };
 
+export type BulkCreateContactsInput = {
+  contacts: CreateContactInput[];
+};
+
+export type BulkCreateContactResult = {
+  contactId?: string;
+  index: number;
+  message?: string;
+  status: "created" | "duplicate" | "failed";
+};
+
+export type BulkCreateContactsPayload = {
+  created: import("../models").ContactData[];
+  createdCount: number;
+  duplicateCount: number;
+  failedCount: number;
+  results: BulkCreateContactResult[];
+  total: number;
+};
+
 export type ContactListQuery = {
   query?: string;
   status?: import("./contact.type").ContactStatusType;

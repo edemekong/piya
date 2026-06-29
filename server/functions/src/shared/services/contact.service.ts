@@ -9,6 +9,7 @@ import { db } from "../../configs/firebase";
 import type { ContactTagData } from "../model/contact-tag";
 import type { ContactData } from "../model/contact";
 import type {
+  BulkCreateContactsBody,
   CreateContactBody,
   GetContactsQuery,
 } from "../schema/contact.schema";
@@ -33,6 +34,22 @@ type ContactPage = {
 type CreateContactResult =
   | { status: "created"; contact: ContactData }
   | { status: "duplicate" };
+
+type BulkCreateContactResult = {
+  contactId?: string;
+  index: number;
+  message?: string;
+  status: "created" | "duplicate" | "failed";
+};
+
+type BulkCreateContactsResult = {
+  created: ContactData[];
+  createdCount: number;
+  duplicateCount: number;
+  failedCount: number;
+  results: BulkCreateContactResult[];
+  total: number;
+};
 
 export class ContactService {
   static async getContacts(
@@ -121,56 +138,13 @@ export class ContactService {
 
     const contactRef = this.contactsCollection(businessId).doc();
     const now = getUTCTimeNow();
-    const parsedPhoneNumber = input.phoneNumber
-      ? parsePhoneNumberFromString(input.phoneNumber)
-      : null;
-    const contactTags = this.getContactTagEntries(input.tags);
-    const contact: ContactData = {
-      id: contactRef.id,
-      userId: null,
-      code: contactRef.id,
-      createdBy,
+    const { contact, contactTags } = this.createContactRecord({
       businessId,
-      name: input.name,
-      profileImageUrl: null,
-      email: input.email,
-      phoneNumber: input.phoneNumber,
-      countryCode: parsedPhoneNumber?.country ?? null,
-      address: input.address ?? null,
-      badge: {
-        badgeId: "regular",
-        points: 0,
-        updatedAt: now,
-      },
-      dob: input.dob ?? null,
-      bmd: input.dob?.slice(5) ?? null,
-      gender: input.gender ?? null,
-      preference: {
-        unsubscribedEmailTypes: [],
-        smsEnabled: Boolean(input.phoneNumber),
-        emailEnabled: Boolean(input.email),
-        whatsappEnabled: Boolean(input.phoneNumber),
-      },
-      status: "active",
-      lastInteractionAt: now,
-      anniversary: null,
-      tags: contactTags.map((tag) => tag.id),
-      searchTokens: this.getContactSearchTokens({
-        code: contactRef.id,
-        email: input.email,
-        name: input.name,
-        phoneNumber: input.phoneNumber,
-      }),
-      counts: {
-        lifetimeValue: 0,
-        totalOrders: 0,
-        messagesSentCount: 0,
-        messagesRepliedCount: 0,
-      },
-      metadata: null,
-      createdAt: now,
-      updatedAt: now,
-    };
+      contactId: contactRef.id,
+      createdBy,
+      input,
+      now,
+    });
 
     await db().runTransaction(async (transaction) => {
       const tagReferences = contactTags.map((tag) =>
@@ -195,6 +169,88 @@ export class ContactService {
     });
 
     return { status: "created", contact };
+  }
+
+  static async bulkCreateContacts(params: {
+    businessId: string;
+    createdBy: string;
+    input: BulkCreateContactsBody;
+  }): Promise<BulkCreateContactsResult> {
+    const { businessId, createdBy, input } = params;
+    const contactsCollection = this.contactsCollection(businessId);
+    const existingEmails = await this.getExistingContactValues(
+      businessId,
+      "email",
+      input.contacts.map((contact) => contact.email).filter(Boolean)
+    );
+    const existingPhoneNumbers = await this.getExistingContactValues(
+      businessId,
+      "phoneNumber",
+      input.contacts.map((contact) => contact.phoneNumber).filter(Boolean)
+    );
+    const seenEmails = new Set<string>();
+    const seenPhoneNumbers = new Set<string>();
+    const tagEntriesById = new Map<string, { id: string; name: string }>();
+    const contactsToCreate: ContactData[] = [];
+    const results: BulkCreateContactResult[] = [];
+    const now = getUTCTimeNow();
+
+    input.contacts.forEach((contactInput, index) => {
+      const email = contactInput.email ?? "";
+      const phoneNumber = contactInput.phoneNumber ?? "";
+      const isDuplicate =
+        (email && (existingEmails.has(email) || seenEmails.has(email))) ||
+        (phoneNumber &&
+          (existingPhoneNumbers.has(phoneNumber) ||
+            seenPhoneNumbers.has(phoneNumber)));
+
+      if (isDuplicate) {
+        results.push({
+          index,
+          message: "A contact with this email or phone number already exists",
+          status: "duplicate",
+        });
+        return;
+      }
+
+      if (email) seenEmails.add(email);
+      if (phoneNumber) seenPhoneNumbers.add(phoneNumber);
+
+      const contactRef = contactsCollection.doc();
+      const { contact, contactTags } = this.createContactRecord({
+        businessId,
+        contactId: contactRef.id,
+        createdBy,
+        input: contactInput,
+        now,
+      });
+
+      contactTags.forEach((tag) => tagEntriesById.set(tag.id, tag));
+      contactsToCreate.push(contact);
+      results.push({
+        contactId: contact.id,
+        index,
+        status: "created",
+      });
+    });
+
+    await this.createMissingContactTags(
+      businessId,
+      Array.from(tagEntriesById.values()),
+      now
+    );
+    await this.createContactsInBatches(businessId, contactsToCreate);
+
+    return {
+      created: contactsToCreate,
+      createdCount: contactsToCreate.length,
+      duplicateCount: results.filter((result) => result.status === "duplicate")
+        .length,
+      failedCount: results.filter((result) => result.status === "failed")
+        .length,
+      results,
+      total: input.contacts.length,
+    };
   }
 
   private static matchesContactFilters(
@@ -282,6 +338,153 @@ export class ContactService {
     });
 
     return Array.from(tagsById.values());
+  }
+
+  private static createContactRecord(params: {
+    businessId: string;
+    contactId: string;
+    createdBy: string;
+    input: CreateContactBody;
+    now: number;
+  }) {
+    const { businessId, contactId, createdBy, input, now } = params;
+    const parsedPhoneNumber = input.phoneNumber
+      ? parsePhoneNumberFromString(input.phoneNumber)
+      : null;
+    const contactTags = this.getContactTagEntries(input.tags);
+    const contact: ContactData = {
+      id: contactId,
+      userId: null,
+      code: contactId,
+      createdBy,
+      businessId,
+      name: input.name,
+      profileImageUrl: null,
+      email: input.email,
+      phoneNumber: input.phoneNumber,
+      countryCode: parsedPhoneNumber?.country ?? null,
+      address: input.address ?? null,
+      badge: {
+        badgeId: "regular",
+        points: 0,
+        updatedAt: now,
+      },
+      dob: input.dob ?? null,
+      bmd: input.dob?.slice(5) ?? null,
+      gender: input.gender ?? null,
+      preference: {
+        unsubscribedEmailTypes: [],
+        smsEnabled: Boolean(input.phoneNumber),
+        emailEnabled: Boolean(input.email),
+        whatsappEnabled: Boolean(input.phoneNumber),
+      },
+      status: "active",
+      lastInteractionAt: now,
+      anniversary: null,
+      tags: contactTags.map((tag) => tag.id),
+      searchTokens: this.getContactSearchTokens({
+        code: contactId,
+        email: input.email,
+        name: input.name,
+        phoneNumber: input.phoneNumber,
+      }),
+      counts: {
+        lifetimeValue: 0,
+        totalOrders: 0,
+        messagesSentCount: 0,
+        messagesRepliedCount: 0,
+      },
+      metadata: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    return { contact, contactTags };
+  }
+
+  private static async getExistingContactValues(
+    businessId: string,
+    field: "email" | "phoneNumber",
+    values: Array<string | null | undefined>
+  ) {
+    const uniqueValues = Array.from(
+      new Set(values.filter((value): value is string => Boolean(value)))
+    );
+    const existingValues = new Set<string>();
+
+    for (const chunk of this.chunk(uniqueValues, 30)) {
+      const snapshot = await this.contactsCollection(businessId)
+        .where(field, "in", chunk)
+        .get();
+
+      snapshot.docs.forEach((document) => {
+        const value = (document.data() as ContactData)[field];
+        if (value) existingValues.add(value);
+      });
+    }
+
+    return existingValues;
+  }
+
+  private static async createMissingContactTags(
+    businessId: string,
+    tags: { id: string; name: string }[],
+    now: number
+  ) {
+    if (tags.length === 0) return;
+
+    const tagsCollection = this.tagsCollection(businessId);
+    const tagReferences = tags.map((tag) => tagsCollection.doc(tag.id));
+    const existingTagIds = new Set<string>();
+
+    for (const references of this.chunk(tagReferences, 300)) {
+      const snapshots = await db().getAll(...references);
+      snapshots.forEach((snapshot) => {
+        if (snapshot.exists) existingTagIds.add(snapshot.id);
+      });
+    }
+
+    const missingTags = tags.filter((tag) => !existingTagIds.has(tag.id));
+
+    for (const chunk of this.chunk(missingTags, 450)) {
+      const batch = db().batch();
+
+      chunk.forEach((tag) => {
+        batch.create(tagsCollection.doc(tag.id), {
+          id: tag.id,
+          name: tag.name,
+          referenceType: "contact",
+          createdAt: now,
+        } satisfies ContactTagData);
+      });
+      await batch.commit();
+    }
+  }
+
+  private static async createContactsInBatches(
+    businessId: string,
+    contacts: ContactData[]
+  ) {
+    const contactsCollection = this.contactsCollection(businessId);
+
+    for (const chunk of this.chunk(contacts, 450)) {
+      const batch = db().batch();
+
+      chunk.forEach((contact) => {
+        batch.create(contactsCollection.doc(contact.id), contact);
+      });
+      await batch.commit();
+    }
+  }
+
+  private static chunk<T>(items: T[], size: number) {
+    const chunks: T[][] = [];
+
+    for (let index = 0; index < items.length; index += size) {
+      chunks.push(items.slice(index, index + size));
+    }
+
+    return chunks;
   }
 
   private static encodeContactCursor(cursor: ContactCursor) {

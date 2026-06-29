@@ -16,8 +16,18 @@ import {
   PhoneNumberField,
   cn,
 } from "@piya/ui";
-import { useGetContactTagsQuery } from "@piya/shared";
-import type { UserGenderType } from "@piya/shared/types";
+import {
+  showToast,
+  useBulkCreateContactsMutation,
+  useGetContactTagsQuery,
+  type AppDispatch,
+} from "@piya/shared";
+import type {
+  BulkCreateContactsPayload,
+  CreateContactInput,
+  UserGenderType,
+} from "@piya/shared/types";
+import { useDispatch } from "react-redux";
 import {
   CONTACT_GENDER_OPTIONS,
   DEFAULT_CONTACT_TAGS,
@@ -75,6 +85,9 @@ const destinationColumnOptions: {
 export function CsvContactImportWorkflow({
   onClose,
 }: CsvContactImportWorkflowProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const [bulkCreateContacts, bulkCreateContactsState] =
+    useBulkCreateContactsMutation();
   const [activeStep, setActiveStep] = React.useState<CsvImportStep>("upload");
   const [contactDrafts, setContactDrafts] = React.useState<CsvContactDraft[]>(
     []
@@ -84,11 +97,17 @@ export function CsvContactImportWorkflow({
   const [isParsingCsv, setIsParsingCsv] = React.useState(false);
   const [mappings, setMappings] = React.useState<CsvColumnMap[]>([]);
   const [rows, setRows] = React.useState<string[][]>([]);
-  const [showPendingApiMessage, setShowPendingApiMessage] =
-    React.useState(false);
+  const [importResult, setImportResult] =
+    React.useState<BulkCreateContactsPayload | null>(null);
   const canReview = mappings.some(
     (mapping) => mapping.include && mapping.destinationColumn !== "ignore"
   );
+  const hasInvalidReviewContact = contactDrafts.some(
+    (contact) =>
+      !contact.name.trim() ||
+      (!contact.email.trim() && !contact.phoneNumber.trim())
+  );
+  const exceedsBulkLimit = contactDrafts.length > 1000;
 
   async function selectImportFile(file: File | undefined) {
     if (!file) return;
@@ -148,7 +167,7 @@ export function CsvContactImportWorkflow({
   function continueToReview() {
     const nextDrafts = createContactDrafts(rows, mappings);
     setContactDrafts(nextDrafts);
-    setShowPendingApiMessage(false);
+    setImportResult(null);
     setActiveStep("review");
   }
 
@@ -161,6 +180,33 @@ export function CsvContactImportWorkflow({
         contact.id === contactId ? { ...contact, ...updates } : contact
       )
     );
+  }
+
+  async function importReviewedContacts() {
+    if (
+      contactDrafts.length === 0 ||
+      contactDrafts.length > 1000 ||
+      hasInvalidReviewContact
+    ) {
+      return;
+    }
+
+    try {
+      const result = await bulkCreateContacts({
+        contacts: contactDrafts.map(createContactInputFromDraft),
+      }).unwrap();
+
+      setImportResult(result);
+      showToast(dispatch, {
+        message: `Imported ${result.createdCount} of ${result.total} contacts.`,
+        variant: result.createdCount > 0 ? "success" : "info",
+      });
+    } catch (error) {
+      showToast(dispatch, {
+        message: getImportErrorMessage(error),
+        variant: "error",
+      });
+    }
   }
 
   return (
@@ -188,8 +234,10 @@ export function CsvContactImportWorkflow({
         {activeStep === "review" ? (
           <CsvReviewStep
             contactDrafts={contactDrafts}
+            importResult={importResult}
             onContactChange={updateContactDraft}
-            showPendingApiMessage={showPendingApiMessage}
+            hasInvalidContact={hasInvalidReviewContact}
+            exceedsBulkLimit={exceedsBulkLimit}
           />
         ) : null}
       </div>
@@ -226,9 +274,18 @@ export function CsvContactImportWorkflow({
 
         {activeStep === "review" ? (
           <Button
-            disabled={contactDrafts.length === 0}
+            buttonState={
+              bulkCreateContactsState.isLoading ? "loading" : "enabled"
+            }
+            disabled={
+              contactDrafts.length === 0 ||
+              hasInvalidReviewContact ||
+              exceedsBulkLimit ||
+              bulkCreateContactsState.isLoading
+            }
             icon={<Check />}
-            onClick={() => setShowPendingApiMessage(true)}
+            loadingLabel="Importing contacts"
+            onClick={() => void importReviewedContacts()}
             type="button"
           >
             Import contacts
@@ -411,12 +468,16 @@ function CsvMapStep({
 
 function CsvReviewStep({
   contactDrafts,
+  exceedsBulkLimit,
+  hasInvalidContact,
+  importResult,
   onContactChange,
-  showPendingApiMessage,
 }: {
   contactDrafts: CsvContactDraft[];
+  exceedsBulkLimit: boolean;
+  hasInvalidContact: boolean;
+  importResult: BulkCreateContactsPayload | null;
   onContactChange: (contactId: string, updates: Partial<CsvContactDraft>) => void;
-  showPendingApiMessage: boolean;
 }) {
   const [openContactIds, setOpenContactIds] = React.useState<Set<string>>(
     () => new Set(contactDrafts.slice(0, 1).map((contact) => contact.id))
@@ -437,6 +498,28 @@ function CsvReviewStep({
 
   return (
     <div className="grid gap-4 pb-24">
+      {exceedsBulkLimit ? (
+        <p className="rounded-md border border-error/20 bg-error/10 p-3 text-callout text-error">
+          Bulk import supports up to 1000 contacts per upload.
+        </p>
+      ) : null}
+
+      {hasInvalidContact ? (
+        <p className="rounded-md border border-error/20 bg-error/10 p-3 text-callout text-error">
+          Each contact needs a name and either an email address or phone number.
+        </p>
+      ) : null}
+
+      {importResult ? (
+        <p className="rounded-md border border-primary/20 bg-secondary/30 p-3 text-callout text-primary">
+          Imported {importResult.createdCount} of {importResult.total} contacts.
+          {importResult.duplicateCount > 0
+            ? ` ${importResult.duplicateCount} duplicate${
+                importResult.duplicateCount === 1 ? "" : "s"
+              } skipped.`
+            : ""}
+        </p>
+      ) : null}
 
       <div className="grid gap-2">
         {contactDrafts.map((contact, index) => {
@@ -786,6 +869,33 @@ function createContactDrafts(rows: string[][], mappings: CsvColumnMap[]) {
         Boolean
       )
     );
+}
+
+function createContactInputFromDraft(
+  contact: CsvContactDraft
+): CreateContactInput {
+  return {
+    name: contact.name.trim(),
+    email: contact.email.trim() || null,
+    phoneNumber: contact.phoneNumber.trim() || null,
+    address: null,
+    dob: null,
+    gender: contact.gender || null,
+    tags: contact.tags,
+  };
+}
+
+function getImportErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Unable to import contacts.";
 }
 
 function getDestinationColumnForHeader(header: string): CsvDestinationColumn {

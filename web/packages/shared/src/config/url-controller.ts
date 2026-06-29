@@ -61,6 +61,10 @@ export class URLController {
     return this.path("/v1/contacts");
   }
 
+  get bulkContacts() {
+    return this.path("/v1/contacts/bulk");
+  }
+
   get badges() {
     return this.path("/v1/badges");
   }

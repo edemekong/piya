@@ -17,6 +17,8 @@ import type {
   AvailabilityScheduleDraft,
   BadgeInput,
   BadgesPayload,
+  BulkCreateContactsInput,
+  BulkCreateContactsPayload,
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
   CommunicationRecipient,
@@ -416,6 +418,19 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["Contact", "ContactTag"],
     }),
+    bulkCreateContacts: builder.mutation<
+      BulkCreateContactsPayload,
+      BulkCreateContactsInput
+    >({
+      queryFn: async (input) => {
+        try {
+          return { data: await contactsService.bulkCreateContacts(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Contact", "ContactTag"],
+    }),
     searchLocations: builder.query<LocationPrediction[], string>({
       queryFn: async (input, api) => {
         try {
@@ -464,6 +479,7 @@ export const {
   useLazyCheckBusinessSlugAvailabilityQuery,
   useLazyGetLocationDetailsQuery,
   useLazySearchLocationsQuery,
+  useBulkCreateContactsMutation,
   useCreateContactMutation,
   useCreateBadgeMutation,
   useCreateLeadRequestMutation,

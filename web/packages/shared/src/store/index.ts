@@ -5,6 +5,7 @@ export {
   useLazySearchLocationsQuery,
   useCompleteWhatsAppConnectionMutation,
   useCreateBadgeMutation,
+  useBulkCreateContactsMutation,
   useCreateContactMutation,
   useCreateLeadRequestMutation,
   useDeleteBadgeMutation,
