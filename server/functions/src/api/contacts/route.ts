@@ -1,11 +1,15 @@
 import { Router, type Response } from "express";
 import {
   bulkCreateContactsSchema,
+  contactParamsSchema,
   createContactSchema,
   getContactsQuerySchema,
   type BulkCreateContactsBody,
+  type ContactParams,
   type CreateContactBody,
   type GetContactsQuery,
+  type UpdateContactBody,
+  updateContactSchema,
 } from "../../shared/schema/contact.schema";
 import { ContactService } from "../../shared/services/contact.service";
 import { BusinessTeamService } from "../../shared/services/team.service";
@@ -80,6 +84,35 @@ ContactRouter.post(
       res,
       response.message,
       { contact: result.contact },
+      response.statusCode,
+      response.code
+    );
+  })
+);
+
+ContactRouter.patch(
+  "/:contactId",
+  validateRequest({ body: updateContactSchema, params: contactParamsSchema }),
+  asyncHandler(async (req, res) => {
+    const membership = await getMembership(req.currentUser?.uid);
+    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+
+    const params = req.params as unknown as ContactParams;
+    const result = await ContactService.updateContact({
+      businessId: membership.businessId,
+      contactId: params.contactId,
+      input: req.body as UpdateContactBody,
+    });
+    if (result === "duplicate") {
+      return sendError(res, API_RESPONSE.contactAlreadyExists);
+    }
+    if (!result) return sendError(res, API_RESPONSE.contactNotFound);
+
+    const response = API_RESPONSE.contactUpdated;
+    return SuccessResult(
+      res,
+      response.message,
+      { contact: result },
       response.statusCode,
       response.code
     );

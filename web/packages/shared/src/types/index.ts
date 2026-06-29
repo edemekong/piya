@@ -44,6 +44,7 @@ export type {
   TeamPayload,
   TokenProvider,
   UpdateAccountSetupRequest,
+  UpdateContactInput,
   UpdateMemberInvitationRoleRequest,
   UpdateMemberRoleRequest,
   UpdateTeamEntryRoleInput,

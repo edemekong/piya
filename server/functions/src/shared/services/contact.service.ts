@@ -12,6 +12,7 @@ import type {
   BulkCreateContactsBody,
   CreateContactBody,
   GetContactsQuery,
+  UpdateContactBody,
 } from "../schema/contact.schema";
 import { ApiError } from "../utils/api-response";
 import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
@@ -251,6 +252,118 @@ export class ContactService {
       results,
       total: input.contacts.length,
     };
+  }
+
+  static async updateContact(params: {
+    businessId: string;
+    contactId: string;
+    input: UpdateContactBody;
+  }) {
+    const { businessId, contactId, input } = params;
+    const contactRef = this.contactsCollection(businessId).doc(contactId);
+    const snapshot = await contactRef.get();
+    if (!snapshot.exists) return null;
+
+    const currentContact = snapshot.data() as ContactData;
+    const hasEmailUpdate = Object.prototype.hasOwnProperty.call(input, "email");
+    const hasPhoneUpdate = Object.prototype.hasOwnProperty.call(
+      input,
+      "phoneNumber"
+    );
+    const hasNameUpdate = Object.prototype.hasOwnProperty.call(input, "name");
+    const hasDobUpdate = Object.prototype.hasOwnProperty.call(input, "dob");
+    const hasAnniversaryUpdate = Object.prototype.hasOwnProperty.call(
+      input,
+      "anniversary"
+    );
+    const hasCountryCodeUpdate = Object.prototype.hasOwnProperty.call(
+      input,
+      "countryCode"
+    );
+    const hasAddressUpdate = Object.prototype.hasOwnProperty.call(input, "address");
+    const hasTagsUpdate = Object.prototype.hasOwnProperty.call(input, "tags");
+    const nextEmail =
+      hasEmailUpdate ? input.email ?? null : currentContact.email ?? null;
+    const nextPhoneNumber =
+      hasPhoneUpdate
+        ? input.phoneNumber ?? null
+        : currentContact.phoneNumber ?? null;
+
+    if (
+      ((hasEmailUpdate && nextEmail && nextEmail !== currentContact.email) ||
+        (hasPhoneUpdate &&
+          nextPhoneNumber &&
+          nextPhoneNumber !== currentContact.phoneNumber)) &&
+      (await this.hasDuplicateContact(
+        businessId,
+        {
+          email: hasEmailUpdate ? nextEmail : null,
+          phoneNumber: hasPhoneUpdate ? nextPhoneNumber : null,
+        },
+        contactId
+      ))
+    ) {
+      return "duplicate" as const;
+    }
+
+    const now = getUTCTimeNow();
+    const nextName = hasNameUpdate ? input.name ?? currentContact.name : currentContact.name;
+    const nextDob = hasDobUpdate ? input.dob ?? null : currentContact.dob ?? null;
+    const nextAnniversary = hasAnniversaryUpdate
+      ? input.anniversary ?? null
+      : currentContact.anniversary ?? null;
+    const parsedPhoneNumber = nextPhoneNumber
+      ? parsePhoneNumberFromString(nextPhoneNumber)
+      : null;
+    const nextCountryCode = hasCountryCodeUpdate
+      ? input.countryCode ?? null
+      : parsedPhoneNumber?.country ?? currentContact.countryCode ?? null;
+
+    const updatePayload: Partial<ContactData> = {
+      updatedAt: now,
+    };
+
+    if (hasNameUpdate) updatePayload.name = nextName;
+    if (hasEmailUpdate) updatePayload.email = nextEmail;
+    if (hasPhoneUpdate) updatePayload.phoneNumber = nextPhoneNumber;
+    if (hasCountryCodeUpdate || hasPhoneUpdate) {
+      updatePayload.countryCode = nextCountryCode;
+    }
+    if (hasDobUpdate) {
+      updatePayload.dob = nextDob;
+      updatePayload.bmd = nextDob?.slice(5) ?? null;
+    }
+    if (hasAnniversaryUpdate) {
+      updatePayload.anniversary = nextAnniversary;
+    }
+    if (hasAddressUpdate) {
+      updatePayload.address = input.address ?? null;
+    }
+    if (hasEmailUpdate || hasPhoneUpdate) {
+      updatePayload.preference = {
+        ...currentContact.preference,
+        emailEnabled: Boolean(nextEmail),
+        smsEnabled: Boolean(nextPhoneNumber),
+        whatsappEnabled: Boolean(nextPhoneNumber),
+      };
+    }
+    if (hasTagsUpdate) {
+      const contactTags = this.getContactTagEntries(input.tags ?? []);
+      await this.createMissingContactTags(businessId, contactTags, now);
+      updatePayload.tags = contactTags.map((tag) => tag.id);
+    }
+    if (hasNameUpdate || hasEmailUpdate || hasPhoneUpdate) {
+      updatePayload.searchTokens = this.getContactSearchTokens({
+        code: currentContact.code,
+        email: nextEmail,
+        name: nextName,
+        phoneNumber: nextPhoneNumber,
+      });
+    }
+
+    await contactRef.update(updatePayload);
+    const contact = { ...currentContact, ...updatePayload };
+    return contact;
   }
 
   private static matchesContactFilters(
@@ -521,7 +634,8 @@ export class ContactService {
 
   private static async hasDuplicateContact(
     businessId: string,
-    input: CreateContactBody
+    input: Pick<CreateContactBody, "email" | "phoneNumber">,
+    excludedContactId?: string
   ) {
     const contacts = this.contactsCollection(businessId);
     const duplicateQueries = [
@@ -539,7 +653,9 @@ export class ContactService {
     ];
     const snapshots = await Promise.all(duplicateQueries);
 
-    return snapshots.some((snapshot) => !snapshot.empty);
+    return snapshots.some((snapshot) =>
+      snapshot.docs.some((document) => document.id !== excludedContactId)
+    );
   }
 
   private static contactsCollection(businessId: string) {

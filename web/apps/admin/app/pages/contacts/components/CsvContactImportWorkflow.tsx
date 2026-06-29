@@ -97,8 +97,6 @@ export function CsvContactImportWorkflow({
   const [isParsingCsv, setIsParsingCsv] = React.useState(false);
   const [mappings, setMappings] = React.useState<CsvColumnMap[]>([]);
   const [rows, setRows] = React.useState<string[][]>([]);
-  const [importResult, setImportResult] =
-    React.useState<BulkCreateContactsPayload | null>(null);
   const canReview = mappings.some(
     (mapping) => mapping.include && mapping.destinationColumn !== "ignore"
   );
@@ -167,7 +165,6 @@ export function CsvContactImportWorkflow({
   function continueToReview() {
     const nextDrafts = createContactDrafts(rows, mappings);
     setContactDrafts(nextDrafts);
-    setImportResult(null);
     setActiveStep("review");
   }
 
@@ -196,11 +193,11 @@ export function CsvContactImportWorkflow({
         contacts: contactDrafts.map(createContactInputFromDraft),
       }).unwrap();
 
-      setImportResult(result);
       showToast(dispatch, {
-        message: `Imported ${result.createdCount} of ${result.total} contacts.`,
+        message: getImportSuccessMessage(result),
         variant: result.createdCount > 0 ? "success" : "info",
       });
+      onClose();
     } catch (error) {
       showToast(dispatch, {
         message: getImportErrorMessage(error),
@@ -234,7 +231,6 @@ export function CsvContactImportWorkflow({
         {activeStep === "review" ? (
           <CsvReviewStep
             contactDrafts={contactDrafts}
-            importResult={importResult}
             onContactChange={updateContactDraft}
             hasInvalidContact={hasInvalidReviewContact}
             exceedsBulkLimit={exceedsBulkLimit}
@@ -356,31 +352,32 @@ function CsvUploadStep({
   onFileSelect: (file: File | undefined) => void;
 }) {
   return (
-    <div className="mx-auto grid w-full max-w-xl gap-5 pb-24">
-      <label className="flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-primary bg-fill px-6 py-10 text-center transition hover:bg-secondary/30">
-        <FileSpreadsheet className="size-10 text-primary" />
-        <span className="mt-4 text-headline font-semibold text-[#2F4B4F]">
-          Upload CSV or XLSX file
-        </span>
-        <span className="mt-2 max-w-sm text-callout text-[#2F4B4F]/65">
-          Use a header row with columns for name, email, phone, tags, and
-          gender.
-        </span>
-        <input
-          accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          className="sr-only"
-          disabled={isParsingCsv}
-          onChange={(event) => onFileSelect(event.target.files?.[0])}
-          type="file"
-        />
-      </label>
+    <div className="flex min-h-full flex-col items-center justify-center gap-5 pb-24">
+      <div className="w-full max-w-xl">
+        <label className="flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-primary bg-fill px-6 py-10 text-center transition hover:bg-secondary/30">
+          <FileSpreadsheet className="size-10 text-primary" />
+          <span className="mt-4 text-headline font-semibold text-[#2F4B4F]">
+            Upload CSV or XLSX file
+          </span>
+          <span className="mt-2 max-w-sm text-callout text-[#2F4B4F]/65">
+            Use a header row with columns for name, email, phone, tags, and
+            gender.
+          </span>
+          <input
+            accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="sr-only"
+            disabled={isParsingCsv}
+            onChange={(event) => onFileSelect(event.target.files?.[0])}
+            type="file"
+          />
+        </label>
+      </div>
 
       {csvError ? (
-        <p className="rounded-md border border-error/20 bg-error/10 p-3 text-callout text-error">
+        <p className="w-full max-w-xl rounded-md border border-error/20 bg-error/10 p-3 text-callout text-error">
           {csvError}
         </p>
       ) : null}
-
     </div>
   );
 }
@@ -470,13 +467,11 @@ function CsvReviewStep({
   contactDrafts,
   exceedsBulkLimit,
   hasInvalidContact,
-  importResult,
   onContactChange,
 }: {
   contactDrafts: CsvContactDraft[];
   exceedsBulkLimit: boolean;
   hasInvalidContact: boolean;
-  importResult: BulkCreateContactsPayload | null;
   onContactChange: (contactId: string, updates: Partial<CsvContactDraft>) => void;
 }) {
   const [openContactIds, setOpenContactIds] = React.useState<Set<string>>(
@@ -507,17 +502,6 @@ function CsvReviewStep({
       {hasInvalidContact ? (
         <p className="rounded-md border border-error/20 bg-error/10 p-3 text-callout text-error">
           Each contact needs a name and either an email address or phone number.
-        </p>
-      ) : null}
-
-      {importResult ? (
-        <p className="rounded-md border border-primary/20 bg-secondary/30 p-3 text-callout text-primary">
-          Imported {importResult.createdCount} of {importResult.total} contacts.
-          {importResult.duplicateCount > 0
-            ? ` ${importResult.duplicateCount} duplicate${
-                importResult.duplicateCount === 1 ? "" : "s"
-              } skipped.`
-            : ""}
         </p>
       ) : null}
 
@@ -1025,6 +1009,17 @@ function formatImportCell(value: unknown) {
 
 function getFileExtension(fileName: string) {
   return fileName.split(".").pop()?.toLocaleLowerCase() ?? "";
+}
+
+function getImportSuccessMessage(result: BulkCreateContactsPayload) {
+  const duplicateMessage =
+    result.duplicateCount > 0
+      ? ` ${result.duplicateCount} duplicate${
+          result.duplicateCount === 1 ? "" : "s"
+        } skipped.`
+      : "";
+
+  return `Imported ${result.createdCount} of ${result.total} contacts.${duplicateMessage}`;
 }
 
 function splitTags(value: string) {

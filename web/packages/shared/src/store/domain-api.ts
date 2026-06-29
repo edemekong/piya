@@ -32,6 +32,7 @@ import type {
   SendWhatsAppMessageInput,
   SendWhatsAppMessagePayload,
   TeamPayload,
+  UpdateContactInput,
   UpdateDeliveryPricingInput,
   UpdateAccountSetupRequest,
   UpdateMemberInvitationRoleRequest,
@@ -418,6 +419,19 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["Contact", "ContactTag"],
     }),
+    updateContact: builder.mutation<
+      ContactData,
+      { contactId: string; input: UpdateContactInput }
+    >({
+      queryFn: async ({ contactId, input }) => {
+        try {
+          return { data: await contactsService.updateContact(contactId, input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Contact", "ContactTag"],
+    }),
     bulkCreateContacts: builder.mutation<
       BulkCreateContactsPayload,
       BulkCreateContactsInput
@@ -509,6 +523,7 @@ export const {
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
+  useUpdateContactMutation,
   useUpdateCurrentUserMutation,
   useUpdateBadgeMutation,
 } = domainApi;

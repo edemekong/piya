@@ -71,6 +71,16 @@ export type CreateContactInput = {
   tags: string[];
 };
 
+export type UpdateContactInput = Partial<
+  Pick<
+    CreateContactInput,
+    "address" | "dob" | "email" | "name" | "phoneNumber" | "tags"
+  > & {
+    anniversary: string | null;
+    countryCode: string | null;
+  }
+>;
+
 export type BulkCreateContactsInput = {
   contacts: CreateContactInput[];
 };

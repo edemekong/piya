@@ -61,6 +61,10 @@ export class URLController {
     return this.path("/v1/contacts");
   }
 
+  contact(id: string) {
+    return this.path(`/v1/contacts/${encodeURIComponent(id)}`);
+  }
+
   get bulkContacts() {
     return this.path("/v1/contacts/bulk");
   }

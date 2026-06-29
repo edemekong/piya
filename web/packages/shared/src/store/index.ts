@@ -34,6 +34,7 @@ export {
   useUpdateMemberRoleMutation,
   useUpdateAccountSetupMutation,
   useUpdateBadgeMutation,
+  useUpdateContactMutation,
   useUpdateCurrentUserMutation,
 } from "./domain-api";
 export {

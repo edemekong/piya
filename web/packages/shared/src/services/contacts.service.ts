@@ -7,6 +7,7 @@ import type {
   ContactTagsPayload,
   ContactsPayload,
   CreateContactInput,
+  UpdateContactInput,
 } from "../types";
 import { BaseAPIService } from "./base-api.service";
 import { authService, type AuthService } from "./auth.service";
@@ -41,6 +42,19 @@ export class ContactsService extends BaseAPIService {
   async createContact(input: CreateContactInput) {
     const data = await this.post<ContactPayload, CreateContactInput>(
       this.urlController.contacts,
+      {
+        body: input,
+        maxRetries: 0,
+        withToken: true,
+      }
+    );
+
+    return data.contact;
+  }
+
+  async updateContact(contactId: string, input: UpdateContactInput) {
+    const data = await this.patch<ContactPayload, UpdateContactInput>(
+      this.urlController.contact(contactId),
       {
         body: input,
         maxRetries: 0,

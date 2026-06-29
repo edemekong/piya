@@ -123,7 +123,10 @@ export function OrdersPage() {
       <ContactViewSheet
         contact={selectedContact}
         initialTab={contactSheetTab}
+        notes={[]}
         onClose={() => setSelectedContact(null)}
+        onCreateNote={() => undefined}
+        onUpdateNote={() => undefined}
         open={Boolean(selectedContact)}
       />
       <OfferingViewSheet

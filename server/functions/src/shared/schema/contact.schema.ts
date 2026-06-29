@@ -22,6 +22,29 @@ const optionalPhoneNumberSchema = z
     "Enter a valid phone number"
   );
 
+const optionalUpdateEmailSchema = z
+  .string()
+  .trim()
+  .email()
+  .max(180)
+  .optional()
+  .nullable()
+  .transform((value) =>
+    value === undefined ? undefined : value?.toLocaleLowerCase() || null
+  );
+
+const optionalUpdatePhoneNumberSchema = z
+  .string()
+  .trim()
+  .max(32)
+  .optional()
+  .nullable()
+  .transform((value) => (value === undefined ? undefined : value || null))
+  .refine(
+    (value) => !value || Boolean(parsePhoneNumberFromString(value)?.isValid()),
+    "Enter a valid phone number"
+  );
+
 const birthdayMonthDaySchema = z.string().regex(
   /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
   "Expected birthday format MM-DD"
@@ -80,6 +103,59 @@ const createContactSchema = z
     path: ["email"],
   });
 
+const contactTagsSchema = z
+  .array(z.string().trim().min(1).max(40))
+  .max(5)
+  .transform((tags) =>
+    tags.filter(
+      (tag, index) =>
+        tags.findIndex(
+          (item) => item.toLocaleLowerCase() === tag.toLocaleLowerCase()
+        ) === index
+    )
+  );
+
+const updateContactSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120).optional(),
+    email: optionalUpdateEmailSchema,
+    phoneNumber: optionalUpdatePhoneNumberSchema,
+    countryCode: z
+      .string()
+      .trim()
+      .max(8)
+      .optional()
+      .nullable()
+      .transform((value) =>
+        value === undefined ? undefined : value?.toLocaleUpperCase() || null
+      ),
+    dob: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected date format YYYY-MM-DD")
+      .optional()
+      .nullable(),
+    anniversary: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected date format YYYY-MM-DD")
+      .optional()
+      .nullable(),
+    address: locationSchema.optional().nullable(),
+    tags: contactTagsSchema.optional(),
+    token: z.unknown().optional(),
+    user: z.unknown().optional(),
+  })
+  .strict()
+  .transform(({ token: _token, user: _user, ...contact }) => contact)
+  .refine((contact) => Object.keys(contact).length > 0, {
+    message: "Enter at least one contact field",
+  });
+
+const contactParamsSchema = z
+  .object({
+    contactId: z.string().trim().min(1).max(120),
+  })
+  .strict();
+
 const bulkCreateContactsSchema = z
   .object({
     contacts: z.array(createContactSchema).min(1).max(1000),
@@ -115,12 +191,18 @@ const getContactsQuerySchema = z
 type CreateContactBody = z.infer<typeof createContactSchema>;
 type BulkCreateContactsBody = z.infer<typeof bulkCreateContactsSchema>;
 type GetContactsQuery = z.infer<typeof getContactsQuerySchema>;
+type UpdateContactBody = z.infer<typeof updateContactSchema>;
+type ContactParams = z.infer<typeof contactParamsSchema>;
 
 export {
   bulkCreateContactsSchema,
+  contactParamsSchema,
   createContactSchema,
   getContactsQuerySchema,
+  updateContactSchema,
   BulkCreateContactsBody,
+  ContactParams,
   CreateContactBody,
   GetContactsQuery,
+  UpdateContactBody,
 };

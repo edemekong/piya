@@ -7,8 +7,12 @@ import type { ContactStatusType } from "@piya/shared/types";
 import {
   AddContactSheet,
   ContactsTable,
+  ContactNotesPanel,
   ContactViewSheet,
+  type ContactNoteData,
+  type ContactOverviewTab,
   type ContactFilters,
+  type ContactViewParentTab,
 } from "./components";
 import type { AddContactMode } from "./types";
 
@@ -28,6 +32,14 @@ export function ContactsPage() {
     React.useState<AddContactMode>("manual");
   const [selectedContact, setSelectedContact] =
     React.useState<ContactData | null>(null);
+  const [selectedContactTab, setSelectedContactTab] =
+    React.useState<ContactViewParentTab>("overview");
+  const [selectedOverviewTab, setSelectedOverviewTab] =
+    React.useState<ContactOverviewTab>("events");
+  const [quickNoteContact, setQuickNoteContact] =
+    React.useState<ContactData | null>(null);
+  const [quickNoteRequestKey, setQuickNoteRequestKey] = React.useState(0);
+  const [contactNotes, setContactNotes] = React.useState<ContactNoteData[]>([]);
 
   React.useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -55,6 +67,54 @@ export function ContactsPage() {
   const contacts = contactPage?.contacts ?? [];
 
   function handleContactSelect(contact: ContactData) {
+    setSelectedContactTab("overview");
+    setSelectedOverviewTab("events");
+    setSelectedContact(contact);
+  }
+
+  function handleAddNote(contact: ContactData) {
+    setQuickNoteContact(contact);
+    setQuickNoteRequestKey((current) => current + 1);
+  }
+
+  function createContactNote(
+    contact: ContactData,
+    note: Omit<ContactNoteData, "contactId" | "createdAt" | "id" | "type">
+  ) {
+    const timestamp = Date.now();
+
+    setContactNotes((current) => [
+      {
+        ...note,
+        contactId: contact.id,
+        createdAt: timestamp,
+        id: createLocalNoteId(),
+        type: "note",
+      },
+      ...current,
+    ]);
+  }
+
+  function updateContactNote(
+    _contact: ContactData,
+    noteId: string,
+    note: Omit<ContactNoteData, "contactId" | "createdAt" | "id" | "type">
+  ) {
+    setContactNotes((current) =>
+      current.map((currentNote) =>
+        currentNote.id === noteId ? { ...currentNote, ...note } : currentNote
+      )
+    );
+  }
+
+  function createQuickContactNote(
+    contact: ContactData,
+    note: Omit<ContactNoteData, "contactId" | "createdAt" | "id" | "type">
+  ) {
+    createContactNote(contact, note);
+    setQuickNoteContact(null);
+    setSelectedContactTab("overview");
+    setSelectedOverviewTab("notes");
     setSelectedContact(contact);
   }
 
@@ -89,7 +149,7 @@ export function ContactsPage() {
               Contacts
             </h1>
             <p className="mt-2 max-w-2xl text-callout text-[#2F4B4F]/75">
-              View, import, and manage people connected to your loyalty program.
+              View, import, and manage people connected to your business.
             </p>
           </div>
           <Button icon={<Plus />} onClick={() => setIsSheetOpen(true)}>
@@ -103,6 +163,7 @@ export function ContactsPage() {
           hasNextPage={contactPage?.hasNextPage ?? false}
           isError={isError}
           isLoading={isFetching}
+          onAddNote={handleAddNote}
           onFiltersApply={applyFilters}
           onContactSelect={handleContactSelect}
           onNextPage={goToNextPage}
@@ -125,9 +186,38 @@ export function ContactsPage() {
       />
       <ContactViewSheet
         contact={selectedContact}
+        initialOverviewTab={selectedOverviewTab}
+        initialTab={selectedContactTab}
+        notes={contactNotes.filter(
+          (note) => note.contactId === selectedContact?.id
+        )}
         onClose={() => setSelectedContact(null)}
+        onContactUpdated={setSelectedContact}
+        onCreateNote={createContactNote}
+        onUpdateNote={updateContactNote}
         open={Boolean(selectedContact)}
       />
+      {quickNoteContact ? (
+        <ContactNotesPanel
+          addNoteRequestKey={quickNoteRequestKey}
+          contact={quickNoteContact}
+          notes={contactNotes.filter(
+            (note) => note.contactId === quickNoteContact.id
+          )}
+          onCreateNote={(note) => createQuickContactNote(quickNoteContact, note)}
+          onEditorClose={() => setQuickNoteContact(null)}
+          onUpdateNote={() => undefined}
+          renderPanel={false}
+        />
+      ) : null}
     </>
   );
+}
+
+function createLocalNoteId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `note_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }

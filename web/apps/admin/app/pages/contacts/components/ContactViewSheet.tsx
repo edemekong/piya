@@ -1,20 +1,42 @@
 import * as React from "react";
-import { MessageCircle, SlidersHorizontal, UserRound, X } from "lucide-react";
+import {
+  MessageCircle,
+  SlidersHorizontal,
+  UserRound,
+  X,
+} from "lucide-react";
 import { SegmentedTabs } from "@piya/ui";
 import type { ContactData } from "@piya/shared/models";
 import { ContactConversationsPanel } from "./ContactConversationsPanel";
+import type { ContactNoteData } from "./ContactNotesPanel";
 import {
   ContactOverviewPanel,
   type ContactOverviewTab,
 } from "./ContactOverviewPanel";
 import { ContactPreferencePanel } from "./ContactPreferencePanel";
 
-export type ContactViewParentTab = "overview" | "preference" | "conversations";
+export type ContactViewParentTab =
+  | "overview"
+  | "preference"
+  | "conversations";
 
 type ContactViewSheetProps = {
+  addNoteRequestKey?: number;
   contact: ContactData | null;
+  initialOverviewTab?: ContactOverviewTab;
   initialTab?: ContactViewParentTab;
+  notes: ContactNoteData[];
   onClose: () => void;
+  onCreateNote: (
+    contact: ContactData,
+    note: Omit<ContactNoteData, "contactId" | "createdAt" | "id" | "type">
+  ) => void;
+  onContactUpdated?: (contact: ContactData) => void;
+  onUpdateNote: (
+    contact: ContactData,
+    noteId: string,
+    note: Omit<ContactNoteData, "contactId" | "createdAt" | "id" | "type">
+  ) => void;
   open: boolean;
 };
 
@@ -41,9 +63,15 @@ const parentTabs = [
 }[];
 
 export function ContactViewSheet({
+  addNoteRequestKey = 0,
   contact,
+  initialOverviewTab = "events",
   initialTab = "overview",
+  notes,
   onClose,
+  onCreateNote,
+  onContactUpdated,
+  onUpdateNote,
   open,
 }: ContactViewSheetProps) {
   const [activeParentTab, setActiveParentTab] =
@@ -54,9 +82,9 @@ export function ContactViewSheet({
   React.useEffect(() => {
     if (open) {
       setActiveParentTab(initialTab);
-      setActiveOverviewTab("events");
+      setActiveOverviewTab(initialOverviewTab);
     }
-  }, [contact?.id, initialTab, open]);
+  }, [contact?.id, initialOverviewTab, initialTab, open]);
 
   if (!open || !contact) return null;
 
@@ -89,8 +117,15 @@ export function ContactViewSheet({
         <div className="flex-1 overflow-y-auto p-5 pt-0 sm:p-6 sm:pt-0">
           {activeParentTab === "overview" ? (
             <ContactOverviewPanel
+              addNoteRequestKey={addNoteRequestKey}
               activeTab={activeOverviewTab}
               contact={contact}
+              notes={notes}
+              onContactUpdated={onContactUpdated}
+              onCreateNote={(note) => onCreateNote(contact, note)}
+              onUpdateNote={(noteId, note) =>
+                onUpdateNote(contact, noteId, note)
+              }
               onTabChange={setActiveOverviewTab}
             />
           ) : null}

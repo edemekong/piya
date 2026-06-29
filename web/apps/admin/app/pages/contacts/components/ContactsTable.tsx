@@ -48,10 +48,10 @@ function statusLabel(status: ContactData["status"]) {
 }
 
 const contactActions = [
-  { icon: PackagePlus, label: "Create order" },
-  { icon: Send, label: "Send request" },
-  { icon: NotebookPen, label: "Add note" },
-  { icon: Trash2, label: "Delete" },
+  { icon: PackagePlus, id: "create-order", label: "Create order" },
+  { icon: Send, id: "send-request", label: "Send request" },
+  { icon: NotebookPen, id: "add-note", label: "Add note" },
+  { icon: Trash2, id: "delete", label: "Delete" },
 ];
 
 type ContactsTableProps = {
@@ -60,6 +60,7 @@ type ContactsTableProps = {
   hasNextPage: boolean;
   isError: boolean;
   isLoading: boolean;
+  onAddNote: (contact: ContactData) => void;
   onContactSelect: (contact: ContactData) => void;
   onFiltersApply: (filters: ContactFilters) => void;
   onNextPage: () => void;
@@ -77,6 +78,7 @@ export function ContactsTable({
   hasNextPage,
   isError,
   isLoading,
+  onAddNote,
   onContactSelect,
   onFiltersApply,
   onNextPage,
@@ -107,6 +109,9 @@ export function ContactsTable({
     contacts.length > 0 &&
     contacts.every((contact) => selectedContactIds.has(contact.id));
   const selectedContactCount = selectedContactIds.size;
+  const openMenuContact = contacts.find(
+    (contact) => contact.id === openMenuContactId
+  );
   const badgesById = React.useMemo(() => {
     return new Map((badgePayload?.badges ?? []).map((badge) => [badge.id, badge]));
   }, [badgePayload]);
@@ -259,7 +264,7 @@ export function ContactsTable({
                         />
                       </p>
                       {contact.address ? (
-                        <p className="mt-1 truncate text-footnote text-[#2F4B4F]/55">
+                        <p className="mt-1 max-w-48 truncate text-footnote text-[#2F4B4F]/55">
                           {formatContactAddress(contact.address)}
                         </p>
                       ) : null}
@@ -267,7 +272,7 @@ export function ContactsTable({
                   </div>
                 </td>
                 <td className="px-5 py-4 text-callout text-[#2F4B4F]/75">
-                  <div className="grid gap-1">
+                  <div className="grid gap-0.5">
                     <ContactValueLine
                       icon={Mail}
                       label={`${contact.name} email`}
@@ -422,8 +427,12 @@ export function ContactsTable({
                   action.label === "Delete" && "text-error",
                 )}
                 key={action.label}
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   setOpenMenuContactId(null);
+                  if (action.id === "add-note" && openMenuContact) {
+                    onAddNote(openMenuContact);
+                  }
                 }}
                 type="button"
               >

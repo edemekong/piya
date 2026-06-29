@@ -84,6 +84,16 @@ const API_RESPONSE = {
     code: "CONTACT_CREATED",
     message: "Contact created",
   },
+  contactUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "CONTACT_UPDATED",
+    message: "Contact updated",
+  },
+  contactNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "CONTACT_NOT_FOUND",
+    message: "Contact not found",
+  },
   contactsBulkCreated: {
     statusCode: STATUS_CODES.created,
     code: "CONTACTS_BULK_CREATED",

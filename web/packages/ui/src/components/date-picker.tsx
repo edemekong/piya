@@ -78,6 +78,7 @@ export function AppDatePicker({
           )}
         >
           <DayPicker
+            captionLayout="dropdown"
             classNames={{
               ...defaultClassNames,
               root: "w-[292px]",
@@ -85,6 +86,9 @@ export function AppDatePicker({
               month: "w-full",
               month_caption:
                 "mb-3 flex h-9 items-center justify-center text-callout font-semibold text-[#2F4B4F]",
+              dropdowns: "flex items-center justify-center gap-2",
+              dropdown:
+                "rounded-sm border border-border bg-fill px-2 py-1 text-footnote font-semibold text-[#2F4B4F] outline-none focus:border-primary focus:bg-white",
               nav: "absolute left-3 right-3 top-3 flex items-center justify-between",
               button_previous:
                 "flex size-8 items-center justify-center rounded-md text-[#2F4B4F]/70 transition hover:bg-fill hover:text-[#2F4B4F]",
@@ -116,6 +120,8 @@ export function AppDatePicker({
             }}
             selected={value ?? undefined}
             showOutsideDays
+            startMonth={new Date(1900, 0)}
+            endMonth={new Date(2100, 11)}
           />
         </div>
       ) : null}
