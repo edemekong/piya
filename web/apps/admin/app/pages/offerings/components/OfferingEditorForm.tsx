@@ -1,8 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Plus, Trash2 } from "lucide-react";
 import { AppCheckbox, AppSelectField, AppTextField } from "@piya/ui";
-import { useGetDiscountsQuery } from "@piya/shared";
-import type { DiscountData } from "@piya/shared/models";
 import type {
   BusinessCategoryTypes,
   OfferingAttributeValueType,
@@ -99,14 +97,6 @@ function OfferingEditorForm({
   const productVariantPresets = React.useMemo(
     () => getProductVariantPresets(productPresetContext),
     [productPresetContext],
-  );
-  const { data: discounts = [] } = useGetDiscountsQuery();
-  const attachableDiscounts = React.useMemo(
-    () =>
-      discounts
-        .filter((discount) => discount.status !== "expired")
-        .sort((left, right) => left.title.localeCompare(right.title)),
-    [discounts],
   );
   const showTypeSelector = typeOptions.length > 1;
   const showCategorySelector = categoryOptions.length > 1;
@@ -357,14 +347,6 @@ function OfferingEditorForm({
       variants: draft.variants.filter((_, variantIndex) =>
         variantIndex !== index
       ),
-    });
-  }
-
-  function toggleDiscount(discountId: string) {
-    onChange({
-      discountIds: draft.discountIds.includes(discountId)
-        ? draft.discountIds.filter((id) => id !== discountId)
-        : [...draft.discountIds, discountId],
     });
   }
 
@@ -740,14 +722,6 @@ function OfferingEditorForm({
             </EditableTable>
           </EditorFieldGroup>
 
-          <EditorFieldGroup title="Discounts">
-            <DiscountAttachmentList
-              discounts={attachableDiscounts}
-              onToggle={toggleDiscount}
-              selectedIds={draft.discountIds}
-            />
-          </EditorFieldGroup>
-
           {showInventoryFields ? (
             <EditorFieldGroup title="Stock">
               <div className="grid gap-4">
@@ -820,11 +794,18 @@ function OfferingEditorForm({
       ) : null}
 
       {activeStep === "media" && draft.type === "product" ? (
-        <OfferingImageUploadBoxes label="Images" />
+        <OfferingImageUploadBoxes
+          images={splitImageUrls(draft.imageUrls)}
+          label="Images"
+          multiple
+        />
       ) : null}
 
       {activeStep === "media" && draft.type === "service" ? (
-        <OfferingImageUploadBoxes label="Image" />
+        <OfferingImageUploadBoxes
+          images={draft.imageUrl ? [draft.imageUrl] : []}
+          label="Image"
+        />
       ) : null}
 
       {activeStep !== "basics" && !draft.type ? (
@@ -911,88 +892,6 @@ function EditorFieldGroup({
   );
 }
 
-function DiscountAttachmentList({
-  discounts,
-  onToggle,
-  selectedIds,
-}: {
-  discounts: DiscountData[];
-  onToggle: (discountId: string) => void;
-  selectedIds: string[];
-}) {
-  if (!discounts.length) {
-    return (
-      <div className="rounded-md border border-border bg-fill px-4 py-3 text-callout text-[#2F4B4F]/65">
-        No discounts available yet.
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid gap-2 rounded-md border border-border bg-white p-3">
-      {discounts.map((discount) => {
-        const checked = selectedIds.includes(discount.id);
-
-        return (
-          <div
-            className="flex items-start gap-3 rounded-sm border border-border bg-fill px-3 py-2.5 transition hover:bg-secondary/30"
-            key={discount.id}
-          >
-            <AppCheckbox
-              checked={checked}
-              label={discount.title}
-              onCheckedChange={() => onToggle(discount.id)}
-            />
-            <span className="min-w-0">
-              <span className="block text-callout font-semibold text-[#2F4B4F]">
-                {discount.title}
-              </span>
-              <span className="mt-1 block text-caption-1 text-[#2F4B4F]/60">
-                {formatDiscountSummary(discount)}
-              </span>
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function formatDiscountSummary(discount: DiscountData) {
-  const reward = formatDiscountReward(discount);
-  const code = discount.code || "No code";
-
-  return `${reward} | ${code}`;
-}
-
-function formatDiscountReward(discount: DiscountData) {
-  if (discount.reward.type === "percentage_discount") {
-    return `${discount.reward.value}% off`;
-  }
-
-  if (discount.reward.type === "fixed_amount_discount") {
-    return formatCurrency(discount.reward.value);
-  }
-
-  if (discount.reward.type === "buy_x_get_y") {
-    const { buyQuantity, getQuantity } = discount.reward.metadata;
-
-    return `Buy ${buyQuantity}, get ${getQuantity}`;
-  }
-
-  if (discount.reward.type === "cashback_credit") {
-    return `${formatCurrency(discount.reward.value)} cashback`;
-  }
-
-  return discount.reward.type.replaceAll("_", " ");
-}
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-NG", {
-    currency: "NGN",
-    style: "currency",
-  }).format(value);
-}
 
 function EditableTable({
   children,
@@ -1114,6 +1013,13 @@ function toggleValue<T>(values: T[], value: T, checked: boolean) {
   }
 
   return values.filter((item) => item !== value);
+}
+
+function splitImageUrls(value: string) {
+  return value
+    .split(",")
+    .map((imageUrl) => imageUrl.trim())
+    .filter(Boolean);
 }
 
 function createAttributeDraft(): OfferingFormDraft["attributes"][number] {
