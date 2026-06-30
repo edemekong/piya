@@ -1,4 +1,7 @@
+import type { BusinessCategoryTypes, BusinessSellingType } from "@piya/shared";
+
 const businessCategories = [
+  { label: "Select business category", value: "" },
   { label: "Laundry", value: "laundry" },
   { label: "Fashion tailoring", value: "fashion_tailoring" },
   { label: "Salon", value: "salon" },
@@ -20,6 +23,44 @@ const businessCategories = [
   { label: "Shortlet apartment", value: "shortlet_apartment" },
 ];
 
+const productBusinessCategories: BusinessCategoryTypes[] = [
+  "restaurant",
+  "food_vendor",
+  "supermarket",
+  "farm_produce",
+  "fashion_store",
+  "electronics_store",
+];
+
+const deliveryIntegrationBusinessCategories: BusinessCategoryTypes[] = [
+  "logistics_delivery",
+  ...productBusinessCategories,
+];
+
+function getBusinessSellingTypes(
+  category: BusinessCategoryTypes | null | undefined,
+): BusinessSellingType[] {
+  if (!category) return [];
+
+  return productBusinessCategories.includes(category)
+    ? ["products"]
+    : ["services"];
+}
+
+function shouldShowAvailabilityIntegration(
+  category: BusinessCategoryTypes | null | undefined,
+) {
+  return getBusinessSellingTypes(category).includes("services");
+}
+
+function shouldShowDeliveryIntegration(
+  category: BusinessCategoryTypes | null | undefined,
+) {
+  return Boolean(
+    category && deliveryIntegrationBusinessCategories.includes(category),
+  );
+}
+
 const genderOptions = [
   { label: "Select gender", value: "" },
   { label: "Male", value: "male" },
@@ -27,4 +68,10 @@ const genderOptions = [
   { label: "Other", value: "other" },
 ];
 
-export { businessCategories, genderOptions };
+export {
+  businessCategories,
+  genderOptions,
+  getBusinessSellingTypes,
+  shouldShowAvailabilityIntegration,
+  shouldShowDeliveryIntegration,
+};

@@ -31,6 +31,10 @@ import { ConnectEmailSheet } from "../components/ConnectEmailSheet";
 import { ConnectWhatsAppSheet } from "../components/ConnectWhatsAppSheet";
 import { profileMenuItems } from "../profileSections";
 import { SettingsCard, SettingsSection as ProfileSectionShell } from "@piya/ui";
+import {
+  shouldShowAvailabilityIntegration,
+  shouldShowDeliveryIntegration,
+} from "@/pages/auth/utils/account-setup-options";
 
 const section = profileMenuItems.find((item) => item.value === "channels")!;
 
@@ -177,6 +181,21 @@ export function IntegrationProfilePage() {
   const [disconnectWhatsApp, { isLoading: isDisconnectingWhatsApp }] =
     useDisconnectWhatsAppConnectionMutation();
   const activeIntegration = integrationsByTab[activeTab];
+  const visibleIntegrationTabs = React.useMemo(
+    () =>
+      integrationTabs.filter(
+        (tab) =>
+          tab.value === "domain" ||
+          tab.value === "message-channel" ||
+          (tab.value === "availability" &&
+            shouldShowAvailabilityIntegration(
+              accountSetup?.business?.category,
+            )) ||
+          (tab.value === "delivery" &&
+            shouldShowDeliveryIntegration(accountSetup?.business?.category)),
+      ),
+    [accountSetup?.business?.category],
+  );
   const whatsappSettings =
     whatsappConnection?.connection ?? accountSetup?.channelSettings?.whatsapp;
   const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
@@ -204,6 +223,12 @@ export function IntegrationProfilePage() {
     });
     setEmailConnected(Boolean(savedEmail));
   }, [accountSetup]);
+
+  React.useEffect(() => {
+    if (visibleIntegrationTabs.some((tab) => tab.value === activeTab)) return;
+
+    setActiveTab(visibleIntegrationTabs[0]?.value ?? "domain");
+  }, [activeTab, visibleIntegrationTabs]);
 
   async function connectDomain(nextSlug: string) {
     const result = await updateAccountSetup({
@@ -277,7 +302,7 @@ export function IntegrationProfilePage() {
         title={section.label}
       >
         <SegmentedTabs
-          items={integrationTabs}
+          items={visibleIntegrationTabs}
           onValueChange={setActiveTab}
           value={activeTab}
         />

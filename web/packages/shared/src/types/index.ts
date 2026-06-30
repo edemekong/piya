@@ -89,6 +89,7 @@ export type {
 
 export type {
   BusinessCategoryTypes,
+  BusinessSellingType,
   BusinessStatusType,
   InvitableMemberRoleType,
   MemberInvitationStatusType,

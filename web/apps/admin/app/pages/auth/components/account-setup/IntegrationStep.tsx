@@ -9,7 +9,7 @@ import {
   Truck,
 } from "lucide-react";
 import { SegmentedTabs, SettingsCard } from "@piya/ui";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   availabilityDataToScheduleDraft,
   type AvailabilityScheduleDraft,
@@ -27,6 +27,10 @@ import {
   ConnectEmailSheet,
   ConnectWhatsAppSheet,
 } from "@/pages/profile/components";
+import {
+  shouldShowAvailabilityIntegration,
+  shouldShowDeliveryIntegration,
+} from "@/pages/auth/utils/account-setup-options";
 import type { SetupDraft } from "@/pages/auth/utils/account-setup-types";
 
 type IntegrationTab =
@@ -157,6 +161,19 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
     useUpdatePrimaryAvailabilityMutation();
   const [updateDeliveryPricing, { isLoading: isSavingDeliveryPricing }] =
     useUpdatePrimaryDeliveryPricingMutation();
+  const visibleIntegrationTabs = useMemo(
+    () =>
+      integrationTabs.filter(
+        (tab) =>
+          tab.value === "domain" ||
+          tab.value === "message-channel" ||
+          (tab.value === "availability" &&
+            shouldShowAvailabilityIntegration(draft.businessProfile.category)) ||
+          (tab.value === "delivery" &&
+            shouldShowDeliveryIntegration(draft.businessProfile.category)),
+      ),
+    [draft.businessProfile.category],
+  );
   const activeIntegration = integrationsByTab[activeTab];
   const savedAvailabilitySchedule = availabilityDataToScheduleDraft(
     availabilityPayload?.availability
@@ -170,6 +187,12 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
     draft.integration.email.fromEmailLocalPart || suggestedSlug;
   const suggestedReplyToEmail =
     draft.integration.email.replyToEmail || draft.businessProfile.email || "";
+
+  useEffect(() => {
+    if (visibleIntegrationTabs.some((tab) => tab.value === activeTab)) return;
+
+    setActiveTab(visibleIntegrationTabs[0]?.value ?? "domain");
+  }, [activeTab, visibleIntegrationTabs]);
 
   function connectDomain(slug: string) {
     setDraft((current) => ({
@@ -217,7 +240,7 @@ function IntegrationStep({ draft, setDraft }: IntegrationStepProps) {
     <>
       <div className="max-w-[820px] space-y-4">
         <SegmentedTabs
-          items={integrationTabs}
+          items={visibleIntegrationTabs}
           onValueChange={setActiveTab}
           value={activeTab}
         />

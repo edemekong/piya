@@ -23,7 +23,7 @@ function BusinessProfileStep({ draft, setDraft }: BusinessProfileStepProps) {
 
   function updateBusinessProfile(
     field: keyof AccountSetupBusinessProfileInput,
-    value: string,
+    value: AccountSetupBusinessProfileInput[keyof AccountSetupBusinessProfileInput],
   ) {
     setDraft((current) => ({
       ...current,
@@ -52,11 +52,14 @@ function BusinessProfileStep({ draft, setDraft }: BusinessProfileStepProps) {
             onChange={(event) =>
               updateBusinessProfile(
                 "category",
-                event.target.value as BusinessCategoryTypes,
+                event.target.value
+                  ? (event.target.value as BusinessCategoryTypes)
+                  : null,
               )
             }
             options={businessCategories}
-            value={businessProfile.category}
+            required
+            value={businessProfile.category ?? ""}
           />
         </FieldGrid>
         <ProfileTextarea

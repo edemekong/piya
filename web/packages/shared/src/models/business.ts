@@ -1,5 +1,6 @@
 import type {
   BusinessCategoryTypes,
+  BusinessSellingType,
   BusinessStatusType,
   InvitableMemberRoleType,
   MemberInvitationStatusType,
@@ -11,6 +12,7 @@ import type { BaseModel } from "./base";
 interface BusinessData extends BaseModel {
   name: string;
   category?: BusinessCategoryTypes;
+  sellingTypes?: BusinessSellingType[];
   createdBy: string;
   logo?: string;
   slug?: string | null;

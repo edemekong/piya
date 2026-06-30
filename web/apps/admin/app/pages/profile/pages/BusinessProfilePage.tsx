@@ -39,7 +39,7 @@ export function BusinessProfilePage({
   const [businessProfile, setBusinessProfile] =
     React.useState<AccountSetupBusinessProfileInput>(() => ({
       name: business?.name ?? "",
-      category: business?.category ?? "fashion_store",
+      category: business?.category ?? null,
       description: business?.description ?? "",
       email: business?.email ?? "",
       phoneNumber: business?.phoneNumber ?? "",
@@ -65,6 +65,14 @@ export function BusinessProfilePage({
     if (!businessProfile.description.trim()) {
       showToast(dispatch, {
         message: "Enter a business description.",
+        variant: "error",
+      });
+      return;
+    }
+
+    if (!businessProfile.category) {
+      showToast(dispatch, {
+        message: "Select a business category.",
         variant: "error",
       });
       return;
@@ -98,7 +106,7 @@ export function BusinessProfilePage({
         setBusinessProfile((current) => ({
           ...current,
           name: savedBusiness.name,
-          category: savedBusiness.category,
+          category: savedBusiness.category ?? null,
           description: savedBusiness.description,
           email: savedBusiness.email ?? "",
           phoneNumber: savedBusiness.phoneNumber ?? "",
@@ -152,11 +160,14 @@ export function BusinessProfilePage({
             onChange={(event) =>
               updateBusinessProfile(
                 "category",
-                event.target.value as BusinessCategoryTypes,
+                event.target.value
+                  ? (event.target.value as BusinessCategoryTypes)
+                  : null,
               )
             }
             options={businessCategories}
-            value={businessProfile.category}
+            required
+            value={businessProfile.category ?? ""}
           />
         </FieldGrid>
         <ProfileTextarea

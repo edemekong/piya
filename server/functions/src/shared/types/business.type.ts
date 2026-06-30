@@ -3,6 +3,7 @@ type MemberRoleType = "owner" | "admin" | "manager";
 type InvitableMemberRoleType = Exclude<MemberRoleType, "owner">;
 type MemberPermissionType = "edit" | "view";
 type MemberInvitationStatusType = "pending" | "accepted";
+type BusinessSellingType = "products" | "services";
 
 type BusinessCategoryTypes =
   | "laundry"
@@ -32,4 +33,5 @@ export {
   MemberRoleType,
   MemberPermissionType,
   BusinessCategoryTypes,
+  BusinessSellingType,
 };

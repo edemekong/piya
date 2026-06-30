@@ -24,6 +24,7 @@ export type {
 } from "./types/delivery-pricing";
 export type {
   BusinessCategoryTypes,
+  BusinessSellingType,
   InvitableMemberRoleType,
   MemberRoleType,
 } from "./types/business.type";

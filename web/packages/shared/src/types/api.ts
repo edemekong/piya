@@ -182,7 +182,7 @@ export type AccountSetupPersonalInfoInput = {
 
 export type AccountSetupBusinessProfileInput = {
   name: string;
-  category?: import("./business.type").BusinessCategoryTypes;
+  category: import("./business.type").BusinessCategoryTypes | null;
   description: string;
   email?: string | null;
   phoneNumber?: string | null;

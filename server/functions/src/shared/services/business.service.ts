@@ -1,10 +1,11 @@
 import { finalConfiguration } from "../../configs/configurations";
 import { db } from "../../configs/firebase";
-import type {
+import {
   BusinessBranding,
   BusinessBrandingData,
   BusinessData,
   MemberData,
+  getBusinessSellingTypes,
 } from "../model/business";
 import type {
   ChannelSettingsData,
@@ -16,6 +17,7 @@ import type {
   AccountSetupBusinessProfileBody,
   AccountSetupIntegrationBody,
 } from "../schema/account-setup.schema";
+
 import type {
   BusinessBrand,
   UpdateBusinessIntegrationsOutcome,
@@ -29,6 +31,7 @@ import {
   isReservedBusinessSlug,
 } from "../utils/business-slug";
 import { StorageService } from "./storage.service";
+
 
 export class BusinessService {
   static async getBrandConfig(hostname: string): Promise<BusinessBrand | null> {
@@ -117,13 +120,15 @@ export class BusinessService {
     const existingBusiness = snapshot.exists
       ? (snapshot.data() as BusinessData)
       : null;
-    const category = data.category ?? existingBusiness?.category;
+    const category = data.category;
+    const sellingTypes = getBusinessSellingTypes(category);
     const logo = data.logo ?? existingBusiness?.logo;
 
     const business: BusinessData = {
       id: businessRef.id,
       name: data.name,
-      ...(category ? { category } : {}),
+      category,
+      sellingTypes,
       createdBy: existingBusiness?.createdBy ?? user.id,
       ...(logo ? { logo } : {}),
       slug: existingBusiness?.slug ?? null,

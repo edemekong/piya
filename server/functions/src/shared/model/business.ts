@@ -1,5 +1,6 @@
 import type {
   BusinessCategoryTypes,
+  BusinessSellingType,
   BusinessStatusType,
   InvitableMemberRoleType,
   MemberInvitationStatusType,
@@ -11,6 +12,7 @@ import type { BaseModel } from "./base";
 interface BusinessData extends BaseModel {
   name: string;
   category?: BusinessCategoryTypes;
+  sellingTypes?: BusinessSellingType[];
   createdBy: string;
   logo?: string;
   slug?: string | null;
@@ -52,10 +54,28 @@ interface MemberInvitationData extends BaseModel {
   acceptedBy?: string | null;
 }
 
+const productBusinessCategories: BusinessCategoryTypes[] = [
+  "restaurant",
+  "food_vendor",
+  "supermarket",
+  "farm_produce",
+  "fashion_store",
+  "electronics_store",
+];
+
+function getBusinessSellingTypes(
+  category: BusinessCategoryTypes,
+): BusinessSellingType[] {
+  return productBusinessCategories.includes(category)
+    ? ["products"]
+    : ["services"];
+}
+
 export {
   BusinessData,
   BusinessBranding,
   BusinessBrandingData,
   MemberData,
   MemberInvitationData,
+  getBusinessSellingTypes,
 };

@@ -82,7 +82,7 @@ const initialSetupDraft: SetupDraft = {
   },
   businessProfile: {
     name: "",
-    category: "fashion_store",
+    category: null,
     description: "",
     email: "",
     phoneNumber: "",
@@ -237,6 +237,10 @@ export function AccountSetupPage() {
         !isValidSupportedPhoneNumber(draft.businessProfile.phoneNumber)
       ) {
         throw new Error("Enter a valid business phone number.");
+      }
+
+      if (!draft.businessProfile.category) {
+        throw new Error("Select a business category.");
       }
 
       await updateAccountSetup({
@@ -559,7 +563,7 @@ function createSetupDraft(
     },
     businessProfile: {
       name: business?.name ?? "",
-      category: business?.category ?? "fashion_store",
+      category: business?.category ?? null,
       description: business?.description ?? "",
       email: business?.email ?? "",
       phoneNumber: business?.phoneNumber ?? "",

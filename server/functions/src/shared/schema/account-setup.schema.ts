@@ -66,7 +66,7 @@ const accountSetupPersonalInfoSchema = z
 const accountSetupBusinessProfileSchema = z
   .object({
     name: z.string().trim().min(1),
-    category: businessCategorySchema.optional(),
+    category: businessCategorySchema,
     description: z.string().trim().min(1),
     email: z.email().nullable().optional(),
     phoneNumber: z.string().trim().min(1).nullable().optional(),
