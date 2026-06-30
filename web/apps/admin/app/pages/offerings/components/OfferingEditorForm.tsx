@@ -104,9 +104,15 @@ function OfferingEditorForm({
   const subTypeLabel = draft.type === "product" ? "Product type" : "Category";
   const subTypePlaceholder =
     draft.type === "product" ? "Select product type" : "Select category";
+  const supportsInventory = shouldShowProductStock(productPresetContext);
+  const hasInventoryDraft =
+    draft.inventoryAllowBackorders ||
+    draft.inventoryQuantity ||
+    draft.inventorySku ||
+    draft.inventoryTrackQuantity;
   const showInventoryFields =
-    draft.features.includes("inventory") &&
-    shouldShowProductStock(productPresetContext);
+    supportsInventory &&
+    (draft.features.includes("inventory") || hasInventoryDraft);
 
   React.useEffect(() => {
     if (draft.type && categoryOptions.length === 1) {
@@ -183,7 +189,7 @@ function OfferingEditorForm({
     }
 
     if (
-      !showInventoryFields &&
+      !supportsInventory &&
       (draft.inventoryAllowBackorders ||
         draft.inventoryQuantity ||
         draft.inventorySku ||
@@ -210,7 +216,7 @@ function OfferingEditorForm({
     productAttributePresets,
     productAttributeUnitOptions,
     productOptionPresets,
-    showInventoryFields,
+    supportsInventory,
   ]);
 
   React.useEffect(() => {
@@ -795,9 +801,10 @@ function OfferingEditorForm({
 
       {activeStep === "media" && draft.type === "product" ? (
         <OfferingImageUploadBoxes
-          images={splitImageUrls(draft.imageUrls)}
+          images={draft.imageUrlList}
           label="Images"
           multiple
+          onImagesChange={(imageUrlList) => onChange({ imageUrlList })}
         />
       ) : null}
 
@@ -805,6 +812,7 @@ function OfferingEditorForm({
         <OfferingImageUploadBoxes
           images={draft.imageUrl ? [draft.imageUrl] : []}
           label="Image"
+          onImagesChange={(images) => onChange({ imageUrl: images[0] ?? "" })}
         />
       ) : null}
 
@@ -1013,13 +1021,6 @@ function toggleValue<T>(values: T[], value: T, checked: boolean) {
   }
 
   return values.filter((item) => item !== value);
-}
-
-function splitImageUrls(value: string) {
-  return value
-    .split(",")
-    .map((imageUrl) => imageUrl.trim())
-    .filter(Boolean);
 }
 
 function createAttributeDraft(): OfferingFormDraft["attributes"][number] {

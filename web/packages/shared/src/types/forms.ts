@@ -104,6 +104,7 @@ export type OfferingFormDraft = {
   duration: string;
   features: OfferingFeatureType[];
   imageUrl: string;
+  imageUrlList: string[];
   imageUrls: string;
   inventoryAllowBackorders: boolean;
   inventoryQuantity: string;

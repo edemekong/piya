@@ -64,7 +64,6 @@ export function GiftEditorSheet({
   const [draft, setDraft] = React.useState<GiftDraft>(createEmptyGiftDraft);
   const [activeStep, setActiveStep] =
     React.useState<GiftEditorStep>("basics");
-  const [saveError, setSaveError] = React.useState<string | null>(null);
   const isEditing = mode === "edit";
   const activeStepIndex = giftEditorSteps.findIndex(
     (step) => step.key === activeStep,
@@ -75,7 +74,6 @@ export function GiftEditorSheet({
   React.useEffect(() => {
     if (open) {
       setActiveStep("basics");
-      setSaveError(null);
       setDraft(gift ? createGiftDraft(gift) : createEmptyGiftDraft());
     }
   }, [gift, open]);
@@ -99,13 +97,11 @@ export function GiftEditorSheet({
   }
 
   async function saveGift() {
-    setSaveError(null);
-
     try {
       await onSave(draftToGift(draft));
       onClose();
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Save failed");
+    } catch {
+      // Toast feedback is handled by the parent mutation handler.
     }
   }
 
@@ -155,12 +151,6 @@ export function GiftEditorSheet({
     >
       <div className="grid gap-5">
         <GiftEditorStepper activeStep={activeStep} />
-
-        {saveError ? (
-          <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
-            {saveError}
-          </p>
-        ) : null}
 
         <GiftForm
           activeStep={activeStep}

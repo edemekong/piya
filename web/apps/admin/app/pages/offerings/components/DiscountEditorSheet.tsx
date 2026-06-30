@@ -121,7 +121,6 @@ export function DiscountEditorSheet({
   const [activeStep, setActiveStep] =
     React.useState<DiscountEditorStep>("basics");
   const [isGiftDialogOpen, setIsGiftDialogOpen] = React.useState(false);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
   const isEditing = mode === "edit";
   const activeStepIndex = discountEditorSteps.findIndex(
     (step) => step.key === activeStep,
@@ -133,7 +132,6 @@ export function DiscountEditorSheet({
   React.useEffect(() => {
     if (open) {
       setActiveStep("basics");
-      setSaveError(null);
       setDraft(discount ? createDiscountDraft(discount) : createEmptyDiscountDraft());
     }
   }, [discount, open]);
@@ -158,13 +156,11 @@ export function DiscountEditorSheet({
   }
 
   async function handleSave() {
-    setSaveError(null);
-
     try {
       await onSave(draftToDiscount({ ...draft, status: "active" }));
       onClose();
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Save failed");
+    } catch {
+      // Toast feedback is handled by the parent mutation handler.
     }
   }
 
@@ -226,12 +222,6 @@ export function DiscountEditorSheet({
       >
         <form className="grid gap-5">
           <DiscountEditorStepper activeStep={activeStep} />
-
-          {saveError ? (
-            <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
-              {saveError}
-            </p>
-          ) : null}
 
           {activeStep === "basics" ? (
             <section className="grid gap-4">
@@ -814,7 +804,6 @@ function GiftQuickCreateDialog({
   const [activeStep, setActiveStep] =
     React.useState<GiftEditorStep>("basics");
   const [creating, setCreating] = React.useState(false);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
   const activeStepIndex = giftEditorSteps.findIndex(
     (step) => step.key === activeStep,
   );
@@ -823,7 +812,6 @@ function GiftQuickCreateDialog({
   React.useEffect(() => {
     if (open) {
       setActiveStep("basics");
-      setSaveError(null);
     }
   }, [open]);
 
@@ -845,12 +833,11 @@ function GiftQuickCreateDialog({
 
   async function createGift() {
     setCreating(true);
-    setSaveError(null);
 
     try {
       await onSave();
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Save failed");
+    } catch {
+      // Toast feedback is handled by the parent mutation handler.
     } finally {
       setCreating(false);
     }
@@ -889,11 +876,6 @@ function GiftQuickCreateDialog({
         </div>
         <div className="grid gap-5 p-6">
           <GiftEditorStepper activeStep={activeStep} />
-          {saveError ? (
-            <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
-              {saveError}
-            </p>
-          ) : null}
           <GiftForm
             activeStep={activeStep}
             draft={draft}

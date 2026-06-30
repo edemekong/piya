@@ -6,33 +6,25 @@ type OfferingImageUploadBoxesProps = {
   images: string[];
   label: string;
   multiple?: boolean;
+  onImagesChange: (images: string[]) => void;
 };
 
 function OfferingImageUploadBoxes({
   images,
   label,
   multiple = false,
+  onImagesChange,
 }: OfferingImageUploadBoxesProps) {
-  const [selectedImages, setSelectedImages] = React.useState<string[]>([]);
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
-  const previewImages = [...images, ...selectedImages];
 
   function handleFiles(files: FileList | null) {
     if (!files?.length) return;
 
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
+    Promise.all(Array.from(files).map(readImageFile)).then((nextImages) => {
+      const validImages = nextImages.filter(Boolean);
+      if (!validImages.length) return;
 
-      reader.onload = () => {
-        const image = typeof reader.result === "string" ? reader.result : "";
-        if (!image) return;
-
-        setSelectedImages((current) =>
-          multiple ? [...current, image] : [image],
-        );
-      };
-
-      reader.readAsDataURL(file);
+      onImagesChange(multiple ? [...images, ...validImages] : [validImages[0]]);
     });
   }
 
@@ -41,7 +33,7 @@ function OfferingImageUploadBoxes({
       <div className="grid gap-2">
         <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
         <div className="flex flex-wrap gap-3">
-          {previewImages.map((image, index) => (
+          {images.map((image, index) => (
             <button
               aria-label={`Preview ${label.toLowerCase()} ${index + 1}`}
               className="size-24 overflow-hidden rounded-md border border-border bg-fill transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -91,6 +83,18 @@ function OfferingImageUploadBoxes({
       </AppSheet>
     </>
   );
+}
+
+function readImageFile(file: File) {
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(typeof reader.result === "string" ? reader.result : "");
+    };
+    reader.onerror = () => resolve("");
+    reader.readAsDataURL(file);
+  });
 }
 
 export { OfferingImageUploadBoxes };

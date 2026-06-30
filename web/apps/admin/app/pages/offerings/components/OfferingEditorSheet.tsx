@@ -71,7 +71,6 @@ export function OfferingEditorSheet({
   const [draft, setDraft] = React.useState<OfferingFormDraft>(
     createEmptyOfferingDraft,
   );
-  const [saveError, setSaveError] = React.useState<string | null>(null);
   const typeOptions = React.useMemo(
     () => getOfferingTypeOptions(businessCategory),
     [businessCategory],
@@ -81,7 +80,6 @@ export function OfferingEditorSheet({
     if (open) {
       setActiveTab("manual");
       setActiveStep("basics");
-      setSaveError(null);
       const nextDraft = offering
         ? createOfferingDraft(offering)
         : createEmptyOfferingDraft();
@@ -141,13 +139,11 @@ export function OfferingEditorSheet({
   }
 
   async function handleSave() {
-    setSaveError(null);
-
     try {
       await onSave(draftToOffering({ ...draft, status: "active" }, offering));
       onClose();
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Publish failed");
+    } catch {
+      // Toast feedback is handled by the parent mutation handler.
     }
   }
 
@@ -213,12 +209,6 @@ export function OfferingEditorSheet({
           onValueChange={setActiveTab}
           value={activeTab}
         />
-
-        {saveError ? (
-          <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
-            {saveError}
-          </p>
-        ) : null}
 
         {activeTab === "manual" ? (
           <OfferingEditorForm

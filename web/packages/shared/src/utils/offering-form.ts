@@ -20,6 +20,7 @@ export function createEmptyOfferingDraft(): OfferingFormDraft {
     duration: "",
     features: [],
     imageUrl: "",
+    imageUrlList: [],
     imageUrls: "",
     inventoryAllowBackorders: false,
     inventoryQuantity: "",
@@ -67,6 +68,7 @@ export function createOfferingDraft(offering: OfferingData): OfferingFormDraft {
     duration: offering.duration?.toString() ?? "",
     features: offering.features ?? [],
     imageUrl: offering.imageUrls?.[0] ?? "",
+    imageUrlList: offering.imageUrls ?? [],
     imageUrls: offering.imageUrls?.join(", ") ?? "",
     inventoryAllowBackorders: offering.inventory?.allowBackorders ?? false,
     inventoryQuantity: offering.inventory?.quantity?.toString() ?? "",
@@ -196,7 +198,7 @@ export function draftToOffering(
     attributes: getProductAttributes(draft),
     features: draft.features.length ? draft.features : null,
     commerce,
-    imageUrls: splitCommaList(draft.imageUrls),
+    imageUrls: getProductImageUrls(draft),
     inventory: getProductInventory(draft),
     location: null,
     options: getProductOptions(draft),
@@ -237,6 +239,12 @@ function getCommerceCheckoutIntents(
   return draft.checkoutIntents.length
     ? draft.checkoutIntents
     : getDefaultCheckoutIntents(draft.type);
+}
+
+function getProductImageUrls(draft: OfferingFormDraft) {
+  if (draft.imageUrlList.length) return draft.imageUrlList;
+
+  return splitCommaList(draft.imageUrls);
 }
 
 function getProductInventory(draft: OfferingFormDraft) {

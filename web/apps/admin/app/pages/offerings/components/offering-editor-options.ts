@@ -418,6 +418,7 @@ function getOfferingTypeDraftUpdates(
     duration: "",
     features: getDefaultOfferingFeatures(type, null),
     imageUrl: "",
+    imageUrlList: [],
     imageUrls: "",
     inventoryAllowBackorders: false,
     inventoryQuantity: "",

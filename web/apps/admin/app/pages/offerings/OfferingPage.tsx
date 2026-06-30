@@ -161,43 +161,107 @@ export function OfferingPage() {
   }
 
   async function handleSave(offering: OfferingData) {
-    if (offeringEditorMode === "edit" && selectedOffering) {
-      await updateOffering({
-        input: offering,
-        offeringId: selectedOffering.id,
-      }).unwrap();
-      return;
-    }
+    const isEditing = offeringEditorMode === "edit" && selectedOffering;
+    const itemName = offeringDisplay.singular;
 
-    await createOffering(offering).unwrap();
+    try {
+      if (isEditing) {
+        await updateOffering({
+          input: offering,
+          offeringId: selectedOffering.id,
+        }).unwrap();
+      } else {
+        await createOffering(offering).unwrap();
+      }
+
+      showToast(dispatch, {
+        message: `${itemName} ${isEditing ? "updated" : "created"}.`,
+        variant: "success",
+      });
+    } catch (error) {
+      const message = getCatalogMutationErrorMessage(
+        error,
+        `Unable to ${isEditing ? "update" : "create"} this ${itemName.toLowerCase()}.`,
+      );
+
+      showToast(dispatch, { message, variant: "error" });
+      throw new Error(message);
+    }
   }
 
   async function handleSaveDiscount(discount: DiscountInput) {
-    if (discountEditorMode === "edit" && selectedDiscount) {
-      await updateDiscount({
-        discountId: selectedDiscount.id,
-        input: discount,
-      }).unwrap();
-      return;
-    }
+    const isEditing = discountEditorMode === "edit" && selectedDiscount;
 
-    await createDiscount(discount).unwrap();
+    try {
+      if (isEditing) {
+        await updateDiscount({
+          discountId: selectedDiscount.id,
+          input: discount,
+        }).unwrap();
+      } else {
+        await createDiscount(discount).unwrap();
+      }
+
+      showToast(dispatch, {
+        message: `Discount ${isEditing ? "updated" : "created"}.`,
+        variant: "success",
+      });
+    } catch (error) {
+      const message = getCatalogMutationErrorMessage(
+        error,
+        `Unable to ${isEditing ? "update" : "create"} this discount.`,
+      );
+
+      showToast(dispatch, { message, variant: "error" });
+      throw new Error(message);
+    }
   }
 
   async function handleCreateGift(input: GiftInput) {
-    return createGift(input).unwrap();
+    try {
+      const gift = await createGift(input).unwrap();
+      showToast(dispatch, {
+        message: "Gift created.",
+        variant: "success",
+      });
+      return gift;
+    } catch (error) {
+      const message = getCatalogMutationErrorMessage(
+        error,
+        "Unable to create this gift.",
+      );
+
+      showToast(dispatch, { message, variant: "error" });
+      throw new Error(message);
+    }
   }
 
   async function handleSaveGift(input: GiftInput) {
-    if (giftEditorMode === "edit" && selectedGift) {
-      await updateGift({
-        giftId: selectedGift.id,
-        input,
-      }).unwrap();
-      return;
-    }
+    const isEditing = giftEditorMode === "edit" && selectedGift;
 
-    await createGift(input).unwrap();
+    try {
+      if (isEditing) {
+        await updateGift({
+          giftId: selectedGift.id,
+          input,
+        }).unwrap();
+      } else {
+        await createGift(input).unwrap();
+      }
+
+      showToast(dispatch, {
+        message: `Gift ${isEditing ? "updated" : "created"}.`,
+        variant: "success",
+      });
+    } catch (error) {
+      const message = getCatalogMutationErrorMessage(
+        error,
+        `Unable to ${isEditing ? "update" : "create"} this gift.`,
+      );
+
+      showToast(dispatch, { message, variant: "error" });
+      throw new Error(message);
+    }
   }
 
   async function deleteSelectedCatalogItem() {
@@ -378,6 +442,10 @@ function capitalize(value: string) {
 }
 
 function getCatalogDeleteErrorMessage(error: unknown) {
+  return getCatalogMutationErrorMessage(error, "Unable to delete this item.");
+}
+
+function getCatalogMutationErrorMessage(error: unknown, fallback: string) {
   if (
     typeof error === "object" &&
     error !== null &&
@@ -387,5 +455,5 @@ function getCatalogDeleteErrorMessage(error: unknown) {
     return error.message;
   }
 
-  return "Unable to delete this item.";
+  return fallback;
 }
