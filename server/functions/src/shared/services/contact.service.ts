@@ -281,6 +281,10 @@ export class ContactService {
       "countryCode"
     );
     const hasAddressUpdate = Object.prototype.hasOwnProperty.call(input, "address");
+    const hasPreferenceUpdate = Object.prototype.hasOwnProperty.call(
+      input,
+      "preference"
+    );
     const hasTagsUpdate = Object.prototype.hasOwnProperty.call(input, "tags");
     const nextEmail =
       hasEmailUpdate ? input.email ?? null : currentContact.email ?? null;
@@ -345,6 +349,12 @@ export class ContactService {
         emailEnabled: Boolean(nextEmail),
         smsEnabled: Boolean(nextPhoneNumber),
         whatsappEnabled: Boolean(nextPhoneNumber),
+      };
+    }
+    if (hasPreferenceUpdate && input.preference) {
+      updatePayload.preference = {
+        ...(updatePayload.preference ?? currentContact.preference),
+        ...input.preference,
       };
     }
     if (hasTagsUpdate) {

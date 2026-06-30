@@ -1,15 +1,39 @@
 import * as React from "react";
 import { Mail, MessageSquare, Pencil } from "lucide-react";
 import { Badge, SectionHeader } from "@piya/ui";
+import {
+  showToast,
+  useUpdateContactMutation,
+  type AppDispatch,
+} from "@piya/shared";
 import type { ContactData } from "@piya/shared/models";
+import { useDispatch } from "react-redux";
 import { ADMIN_ASSETS } from "@/utils/assets";
 
 type PreferenceChannel = "email" | "sms" | "whatsapp";
+type PreferenceValues = Record<PreferenceChannel, boolean>;
+type PreferenceField =
+  | "emailEnabled"
+  | "smsEnabled"
+  | "whatsappEnabled";
 
-export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
-  const [preferences, setPreferences] = React.useState<
-    Record<PreferenceChannel, boolean>
-  >({
+const preferenceFieldByChannel = {
+  email: "emailEnabled",
+  sms: "smsEnabled",
+  whatsapp: "whatsappEnabled",
+} satisfies Record<PreferenceChannel, PreferenceField>;
+
+export function ContactPreferencePanel({
+  contact,
+  onContactUpdated,
+}: {
+  contact: ContactData;
+  onContactUpdated?: (contact: ContactData) => void;
+}) {
+  const dispatch = useDispatch<AppDispatch>();
+  const [updateContact, { isLoading: isUpdatingPreference }] =
+    useUpdateContactMutation();
+  const [preferences, setPreferences] = React.useState<PreferenceValues>({
     email: contact.preference.emailEnabled,
     sms: contact.preference.smsEnabled,
     whatsapp: contact.preference.whatsappEnabled,
@@ -31,11 +55,36 @@ export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
     contact.preference.whatsappEnabled,
   ]);
 
-  function togglePreference(channel: PreferenceChannel) {
-    setPreferences((current) => ({
-      ...current,
-      [channel]: !current[channel],
-    }));
+  async function togglePreference(channel: PreferenceChannel) {
+    if (isUpdatingPreference) return;
+
+    const nextPreferences = {
+      ...preferences,
+      [channel]: !preferences[channel],
+    };
+    setPreferences(nextPreferences);
+
+    try {
+      const updatedContact = await updateContact({
+        contactId: contact.id,
+        input: {
+          preference: {
+            [preferenceFieldByChannel[channel]]: nextPreferences[channel],
+          },
+        },
+      }).unwrap();
+      onContactUpdated?.(updatedContact);
+    } catch (error) {
+      setPreferences(preferences);
+      showToast(dispatch, {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Preference update failed",
+        title: "Could not save preference",
+        variant: "error",
+      });
+    }
   }
 
   const preferenceCards = [
@@ -75,7 +124,7 @@ export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
       <div className="grid gap-3 sm:grid-cols-3">
         {preferenceCards.map((preference) => (
           <div
-            className="rounded-md border border-border bg-fill/40 p-4"
+            className="rounded-md border border-border bg-fill/40 px-4 pb-3 pt-4"
             key={preference.label}
           >
             <div className="flex items-center gap-2 text-footnote font-normal text-[#2F4B4F]/65">
@@ -92,6 +141,7 @@ export function ContactPreferencePanel({ contact }: { contact: ContactData }) {
                   aria-label={`Toggle ${preference.label} preference`}
                   className="inline-flex h-7 w-12 shrink-0 items-center rounded-full bg-[#2F4B4F]/20 p-1 transition-colors data-[checked=true]:bg-primary"
                   data-checked={preferences[preference.channel]}
+                  disabled={isUpdatingPreference}
                   onClick={() => togglePreference(preference.channel)}
                   role="switch"
                   type="button"

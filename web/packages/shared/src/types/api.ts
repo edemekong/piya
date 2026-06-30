@@ -78,6 +78,7 @@ export type UpdateContactInput = Partial<
   > & {
     anniversary: string | null;
     countryCode: string | null;
+    preference: Partial<import("../models").ContactPreference>;
   }
 >;
 

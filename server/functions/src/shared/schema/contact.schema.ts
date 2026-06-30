@@ -112,8 +112,22 @@ const contactTagsSchema = z
         tags.findIndex(
           (item) => item.toLocaleLowerCase() === tag.toLocaleLowerCase()
         ) === index
-    )
+      )
   );
+
+const contactPreferenceUpdateSchema = z
+  .object({
+    emailEnabled: z.boolean().optional(),
+    smsEnabled: z.boolean().optional(),
+    whatsappEnabled: z.boolean().optional(),
+    unsubscribedEmailTypes: z
+      .array(z.string().trim().min(1).max(80))
+      .optional(),
+  })
+  .strict()
+  .refine((preference) => Object.keys(preference).length > 0, {
+    message: "Enter at least one preference field",
+  });
 
 const updateContactSchema = z
   .object({
@@ -140,6 +154,7 @@ const updateContactSchema = z
       .optional()
       .nullable(),
     address: locationSchema.optional().nullable(),
+    preference: contactPreferenceUpdateSchema.optional(),
     tags: contactTagsSchema.optional(),
     token: z.unknown().optional(),
     user: z.unknown().optional(),

@@ -17,6 +17,8 @@ import type {
 import type { OrderDraft } from "@piya/shared/types";
 import {
   createEmptyOrderDraft,
+  dateInputToDate,
+  dateToDateInput,
   draftToOrder,
 } from "@piya/shared/utils";
 import { formatOrderLabel } from "@piya/shared/utils";
@@ -271,10 +273,10 @@ export function OrderEditorSheet({
                 <AppDatePicker
                   ariaLabel="Choose estimated delivery date"
                   onChange={(date) =>
-                    updateDraft({ estimatedDeliveryAt: formatDateDraft(date) })
+                    updateDraft({ estimatedDeliveryAt: dateToDateInput(date) })
                   }
                   popoverAlign="right"
-                  value={dateDraftToDate(draft.estimatedDeliveryAt)}
+                  value={dateInputToDate(draft.estimatedDeliveryAt)}
                 />
               </label>
             </div>
@@ -419,14 +421,4 @@ function MoneyField({
       </div>
     </label>
   );
-}
-
-function formatDateDraft(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function dateDraftToDate(value: string) {
-  if (!value) return null;
-
-  return new Date(`${value}T00:00:00`);
 }

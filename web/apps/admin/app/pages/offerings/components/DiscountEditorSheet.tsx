@@ -28,6 +28,8 @@ import {
 import {
   createDiscountDraft,
   createEmptyDiscountDraft,
+  dateInputToDate,
+  dateToDateInput,
   draftToDiscount,
   formatDiscountLabel,
 } from "@piya/shared/utils";
@@ -270,8 +272,8 @@ export function DiscountEditorSheet({
                 </span>
                 <AppDatePicker
                   ariaLabel="Choose discount start date"
-                  onChange={(date) => updateDraft({ startsAt: formatDateDraft(date) })}
-                  value={dateDraftToDate(draft.startsAt)}
+                  onChange={(date) => updateDraft({ startsAt: dateToDateInput(date) })}
+                  value={dateInputToDate(draft.startsAt)}
                 />
               </label>
               <label className="grid gap-2">
@@ -280,9 +282,9 @@ export function DiscountEditorSheet({
                 </span>
                 <AppDatePicker
                   ariaLabel="Choose discount end date"
-                  onChange={(date) => updateDraft({ endsAt: formatDateDraft(date) })}
+                  onChange={(date) => updateDraft({ endsAt: dateToDateInput(date) })}
                   popoverAlign="right"
-                  value={dateDraftToDate(draft.endsAt)}
+                  value={dateInputToDate(draft.endsAt)}
                 />
               </label>
             </div>
@@ -828,14 +830,4 @@ function parseFormattedAmount(value: string) {
   if (decimalParts.length === 0) return wholePart;
 
   return `${wholePart}.${decimalParts.join("")}`;
-}
-
-function formatDateDraft(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function dateDraftToDate(value: string) {
-  if (!value) return null;
-
-  return new Date(`${value}T00:00:00`);
 }

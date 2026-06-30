@@ -130,7 +130,10 @@ export function ContactViewSheet({
             />
           ) : null}
           {activeParentTab === "preference" ? (
-            <ContactPreferencePanel contact={contact} />
+            <ContactPreferencePanel
+              contact={contact}
+              onContactUpdated={onContactUpdated}
+            />
           ) : null}
           {activeParentTab === "conversations" ? (
             <ContactConversationsPanel />

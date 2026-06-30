@@ -22,7 +22,7 @@ export function formatTime(timestamp: number, locale = "en") {
 }
 
 export function timestampToDateInput(timestamp: number) {
-  return new Date(timestamp).toISOString().slice(0, 10);
+  return dateToDateInput(new Date(timestamp));
 }
 
 export function dateInputToTimestamp(value: string) {
@@ -39,7 +39,11 @@ export function dateInputToDate(value: string) {
 }
 
 export function dateToDateInput(date: Date) {
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 export function formatRelativeTime(timestamp: number) {
