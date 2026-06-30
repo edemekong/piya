@@ -29,7 +29,7 @@ export const dummyCommunications: CommunicationAdminData[] = [
     trigger: { type: "onboarding", schedule: null },
     targetAudience: {
       targetTags: ["new lead", "first order"],
-      targetBadgeTypes: ["regular", "bronze"],
+      targetBadgeTypes: ["new", "bronze"],
     },
     stepsOrder: ["welcome_email", "welcome_whatsapp"],
     steps: {
@@ -354,7 +354,7 @@ export const dummyContacts: ContactData[] = [
       country: "Ghana",
       postalCode: "GA-184",
     },
-    badge: { badgeId: "regular", points: 120, updatedAt: contactNow - day * 35 },
+    badge: { badgeId: "new", points: 120, updatedAt: contactNow - day * 35 },
     dob: null,
     bmd: null,
     preference: {

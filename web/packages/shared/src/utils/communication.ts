@@ -47,7 +47,7 @@ export const DEFAULT_TAG_OPTIONS = [
 ];
 
 export const DEFAULT_BADGE_OPTIONS = [
-  "regular",
+  "new",
   "bronze",
   "silver",
   "gold",

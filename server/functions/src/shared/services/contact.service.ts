@@ -133,7 +133,7 @@ export class ContactService {
     input: CreateContactBody;
   }): Promise<CreateContactResult> {
     const { businessId, createdBy, input } = params;
-    if (await this.hasDuplicateContact(businessId, input)) {
+    if (await this.getDuplicateContact(businessId, input)) {
       return { status: "duplicate" };
     }
 
@@ -294,7 +294,7 @@ export class ContactService {
         (hasPhoneUpdate &&
           nextPhoneNumber &&
           nextPhoneNumber !== currentContact.phoneNumber)) &&
-      (await this.hasDuplicateContact(
+      (await this.getDuplicateContact(
         businessId,
         {
           email: hasEmailUpdate ? nextEmail : null,
@@ -478,7 +478,7 @@ export class ContactService {
       countryCode: parsedPhoneNumber?.country ?? null,
       address: input.address ?? null,
       badge: {
-        badgeId: "regular",
+        badgeId: "new",
         points: 0,
         updatedAt: now,
       },
@@ -632,7 +632,7 @@ export class ContactService {
     return { createdAt: contact.createdAt, id: document.id };
   }
 
-  private static async hasDuplicateContact(
+  private static async getDuplicateContact(
     businessId: string,
     input: Pick<CreateContactBody, "email" | "phoneNumber">,
     excludedContactId?: string

@@ -29,9 +29,9 @@ const defaultBadges: BadgeData[] = [
     createdAt: 0,
   },
   {
-    id: "regular",
+    id: "new",
     businessId: "default",
-    name: "Regular",
+    name: "New",
     description: "Default badge for customers starting the loyalty journey.",
     icon: "sage-round-seal",
     rule: { metric: "points_at_least", value: 0 },

@@ -94,7 +94,7 @@ accountSetupRouter.patch(
         return ErrorResult(
           res,
           response.statusCode,
-          error instanceof Error ? error.message : response.message,
+          response.message,
           response.code,
         );
       }
@@ -162,7 +162,7 @@ accountSetupRouter.patch(
         return ErrorResult(
           res,
           response.statusCode,
-          error instanceof Error ? error.message : response.message,
+          response.message,
           response.code,
         );
       }

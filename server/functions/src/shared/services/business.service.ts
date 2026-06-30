@@ -157,7 +157,7 @@ export class BusinessService {
       businessId: business.id,
       name: user.name || data.name,
       email: user.email,
-      profileImageUrl: user.profileImageUrl,
+      profileImageUrl: user.profileImageUrl ?? null,
       role: "owner",
       permission: "edit",
       createdAt: now,
@@ -338,9 +338,10 @@ export class BusinessService {
         existingBusiness.branding?.socialLinks ??
         null,
     };
+    const businessLogo = branding.logo ?? existingBusiness.logo;
     const business: BusinessData = {
       ...existingBusiness,
-      logo: branding.logo ?? existingBusiness.logo,
+      ...(businessLogo ? { logo: businessLogo } : {}),
       branding,
       updatedAt: now,
     };

@@ -164,7 +164,7 @@ function createContactFromOrder(order: OrderData): ContactData {
         }
       : null,
     badge: {
-      badgeId: "regular",
+      badgeId: "new",
       points: 0,
       updatedAt: now,
     },

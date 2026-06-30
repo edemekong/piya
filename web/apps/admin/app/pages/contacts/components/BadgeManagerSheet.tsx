@@ -100,7 +100,7 @@ const currencyOptions = [
   { code: "ZAR", label: "South African rand" },
 ];
 
-const defaultBadgeIds = new Set(["gold", "silver", "regular"]);
+const defaultBadgeIds = new Set(["gold", "silver", "new"]);
 
 function createEmptyDraft(): BadgeDraft {
   const iconId = badgeIconOptions[0]?.id ?? "";
