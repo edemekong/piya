@@ -169,13 +169,8 @@ function formatReward(discount: DiscountData) {
     return formatCurrency(discount.reward.value);
   }
 
-  if (discount.reward.type === "free_shipping") {
-    return "Free shipping";
-  }
-
   if (discount.reward.type === "buy_x_get_y") {
-    const buyQuantity = discount.reward.metadata?.buyQuantity ?? discount.reward.value;
-    const getQuantity = discount.reward.metadata?.getQuantity ?? 1;
+    const { buyQuantity, getQuantity } = discount.reward.metadata;
 
     return `Buy ${buyQuantity}, get ${getQuantity}`;
   }
@@ -188,18 +183,10 @@ function formatReward(discount: DiscountData) {
     return `${formatCurrency(discount.reward.value)} cashback`;
   }
 
-  if (discount.reward.type === "custom_perk") {
-    return discount.reward.metadata?.customPerkDescription ?? "Custom perk";
-  }
-
   return formatDiscountLabel(discount.reward.type);
 }
 
 function formatCode(discount: DiscountData) {
-  if (discount.codeGeneration === "unique_per_contact") {
-    return "Unique per contact";
-  }
-
   return discount.code ?? "No code";
 }
 

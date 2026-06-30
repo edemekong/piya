@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Gift, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Gift, MoreVertical, Pencil } from "lucide-react";
 import { cn } from "@piya/ui";
 import type { GiftData } from "@piya/shared/models";
 
@@ -18,7 +18,7 @@ export function GiftsTable({ gifts, onEdit, onView }: GiftsTableProps) {
             <th className="py-3 pr-4 font-semibold">Gift name</th>
             <th className="px-4 py-3 font-semibold">Value</th>
             <th className="px-4 py-3 font-semibold">Quantity</th>
-            <th className="px-4 py-3 font-semibold">Max/contact</th>
+            <th className="px-4 py-3 font-semibold">Status</th>
             <th className="py-3 pl-4 text-right font-semibold">Actions</th>
           </tr>
         </thead>
@@ -47,7 +47,16 @@ export function GiftsTable({ gifts, onEdit, onView }: GiftsTableProps) {
                 {gift.quantityAvailable ?? "Unlimited"}
               </td>
               <td className="px-4 py-4 text-callout text-[#2F4B4F]/75">
-                {gift.maxPerContact}
+                <span
+                  className={cn(
+                    "inline-flex rounded-full px-2.5 py-1 text-caption-1 font-semibold",
+                    gift.status === "active"
+                      ? "bg-secondary text-primary"
+                      : "bg-fill text-[#2F4B4F]/60",
+                  )}
+                >
+                  {gift.status === "active" ? "Active" : "Disabled"}
+                </span>
               </td>
               <td className="py-4 pl-4">
                 <GiftActions gift={gift} onEdit={onEdit} />
@@ -105,12 +114,6 @@ function GiftActions({
               onEdit(gift);
             }}
           />
-          <ActionMenuItem
-            destructive
-            icon={<Trash2 className="size-4" />}
-            label="Delete"
-            onClick={() => setOpen(false)}
-          />
         </div>
       ) : null}
     </div>
@@ -118,22 +121,17 @@ function GiftActions({
 }
 
 function ActionMenuItem({
-  destructive = false,
   icon,
   label,
   onClick,
 }: {
-  destructive?: boolean;
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
 }) {
   return (
     <button
-      className={cn(
-        "flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left transition last:border-b-0 hover:bg-fill",
-        destructive ? "text-error" : "text-[#2F4B4F]",
-      )}
+      className="flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left text-[#2F4B4F] transition last:border-b-0 hover:bg-fill"
       onClick={onClick}
       type="button"
     >

@@ -1,17 +1,19 @@
-export type DiscountStatusType = "draft" | "active" | "paused" | "expired";
+import type { BaseModel } from "./base";
 
-export type RewardType =
+type DiscountStatusType = "draft" | "active" | "paused" | "expired";
+
+type RewardType =
   | "percentage_discount"
   | "fixed_amount_discount"
   | "buy_x_get_y"
   | "freebie_product"
   | "cashback_credit";
 
-export type DiscountApplicabilityScope =
+type DiscountApplicabilityScope =
   | "all_offerings"
   | "specific_offerings";
 
-export type DiscountReward =
+type DiscountReward =
   | {
       type: "percentage_discount";
       value: number;
@@ -35,19 +37,16 @@ export type DiscountReward =
       };
     };
 
-export type DiscountRules = {
+interface DiscountRules {
   minimumOrderValue?: number | null;
   maxUsesPerContact: number;
   totalUsageLimit?: number | null;
   applicabilityScope: DiscountApplicabilityScope;
   offeringIds?: string[] | null;
-};
+}
 
-export type DiscountData = {
-  id: string;
+interface DiscountData extends BaseModel {
   businessId: string;
-  createdAt: number;
-  updatedAt: number;
   createdBy: string;
   title: string;
   description: string;
@@ -57,4 +56,13 @@ export type DiscountData = {
   rules: DiscountRules;
   startsAt: number;
   endsAt?: number | null;
+}
+
+export {
+  DiscountApplicabilityScope,
+  DiscountData,
+  DiscountReward,
+  DiscountRules,
+  DiscountStatusType,
+  RewardType,
 };

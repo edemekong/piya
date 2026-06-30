@@ -16,8 +16,13 @@ import {
   useGetOfferingsQuery,
   useCreateOfferingMutation,
   useUpdateOfferingMutation,
+  useCreateDiscountMutation,
+  useCreateGiftMutation,
+  useUpdateDiscountMutation,
+  useUpdateGiftMutation,
 } from "@piya/shared";
 import type { DiscountData, GiftData, OfferingData } from "@piya/shared/models";
+import type { DiscountInput, GiftInput } from "@piya/shared/types";
 import {
   DiscountEditorSheet,
   DiscountsTable,
@@ -59,6 +64,14 @@ export function OfferingPage() {
     useCreateOfferingMutation();
   const [updateOffering, { isLoading: isUpdatingOffering }] =
     useUpdateOfferingMutation();
+  const [createDiscount, { isLoading: isCreatingDiscount }] =
+    useCreateDiscountMutation();
+  const [updateDiscount, { isLoading: isUpdatingDiscount }] =
+    useUpdateDiscountMutation();
+  const [createGift, { isLoading: isCreatingGift }] =
+    useCreateGiftMutation();
+  const [updateGift, { isLoading: isUpdatingGift }] =
+    useUpdateGiftMutation();
   const [activeTab, setActiveTab] = React.useState<MainTab>("offerings");
   const [discounts, setDiscounts] =
     React.useState<DiscountData[]>([]);
@@ -136,22 +149,32 @@ export function OfferingPage() {
     await createOffering(offering).unwrap();
   }
 
-  function handleSaveDiscount(discount: DiscountData) {
-    setDiscounts((current) => {
-      const exists = current.some((item) => item.id === discount.id);
-      return exists
-        ? current.map((item) => (item.id === discount.id ? discount : item))
-        : [discount, ...current];
-    });
+  async function handleSaveDiscount(discount: DiscountInput) {
+    if (discountEditorMode === "edit" && selectedDiscount) {
+      await updateDiscount({
+        discountId: selectedDiscount.id,
+        input: discount,
+      }).unwrap();
+      return;
+    }
+
+    await createDiscount(discount).unwrap();
   }
 
-  function handleSaveGift(gift: GiftData) {
-    setGifts((current) => {
-      const exists = current.some((item) => item.id === gift.id);
-      return exists
-        ? current.map((item) => (item.id === gift.id ? gift : item))
-        : [gift, ...current];
-    });
+  async function handleCreateGift(input: GiftInput) {
+    return createGift(input).unwrap();
+  }
+
+  async function handleSaveGift(input: GiftInput) {
+    if (giftEditorMode === "edit" && selectedGift) {
+      await updateGift({
+        giftId: selectedGift.id,
+        input,
+      }).unwrap();
+      return;
+    }
+
+    await createGift(input).unwrap();
   }
 
   const isDiscountsTab = activeTab === "discounts";
@@ -172,6 +195,8 @@ export function OfferingPage() {
       ? "Filter gifts"
       : offeringDisplay.filterLabel;
   const isSavingOffering = isCreatingOffering || isUpdatingOffering;
+  const isSavingDiscount = isCreatingDiscount || isUpdatingDiscount;
+  const isSavingGift = isCreatingGift || isUpdatingGift;
 
   return (
     <>
@@ -255,9 +280,10 @@ export function OfferingPage() {
         gifts={gifts}
         mode={discountEditorMode}
         onClose={() => setIsDiscountEditorOpen(false)}
-        onCreateGift={handleSaveGift}
+        onCreateGift={handleCreateGift}
         onSave={handleSaveDiscount}
         open={isDiscountEditorOpen}
+        saving={isSavingDiscount}
       />
       <GiftEditorSheet
         gift={selectedGift}
@@ -265,6 +291,7 @@ export function OfferingPage() {
         onClose={() => setIsGiftEditorOpen(false)}
         onSave={handleSaveGift}
         open={isGiftEditorOpen}
+        saving={isSavingGift}
       />
     </>
   );

@@ -1,6 +1,7 @@
-import type { BaseAPIServiceOptions } from "../types";
 import type {
+  BaseAPIServiceOptions,
   OfferingInput,
+  OfferingListQuery,
   OfferingPayload,
   OfferingsPayload,
 } from "../types";
@@ -27,8 +28,9 @@ export class OfferingsService extends BaseAPIService {
     });
   }
 
-  getOfferings(): Promise<OfferingsPayload> {
+  getOfferings(input: OfferingListQuery = {}): Promise<OfferingsPayload> {
     return this.get<OfferingsPayload>(this.urlController.offerings, {
+      queryParameters: input,
       withToken: true,
     });
   }

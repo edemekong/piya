@@ -141,6 +141,19 @@ export type BadgeInput = Pick<
 
 export type OfferingsPayload = {
   offerings: import("../models").OfferingData[];
+  nextCursor?: string | null;
+  hasNextPage?: boolean;
+};
+
+export type OfferingListQuery = {
+  categoryId?: string;
+  cursor?: string;
+  limit?: number;
+  query?: string;
+  status?: import("../models").OfferingData["status"];
+  subType?: import("./offering.type").OfferingSubType;
+  tag?: string;
+  type?: import("./offering.type").OfferingType;
 };
 
 export type OfferingPayload = {
@@ -157,6 +170,39 @@ export type OfferingInput = Omit<
       "businessId" | "createdAt" | "id" | "updatedAt"
     >
   >;
+
+export type DiscountsPayload = {
+  discounts: import("../models").DiscountData[];
+};
+
+export type DiscountPayload = {
+  discount: import("../models").DiscountData;
+};
+
+export type DiscountInput = Omit<
+  import("../models").DiscountData,
+  "businessId" | "createdAt" | "createdBy" | "id" | "updatedAt"
+>;
+
+export type GiftsPayload = {
+  gifts: import("../models").GiftData[];
+};
+
+export type GiftPayload = {
+  gift: import("../models").GiftData;
+};
+
+export type GiftInput = Pick<
+  import("../models").GiftData,
+  | "currency"
+  | "description"
+  | "estimatedValue"
+  | "name"
+  | "quantityAvailable"
+  | "status"
+> & {
+  imageBase64?: string;
+};
 
 export type LocationPredictionsPayload = {
   predictions: import("../models").LocationPrediction[];

@@ -30,6 +30,7 @@ interface OfferingData extends BaseModel {
   commerce?: OfferingCommerceConfig | null;
   location?: LocationData | null;
   meta?: Record<string, any> | null;
+  searchTokens?: string[] | null;
   tags: string[];
 }
 
@@ -72,6 +73,7 @@ interface OfferingInventoryConfig {
 
 interface OfferingCommerceConfig {
   checkoutIntents: OfferingCheckoutIntentType[];
+  discountIds?: string[] | null;
   paymentModes?: CheckoutPaymentMode[] | null;
   requiresBusinessConfirmation?: boolean;
   minQuantity?: number | null;

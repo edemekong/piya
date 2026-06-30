@@ -28,8 +28,12 @@ import type {
   CreateContactInput,
   CreateLeadRequestInput,
   DeliveryPricingPayload,
+  DiscountInput,
+  GiftInput,
   InviteMemberInput,
   OfferingInput,
+  OfferingListQuery,
+  OfferingsPayload,
   SendWhatsAppMessageInput,
   SendWhatsAppMessagePayload,
   TeamPayload,
@@ -472,18 +476,95 @@ export const domainApi = createApi({
       },
     }),
     getDiscounts: builder.query<DiscountData[], void>({
-      queryFn: () => ({ data: discountsService.getDiscounts() }),
+      queryFn: async () => {
+        try {
+          const payload = await discountsService.getDiscounts();
+          return { data: payload.discounts };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
       providesTags: ["Discount"],
     }),
+    createDiscount: builder.mutation<DiscountData, DiscountInput>({
+      queryFn: async (input) => {
+        try {
+          const payload = await discountsService.createDiscount(input);
+          return { data: payload.discount };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Discount"],
+    }),
+    updateDiscount: builder.mutation<
+      DiscountData,
+      { discountId: string; input: DiscountInput }
+    >({
+      queryFn: async ({ discountId, input }) => {
+        try {
+          const payload = await discountsService.updateDiscount(
+            discountId,
+            input,
+          );
+          return { data: payload.discount };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Discount"],
+    }),
     getGifts: builder.query<GiftData[], void>({
-      queryFn: () => ({ data: giftsService.getGifts() }),
+      queryFn: async () => {
+        try {
+          const payload = await giftsService.getGifts();
+          return { data: payload.gifts };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
       providesTags: ["Gift"],
+    }),
+    createGift: builder.mutation<GiftData, GiftInput>({
+      queryFn: async (input) => {
+        try {
+          const payload = await giftsService.createGift(input);
+          return { data: payload.gift };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Gift"],
+    }),
+    updateGift: builder.mutation<
+      GiftData,
+      { giftId: string; input: GiftInput }
+    >({
+      queryFn: async ({ giftId, input }) => {
+        try {
+          const payload = await giftsService.updateGift(giftId, input);
+          return { data: payload.gift };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Gift"],
     }),
     getOfferings: builder.query<OfferingData[], void>({
       queryFn: async () => {
         try {
           const payload = await offeringsService.getOfferings();
           return { data: payload.offerings };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["Offering"],
+    }),
+    getOfferingsPage: builder.query<OfferingsPayload, OfferingListQuery>({
+      queryFn: async (input) => {
+        try {
+          return { data: await offeringsService.getOfferings(input) };
         } catch (error) {
           return { error: getDomainApiError(error) };
         }
@@ -532,6 +613,8 @@ export const {
   useBulkCreateContactsMutation,
   useCreateContactMutation,
   useCreateBadgeMutation,
+  useCreateDiscountMutation,
+  useCreateGiftMutation,
   useCreateLeadRequestMutation,
   useCreateOfferingMutation,
   useCompleteWhatsAppConnectionMutation,
@@ -549,6 +632,7 @@ export const {
   useGetBadgesQuery,
   useGetDiscountsQuery,
   useGetGiftsQuery,
+  useGetOfferingsPageQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
   useGetTeamQuery,
@@ -559,6 +643,8 @@ export const {
   useUpdatePrimaryDeliveryPricingMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
+  useUpdateDiscountMutation,
+  useUpdateGiftMutation,
   useUpdateOfferingMutation,
   useUpdateAccountSetupMutation,
   useUpdateContactMutation,

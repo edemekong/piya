@@ -27,6 +27,7 @@ export function createEmptyOfferingDraft(): OfferingFormDraft {
     inventoryTrackQuantity: false,
     options: [],
     checkoutIntents: [],
+    discountIds: [],
     locationAddress: "",
     locationCity: "",
     locationCountry: "",
@@ -80,6 +81,7 @@ export function createOfferingDraft(offering: OfferingData): OfferingFormDraft {
     checkoutIntents:
       offering.commerce?.checkoutIntents ??
       getDefaultCheckoutIntents(offering.type),
+    discountIds: offering.commerce?.discountIds ?? [],
     locationAddress: offering.location?.address ?? "",
     locationCity: offering.location?.city ?? "",
     locationCountry: offering.location?.country ?? "",
@@ -143,6 +145,7 @@ export function draftToOffering(
     checkoutIntents: getCommerceCheckoutIntents(draft),
     depositAmount: numberOrNull(draft.depositAmount),
     depositPercent: numberOrNull(draft.depositPercent),
+    discountIds: draft.discountIds.length ? draft.discountIds : null,
     maxQuantity: numberOrNull(draft.maxQuantity),
     minQuantity: numberOrNull(draft.minQuantity),
     paymentModes: draft.paymentModes,

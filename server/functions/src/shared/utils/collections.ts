@@ -12,6 +12,8 @@ const BUSINESS_SUBCOLLECTIONS = {
   channelSettings: "channel_settings",
   contacts: "contacts",
   deliveryPricing: "delivery_pricing",
+  discounts: "discounts",
+  gifts: "gifts",
   memberInvitations: "member_invitations",
   members: "members",
   offerings: "offerings",

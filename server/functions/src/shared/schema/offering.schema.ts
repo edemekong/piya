@@ -98,6 +98,11 @@ const offeringCommerceSchema = z
     checkoutIntents: z.array(offeringCheckoutIntentSchema).min(1).max(5),
     depositAmount: z.number().nonnegative().optional().nullable(),
     depositPercent: z.number().min(0).max(100).optional().nullable(),
+    discountIds: z
+      .array(z.string().trim().min(1).max(120))
+      .max(100)
+      .optional()
+      .nullable(),
     maxQuantity: z.number().int().positive().optional().nullable(),
     minQuantity: z.number().int().positive().optional().nullable(),
     paymentModes: z.array(checkoutPaymentModeSchema).optional().nullable(),
@@ -169,6 +174,21 @@ const offeringBodySchema = z
 const createOfferingSchema = offeringBodySchema;
 const updateOfferingSchema = offeringBodySchema;
 
+const getOfferingsQuerySchema = z
+  .object({
+    categoryId: z.string().trim().max(120).optional(),
+    cursor: z.string().trim().max(1000).optional(),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    query: z.string().trim().max(120).optional(),
+    status: offeringStatusSchema.optional(),
+    subType: offeringSubTypeSchema.optional(),
+    tag: z.string().trim().max(80).optional(),
+    token: z.unknown().optional(),
+    type: offeringTypeSchema.optional(),
+  })
+  .strict()
+  .transform(({ token: _token, ...query }) => query);
+
 const offeringParamsSchema = z
   .object({
     offeringId: z.string().trim().min(1).max(120),
@@ -176,14 +196,17 @@ const offeringParamsSchema = z
   .strict();
 
 type CreateOfferingBody = z.infer<typeof createOfferingSchema>;
+type GetOfferingsQuery = z.infer<typeof getOfferingsQuerySchema>;
 type OfferingParams = z.infer<typeof offeringParamsSchema>;
 type UpdateOfferingBody = z.infer<typeof updateOfferingSchema>;
 
 export {
   createOfferingSchema,
+  getOfferingsQuerySchema,
   offeringParamsSchema,
   updateOfferingSchema,
   CreateOfferingBody,
+  GetOfferingsQuery,
   OfferingParams,
   UpdateOfferingBody,
 };

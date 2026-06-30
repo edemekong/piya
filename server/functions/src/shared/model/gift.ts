@@ -1,10 +1,9 @@
-export type GiftStatusType = "active" | "disabled";
+import type { BaseModel } from "./base";
 
-export type GiftData = {
-  id: string;
+type GiftStatusType = "active" | "disabled";
+
+interface GiftData extends BaseModel {
   businessId: string;
-  createdAt: number;
-  updatedAt: number;
   createdBy: string;
   name: string;
   description?: string | null;
@@ -13,4 +12,6 @@ export type GiftData = {
   currency?: string | null;
   quantityAvailable?: number | null;
   imageUrl?: string | null;
-};
+}
+
+export { GiftData, GiftStatusType };

@@ -1,19 +1,105 @@
+import {
+  FieldPath,
+  type DocumentData,
+  type Query,
+  type QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import { db } from "../../configs/firebase";
 import type { OfferingData } from "../model/offering";
 import type {
   CreateOfferingBody,
+  GetOfferingsQuery,
   UpdateOfferingBody,
 } from "../schema/offering.schema";
+import { ApiError } from "../utils/api-response";
 import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
+import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
 
-export class OfferingService {
-  static async getOfferings(businessId: string): Promise<OfferingData[]> {
-    const snapshot = await this.offeringsCollection(businessId)
-      .orderBy("createdAt", "desc")
-      .get();
+const OFFERING_SCAN_BATCH_SIZE = 100;
 
-    return snapshot.docs.map((document) => document.data() as OfferingData);
+type OfferingCursor = {
+  createdAt: number;
+  id: string;
+};
+
+type OfferingPage = {
+  offerings: OfferingData[];
+  nextCursor: string | null;
+  hasNextPage: boolean;
+};
+
+export class OfferingService {
+  static async getOfferings(
+    businessId: string,
+    input: GetOfferingsQuery,
+  ): Promise<OfferingPage> {
+    const searchToken = input.query
+      ? this.normalizeSearchValue(input.query)
+      : null;
+    let baseQuery: Query<DocumentData> = this.offeringsCollection(businessId)
+      .orderBy("createdAt", "desc")
+      .orderBy(FieldPath.documentId(), "desc");
+
+    if (searchToken) {
+      baseQuery = baseQuery.where(
+        "searchTokens",
+        "array-contains",
+        searchToken,
+      );
+    }
+    if (input.status) baseQuery = baseQuery.where("status", "==", input.status);
+    if (input.type) baseQuery = baseQuery.where("type", "==", input.type);
+    if (input.subType) {
+      baseQuery = baseQuery.where("subType", "==", input.subType);
+    }
+    if (input.categoryId) {
+      baseQuery = baseQuery.where("category.id", "==", input.categoryId);
+    }
+    if (input.tag) {
+      baseQuery = baseQuery.where("tags", "array-contains", input.tag);
+    }
+
+    let scanCursor = input.cursor
+      ? this.decodeOfferingCursor(input.cursor)
+      : null;
+    const matchedOfferings: OfferingData[] = [];
+
+    while (matchedOfferings.length <= input.limit) {
+      let batchQuery = baseQuery;
+      if (scanCursor) {
+        batchQuery = batchQuery.startAfter(scanCursor.createdAt, scanCursor.id);
+      }
+
+      const snapshot = await batchQuery.limit(OFFERING_SCAN_BATCH_SIZE).get();
+      if (snapshot.empty) break;
+
+      snapshot.docs.some((document) => {
+        matchedOfferings.push(document.data() as OfferingData);
+        return matchedOfferings.length > input.limit;
+      });
+
+      if (matchedOfferings.length > input.limit) break;
+      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+      if (!lastDocument || snapshot.size < OFFERING_SCAN_BATCH_SIZE) break;
+      scanCursor = this.getDocumentCursor(lastDocument);
+    }
+
+    const offerings = matchedOfferings.slice(0, input.limit);
+    const hasNextPage = matchedOfferings.length > input.limit;
+    const lastOffering = offerings[offerings.length - 1];
+
+    return {
+      offerings,
+      hasNextPage,
+      nextCursor:
+        hasNextPage && lastOffering
+          ? this.encodeOfferingCursor({
+              createdAt: lastOffering.createdAt,
+              id: lastOffering.id,
+            })
+          : null,
+    };
   }
 
   static async createOffering(params: {
@@ -28,6 +114,7 @@ export class OfferingService {
       businessId,
       id: offeringRef.id,
       createdAt: now,
+      searchTokens: this.getOfferingSearchTokens(input),
       updatedAt: now,
     };
 
@@ -52,6 +139,7 @@ export class OfferingService {
       businessId,
       id: offeringId,
       createdAt: existingOffering.createdAt,
+      searchTokens: this.getOfferingSearchTokens(input),
       updatedAt: getUTCTimeNow(),
     };
 
@@ -64,5 +152,70 @@ export class OfferingService {
       .collection(COLLECTIONS.business)
       .doc(businessId)
       .collection(BUSINESS_SUBCOLLECTIONS.offerings);
+  }
+
+  private static getDocumentCursor(
+    document: QueryDocumentSnapshot<DocumentData>,
+  ): OfferingCursor {
+    const data = document.data() as Pick<OfferingData, "createdAt">;
+    return { createdAt: data.createdAt, id: document.id };
+  }
+
+  private static encodeOfferingCursor(cursor: OfferingCursor) {
+    return Buffer.from(JSON.stringify(cursor)).toString("base64url");
+  }
+
+  private static decodeOfferingCursor(cursor: string): OfferingCursor {
+    try {
+      const value = JSON.parse(
+        Buffer.from(cursor, "base64url").toString("utf8"),
+      ) as Partial<OfferingCursor>;
+      if (
+        typeof value.createdAt === "number" &&
+        Number.isFinite(value.createdAt) &&
+        typeof value.id === "string" &&
+        value.id.length > 0
+      ) {
+        return { createdAt: value.createdAt, id: value.id };
+      }
+    } catch {
+      // Return the standardized invalid request response below.
+    }
+
+    const response = API_RESPONSE.invalidRequest;
+    throw new ApiError(response.statusCode, response.message, response.code);
+  }
+
+  private static getOfferingSearchTokens(
+    input: Pick<OfferingData, "category" | "name" | "tags">,
+  ) {
+    const tokens = new Set<string>();
+    const normalizedName = this.normalizeSearchValue(input.name);
+
+    this.addPrefixes(tokens, normalizedName);
+    normalizedName
+      .split(" ")
+      .filter(Boolean)
+      .forEach((word) => this.addPrefixes(tokens, word));
+
+    if (input.category?.name) {
+      this.addPrefixes(tokens, this.normalizeSearchValue(input.category.name));
+    }
+
+    input.tags.forEach((tag) => {
+      this.addPrefixes(tokens, this.normalizeSearchValue(tag));
+    });
+
+    return Array.from(tokens).filter(Boolean);
+  }
+
+  private static addPrefixes(tokens: Set<string>, value: string) {
+    for (let index = 1; index <= value.length; index += 1) {
+      tokens.add(value.slice(0, index));
+    }
+  }
+
+  private static normalizeSearchValue(value: string) {
+    return value.trim().toLocaleLowerCase().replace(/\s+/g, " ");
   }
 }

@@ -85,6 +85,22 @@ export class URLController {
     return this.path(`/v1/offerings/${encodeURIComponent(id)}`);
   }
 
+  get discounts() {
+    return this.path("/v1/discounts");
+  }
+
+  discount(id: string) {
+    return this.path(`/v1/discounts/${encodeURIComponent(id)}`);
+  }
+
+  get gifts() {
+    return this.path("/v1/gifts");
+  }
+
+  gift(id: string) {
+    return this.path(`/v1/gifts/${encodeURIComponent(id)}`);
+  }
+
   get contactTags() {
     return this.path("/v1/contacts/tags");
   }

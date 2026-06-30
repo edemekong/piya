@@ -1,6 +1,16 @@
 import * as React from "react";
-import { CheckCircle2, ChevronDown, Plus, Sparkles, X } from "lucide-react";
 import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  Plus,
+  Search,
+  X,
+} from "lucide-react";
+import {
+  AppCheckbox,
   AppDatePicker,
   AppSelectField,
   AppSheet,
@@ -9,17 +19,23 @@ import {
   Button,
   cn,
 } from "@piya/ui";
-import { useGetOfferingsQuery } from "@piya/shared";
 import {
-  DEFAULT_BADGE_OPTIONS,
-  formatLabel,
-} from "@piya/shared/utils";
+  useGetAccountSetupQuery,
+  useGetOfferingsPageQuery,
+} from "@piya/shared";
+import { getOfferingDisplayConfig } from "@/utils/offering-display";
 import type {
+  DiscountApplicabilityScope,
   DiscountData,
-  DiscountStatusType,
   RewardType,
+  OfferingData,
 } from "@piya/shared/models";
-import type { DiscountFormDraft, GiftDraft } from "@piya/shared/types";
+import type {
+  DiscountFormDraft,
+  DiscountInput,
+  GiftDraft,
+  GiftInput,
+} from "@piya/shared/types";
 import type { GiftData } from "@piya/shared/models";
 import {
   createEmptyGiftDraft,
@@ -33,36 +49,53 @@ import {
   draftToDiscount,
   formatDiscountLabel,
 } from "@piya/shared/utils";
-import { GiftForm } from "./GiftEditorSheet";
+import {
+  GiftEditorStepper,
+  GiftForm,
+  giftEditorSteps,
+  type GiftEditorStep,
+} from "./GiftEditorSheet";
 
 type EditorMode = "create" | "edit";
+type DiscountEditorStep =
+  | "basics"
+  | "reward"
+  | "applies_to"
+  | "limits"
+  | "schedule";
 
 type DiscountEditorSheetProps = {
   discount: DiscountData | null;
   gifts: GiftData[];
   mode: EditorMode;
   onClose: () => void;
-  onCreateGift: (gift: GiftData) => void;
-  onSave: (discount: DiscountData) => void;
+  onCreateGift: (gift: GiftInput) => Promise<GiftData>;
+  onSave: (discount: DiscountInput) => Promise<void> | void;
   open: boolean;
+  saving?: boolean;
 };
 
 const rewardTypes: RewardType[] = [
   "percentage_discount",
   "fixed_amount_discount",
-  "free_shipping",
   "buy_x_get_y",
   "freebie_product",
   "cashback_credit",
-  "custom_perk",
 ];
 
-const currencies = [
-  { code: "NGN", label: "Naira" },
-  { code: "USD", label: "Dollar" },
-  { code: "GHS", label: "Ghana cedi" },
-  { code: "KES", label: "Kenya shilling" },
-  { code: "ZAR", label: "South African rand" },
+const discountEditorSteps: { key: DiscountEditorStep; label: string }[] = [
+  { key: "basics", label: "Basics" },
+  { key: "reward", label: "Reward" },
+  { key: "applies_to", label: "Applies To" },
+  { key: "limits", label: "Limits" },
+  { key: "schedule", label: "Schedule" },
+];
+const applicabilityOptions: {
+  label: string;
+  value: DiscountApplicabilityScope;
+}[] = [
+  { label: "All items", value: "all_offerings" },
+  { label: "Specific items", value: "specific_offerings" },
 ];
 export function DiscountEditorSheet({
   discount,
@@ -72,23 +105,35 @@ export function DiscountEditorSheet({
   onCreateGift,
   onSave,
   open,
+  saving = false,
 }: DiscountEditorSheetProps) {
-  const { data: offerings = [] } = useGetOfferingsQuery();
+  const { data: accountSetup } = useGetAccountSetupQuery();
+  const offeringDisplay = getOfferingDisplayConfig(
+    accountSetup?.business?.category ?? null,
+  );
+  const itemLabel = getBusinessItemLabel(offeringDisplay.singular);
   const [draft, setDraft] = React.useState<DiscountFormDraft>(
     createEmptyDiscountDraft,
   );
   const [giftDraft, setGiftDraft] = React.useState<GiftDraft>(
     createEmptyGiftDraft,
   );
+  const [activeStep, setActiveStep] =
+    React.useState<DiscountEditorStep>("basics");
   const [isGiftDialogOpen, setIsGiftDialogOpen] = React.useState(false);
+  const [saveError, setSaveError] = React.useState<string | null>(null);
   const isEditing = mode === "edit";
-  const offeringTagOptions = React.useMemo(
-    () => Array.from(new Set(offerings.flatMap((offering) => offering.tags))).sort(),
-    [offerings],
+  const activeStepIndex = discountEditorSteps.findIndex(
+    (step) => step.key === activeStep,
   );
+  const isFinalStep = activeStepIndex === discountEditorSteps.length - 1;
+  const canSave = Boolean(draft.title.trim());
+  const canContinue = canSave;
 
   React.useEffect(() => {
     if (open) {
+      setActiveStep("basics");
+      setSaveError(null);
       setDraft(discount ? createDiscountDraft(discount) : createEmptyDiscountDraft());
     }
   }, [discount, open]);
@@ -97,23 +142,43 @@ export function DiscountEditorSheet({
     setDraft((current) => ({ ...current, ...updates }));
   }
 
-  function handleSave(status?: DiscountStatusType) {
-    onSave(draftToDiscount({ ...draft, status: status ?? draft.status }, discount));
-    onClose();
+  function goToPreviousStep() {
+    if (activeStepIndex === 0) {
+      onClose();
+      return;
+    }
+
+    setActiveStep(discountEditorSteps[activeStepIndex - 1].key);
+  }
+
+  function goToNextStep() {
+    if (activeStepIndex >= discountEditorSteps.length - 1) return;
+
+    setActiveStep(discountEditorSteps[activeStepIndex + 1].key);
+  }
+
+  async function handleSave() {
+    setSaveError(null);
+
+    try {
+      await onSave(draftToDiscount({ ...draft, status: "active" }));
+      onClose();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Save failed");
+    }
   }
 
   function openGiftDialog() {
     setGiftDraft({
       ...createEmptyGiftDraft(),
-      currency: draft.currency,
+      currency: "NGN",
       status: "active",
     });
     setIsGiftDialogOpen(true);
   }
 
-  function handleCreateGift() {
-    const gift = draftToGift(giftDraft);
-    onCreateGift(gift);
+  async function handleCreateGift() {
+    const gift = await onCreateGift(draftToGift(giftDraft));
     updateDraft({ freebieGiftId: gift.id });
     setIsGiftDialogOpen(false);
   }
@@ -126,21 +191,32 @@ export function DiscountEditorSheet({
           <>
             <Button
               className="bg-fill text-[#2F4B4F] hover:bg-fill-secondary"
-              disabled={!draft.title.trim()}
-              onClick={() => handleSave("draft")}
+              icon={activeStepIndex === 0 ? undefined : <ChevronLeft />}
+              onClick={goToPreviousStep}
               type="button"
               variant="secondary"
             >
-              Save draft
+              {activeStepIndex === 0 ? "Cancel" : "Back"}
             </Button>
-            <Button
-              disabled={!draft.title.trim()}
-              icon={<CheckCircle2 />}
-              onClick={() => handleSave("active")}
-              type="button"
-            >
-              Publish
-            </Button>
+            {!isFinalStep ? (
+              <Button
+                disabled={!canContinue}
+                icon={<ChevronRight />}
+                onClick={goToNextStep}
+                type="button"
+              >
+                Continue
+              </Button>
+            ) : (
+              <Button
+                disabled={!canSave || saving}
+                icon={<CheckCircle2 />}
+                onClick={handleSave}
+                type="button"
+              >
+                {saving ? "Publishing..." : "Publish"}
+              </Button>
+            )}
           </>
         }
         maxWidthClassName="max-w-2xl"
@@ -149,146 +225,179 @@ export function DiscountEditorSheet({
         title={isEditing ? "Edit discount" : "Create discount"}
       >
         <form className="grid gap-5">
-          <section className="grid gap-4">
-            <TextField
-              label="Title"
-              onChange={(title) => updateDraft({ title })}
-              placeholder="Enter discount title"
-              value={draft.title}
-            />
-            <TextAreaField
-              label="Description"
-              onChange={(description) => updateDraft({ description })}
-              placeholder="Enter discount description"
-              value={draft.description}
-            />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <CodeField
-                autoEnabled={draft.codeGeneration === "unique_per_contact"}
-                label="Discount code"
-                onChange={(code) => updateDraft({ code: code.toUpperCase() })}
-                onToggleAuto={(enabled) =>
-                  updateDraft({
-                    code: enabled ? "" : draft.code,
-                    codeGeneration: enabled ? "unique_per_contact" : "manual",
-                  })
-                }
-                placeholder="Enter discount code"
-                value={draft.code}
-              />
-            </div>
-          </section>
+          <DiscountEditorStepper activeStep={activeStep} />
 
-          <section className="grid gap-4 border-t border-border pt-4">
-            <h3 className="text-callout font-semibold text-[#2F4B4F]">Reward</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Reward type"
-                onChange={(rewardType) =>
-                  updateDraft({
-                    buyQuantity: "",
-                    freebieGiftId: "",
-                    getQuantity: "",
-                    maxDiscountAmount:
-                      rewardType === "percentage_discount"
-                        ? draft.maxDiscountAmount
-                        : "",
-                    perkDescription: "",
-                    rewardType: rewardType as RewardType,
-                    rewardValue: "",
-                  })
-                }
-                options={rewardTypes.map((rewardType) => ({
-                  label: formatDiscountLabel(rewardType),
-                  value: rewardType,
-                }))}
-                value={draft.rewardType}
-              />
-              <RewardValueFields
-                draft={draft}
-                gifts={gifts}
-                onChange={updateDraft}
-                onCreateGift={openGiftDialog}
-              />
-            </div>
-          </section>
+          {saveError ? (
+            <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
+              {saveError}
+            </p>
+          ) : null}
 
-          <section className="grid gap-4 border-t border-border pt-4">
-            <h3 className="text-callout font-semibold text-[#2F4B4F]">Rules</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <MoneyField
-                currency={draft.currency}
-                label="Minimum spend"
-                onCurrencyChange={(currency) => updateDraft({ currency })}
-                onChange={(minimumOrderValue) =>
-                  updateDraft({ minimumOrderValue })
-                }
-                placeholder="Enter minimum spend"
-                value={draft.minimumOrderValue}
-              />
+          {activeStep === "basics" ? (
+            <section className="grid gap-4">
               <TextField
-                label="Max uses per contact"
-                onChange={(maxUsesPerContact) =>
-                  updateDraft({ maxUsesPerContact })
-                }
-                placeholder="Enter max uses per contact"
-                type="number"
-                value={draft.maxUsesPerContact}
+                label="Title"
+                onChange={(title) => updateDraft({ title })}
+                placeholder="Enter discount title"
+                value={draft.title}
               />
-              <TextField
-                label="Total usage limit"
-                onChange={(totalUsageLimit) => updateDraft({ totalUsageLimit })}
-                placeholder="Enter total usage limit"
-                type="number"
-                value={draft.totalUsageLimit}
+              <TextAreaField
+                label="Description"
+                onChange={(description) => updateDraft({ description })}
+                placeholder="Enter discount description"
+                value={draft.description}
               />
-              <OptionPicker
-                label="Target tags"
-                onChange={(targetTags) =>
-                  updateDraft({ targetTags: targetTags.join(", ") })
-                }
-                options={offeringTagOptions}
-                placeholder="Select offering tags"
-                selected={splitSelected(draft.targetTags)}
-              />
-              <OptionPicker
-                label="Target badges"
-                onChange={(targetBadgeTypes) =>
-                  updateDraft({ targetBadgeTypes: targetBadgeTypes.join(", ") })
-                }
-                options={DEFAULT_BADGE_OPTIONS}
-                placeholder="Select badges"
-                selected={splitSelected(draft.targetBadgeTypes)}
-              />
-            </div>
-          </section>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label="Discount code"
+                  onChange={(code) => updateDraft({ code: code.toUpperCase() })}
+                  placeholder="Enter discount code"
+                  value={draft.code}
+                />
+              </div>
+            </section>
+          ) : null}
 
-          <section className="grid gap-4 border-t border-border pt-4">
-            <h3 className="text-callout font-semibold text-[#2F4B4F]">Schedule</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-footnote font-normal text-[#2F4B4F]">
-                  Starts at
-                </span>
-                <AppDatePicker
-                  ariaLabel="Choose discount start date"
-                  onChange={(date) => updateDraft({ startsAt: dateToDateInput(date) })}
-                  value={dateInputToDate(draft.startsAt)}
+          {activeStep === "reward" ? (
+            <section className="grid gap-4">
+              <h3 className="text-callout font-semibold text-[#2F4B4F]">
+                Reward
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SelectField
+                  label="Reward type"
+                  onChange={(rewardType) =>
+                    updateDraft({
+                      buyQuantity: "",
+                      freebieGiftId: "",
+                      getQuantity: "",
+                      maxDiscountAmount:
+                        rewardType === "percentage_discount"
+                          ? draft.maxDiscountAmount
+                          : "",
+                      rewardType: rewardType as RewardType,
+                      rewardValue: "",
+                    })
+                  }
+                  options={rewardTypes.map((rewardType) => ({
+                    label: formatDiscountLabel(rewardType),
+                    value: rewardType,
+                  }))}
+                  value={draft.rewardType}
                 />
-              </label>
-              <label className="grid gap-2">
-                <span className="text-footnote font-normal text-[#2F4B4F]">
-                  Ends at
-                </span>
-                <AppDatePicker
-                  ariaLabel="Choose discount end date"
-                  onChange={(date) => updateDraft({ endsAt: dateToDateInput(date) })}
-                  popoverAlign="right"
-                  value={dateInputToDate(draft.endsAt)}
+                <RewardValueFields
+                  draft={draft}
+                  gifts={gifts}
+                  onChange={updateDraft}
+                  onCreateGift={openGiftDialog}
                 />
-              </label>
-            </div>
-          </section>
+              </div>
+            </section>
+          ) : null}
+
+          {activeStep === "applies_to" ? (
+            <section className="grid gap-4">
+              <h3 className="text-callout font-semibold text-[#2F4B4F]">
+                Applies To
+              </h3>
+              <div className="grid gap-4">
+                <SelectField
+                  label="Apply discount to"
+                  onChange={(applicabilityScope) =>
+                    updateDraft({
+                      applicabilityScope:
+                        applicabilityScope as DiscountApplicabilityScope,
+                      offeringIds: "",
+                    })
+                  }
+                  options={applicabilityOptions}
+                  value={draft.applicabilityScope}
+                />
+
+                {draft.applicabilityScope === "specific_offerings" ? (
+                  <OfferingPicker
+                    itemLabel={itemLabel}
+                    onChange={(offeringIds) =>
+                      updateDraft({ offeringIds: offeringIds.join(", ") })
+                    }
+                    rewardLabel={getDraftRewardLabel(draft)}
+                    selected={splitSelected(draft.offeringIds)}
+                  />
+                ) : null}
+              </div>
+            </section>
+          ) : null}
+
+          {activeStep === "limits" ? (
+            <section className="grid gap-4">
+              <h3 className="text-callout font-semibold text-[#2F4B4F]">
+                Limits
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <MoneyField
+                  label="Minimum spend"
+                  onChange={(minimumOrderValue) =>
+                    updateDraft({ minimumOrderValue })
+                  }
+                  placeholder="Enter minimum spend"
+                  value={draft.minimumOrderValue}
+                />
+                <TextField
+                  label="Max uses per contact"
+                  onChange={(maxUsesPerContact) =>
+                    updateDraft({ maxUsesPerContact })
+                  }
+                  placeholder="Enter max uses per contact"
+                  type="number"
+                  value={draft.maxUsesPerContact}
+                />
+                <TextField
+                  label="Total usage limit"
+                  onChange={(totalUsageLimit) =>
+                    updateDraft({ totalUsageLimit })
+                  }
+                  placeholder="Enter total usage limit"
+                  type="number"
+                  value={draft.totalUsageLimit}
+                />
+              </div>
+            </section>
+          ) : null}
+
+          {activeStep === "schedule" ? (
+            <section className="grid gap-4">
+              <h3 className="text-callout font-semibold text-[#2F4B4F]">
+                Schedule
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-2">
+                  <span className="text-footnote font-normal text-[#2F4B4F]">
+                    Starts at
+                  </span>
+                  <AppDatePicker
+                    ariaLabel="Choose discount start date"
+                    onChange={(date) =>
+                      updateDraft({ startsAt: dateToDateInput(date) })
+                    }
+                    value={dateInputToDate(draft.startsAt)}
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-footnote font-normal text-[#2F4B4F]">
+                    Ends at
+                  </span>
+                  <AppDatePicker
+                    ariaLabel="Choose discount end date"
+                    onChange={(date) =>
+                      updateDraft({ endsAt: dateToDateInput(date) })
+                    }
+                    popoverAlign="right"
+                    value={dateInputToDate(draft.endsAt)}
+                  />
+                </label>
+              </div>
+            </section>
+          ) : null}
         </form>
       </AppSheet>
 
@@ -300,61 +409,264 @@ export function DiscountEditorSheet({
         onClose={() => setIsGiftDialogOpen(false)}
         onSave={handleCreateGift}
         open={isGiftDialogOpen}
-        tagOptions={offeringTagOptions}
       />
     </>
   );
 }
 
-function CodeField({
-  autoEnabled,
-  label,
-  onChange,
-  onToggleAuto,
-  placeholder,
-  value,
+function DiscountEditorStepper({
+  activeStep,
 }: {
-  autoEnabled: boolean;
-  label: string;
-  onChange: (value: string) => void;
-  onToggleAuto: (enabled: boolean) => void;
-  placeholder: string;
-  value: string;
+  activeStep: DiscountEditorStep;
+}) {
+  const activeIndex = discountEditorSteps.findIndex(
+    (step) => step.key === activeStep,
+  );
+
+  return (
+    <div className="flex w-full items-center gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {discountEditorSteps.map((step, index) => {
+        const isActive = index === activeIndex;
+        const isComplete = index < activeIndex;
+
+        return (
+          <React.Fragment key={step.key}>
+            <div className="flex shrink-0 items-center gap-2">
+              <span
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full border text-footnote font-semibold",
+                  isActive
+                    ? "border-primary bg-primary text-white"
+                    : isComplete
+                      ? "border-primary bg-secondary text-primary"
+                      : "border-border bg-white text-[#2F4B4F]/55",
+                )}
+              >
+                {isComplete ? <CheckCircle2 className="size-4" /> : index + 1}
+              </span>
+              <span
+                className={cn(
+                  "whitespace-nowrap text-callout font-semibold",
+                  isActive || isComplete ? "text-primary" : "text-[#2F4B4F]/55",
+                )}
+              >
+                {step.label}
+              </span>
+            </div>
+            {index < discountEditorSteps.length - 1 ? (
+              <span
+                className={cn(
+                  "h-px min-w-8 flex-1",
+                  isComplete ? "bg-primary" : "bg-border",
+                )}
+              />
+            ) : null}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+function OfferingPicker({
+  itemLabel,
+  onChange,
+  rewardLabel,
+  selected,
+}: {
+  itemLabel: string;
+  onChange: (selected: string[]) => void;
+  rewardLabel: string;
+  selected: string[];
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const normalizedSearch = search.trim();
+  const { data: offeringsPage, isFetching } = useGetOfferingsPageQuery(
+    {
+      limit: normalizedSearch ? 10 : 5,
+      query: normalizedSearch || undefined,
+    },
+    { skip: !open },
+  );
+  const offerings = offeringsPage?.offerings ?? [];
+  const summary =
+    selected.length > 0 ? `${selected.length} selected` : `Select ${itemLabel}`;
+
+  function toggle(offeringId: string) {
+    onChange(
+      selected.includes(offeringId)
+        ? selected.filter((id) => id !== offeringId)
+        : [...selected, offeringId],
+    );
+  }
+
+  return (
+    <fieldset className="grid gap-2">
+      <span className="text-footnote font-normal text-[#2F4B4F]">
+        {itemLabel}
+      </span>
+      <button
+        className="flex h-12 items-center justify-between gap-3 rounded-sm border border-border bg-fill px-3 text-left text-callout text-[#2F4B4F] outline-none transition hover:bg-secondary/30 focus:border-primary focus:bg-white"
+        onClick={() => setOpen(true)}
+        type="button"
+      >
+        <span
+          className={selected.length > 0 ? "font-semibold" : "text-[#2F4B4F]/45"}
+        >
+          {summary}
+        </span>
+        <ChevronDown
+          className="size-4 shrink-0 text-[#2F4B4F]/65"
+        />
+      </button>
+
+      {open ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#102A2D]/45 p-4">
+          <button
+            aria-label={`Close ${itemLabel} picker`}
+            className="absolute inset-0 cursor-default"
+            onClick={() => setOpen(false)}
+            type="button"
+          />
+          <div
+            aria-modal="true"
+            className="relative flex max-h-[86vh] w-full max-w-2xl flex-col overflow-hidden rounded-md bg-white text-[#2F4B4F] shadow-xl"
+            role="dialog"
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-border p-5">
+              <div>
+                <h2 className="text-title-3 font-semibold text-[#2F4B4F]">
+                  Select {itemLabel}
+                </h2>
+              </div>
+              <button
+                aria-label="Close"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-fill text-[#2F4B4F] hover:bg-secondary"
+                onClick={() => setOpen(false)}
+                type="button"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="border-b border-border p-4">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/50" />
+                <input
+                  className="h-11 w-full rounded-sm border border-border bg-fill pl-10 pr-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={`Search ${itemLabel.toLowerCase()}`}
+                  type="search"
+                  value={search}
+                />
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {isFetching ? (
+                <p className="rounded-md border border-border bg-fill px-4 py-3 text-callout text-[#2F4B4F]/65">
+                  Loading {itemLabel.toLowerCase()}...
+                </p>
+              ) : offerings.length ? (
+                <div className="grid gap-2">
+                  {offerings.map((offering) => (
+                    <OfferingPickerRow
+                      checked={selected.includes(offering.id)}
+                      key={offering.id}
+                      offering={offering}
+                      onToggle={toggle}
+                      rewardLabel={rewardLabel}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-md border border-border bg-fill px-4 py-3 text-callout text-[#2F4B4F]/65">
+                  No {itemLabel.toLowerCase()} found.
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between gap-3 border-t border-border p-4">
+              <span className="text-caption-1 font-semibold text-[#2F4B4F]/65">
+                {selected.length} selected
+              </span>
+              <Button onClick={() => setOpen(false)} type="button">
+                Done
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </fieldset>
+  );
+}
+
+function OfferingPickerRow({
+  checked,
+  offering,
+  onToggle,
+  rewardLabel,
+}: {
+  checked: boolean;
+  offering: OfferingData;
+  onToggle: (offeringId: string) => void;
+  rewardLabel: string;
 }) {
   return (
-    <div className="grid gap-2 sm:col-span-2">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
-        <label className="inline-flex items-center gap-2 text-caption-1 font-semibold text-[#2F4B4F]/70">
-          <input
-            checked={autoEnabled}
-            className="size-4 accent-primary"
-            onChange={(event) => onToggleAuto(event.target.checked)}
-            type="checkbox"
-          />
-          Unique per contact
-        </label>
-      </div>
-      <div
-        className={cn(
-          "flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white",
-          autoEnabled && "bg-secondary/30",
-        )}
+    <div
+      className="flex w-full items-center gap-3 rounded-md px-3 py-3 transition hover:bg-fill"
+    >
+      <AppCheckbox
+        checked={checked}
+        label={`Select ${offering.name}`}
+        onCheckedChange={() => onToggle(offering.id)}
+      />
+      <button
+        className="flex min-w-0 flex-1 items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+        onClick={() => onToggle(offering.id)}
+        type="button"
       >
-        <span className="flex w-12 shrink-0 items-center justify-center border-r border-border text-primary">
-          <Sparkles className="size-4" />
+        <OfferingPickerImage offering={offering} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-callout font-semibold text-[#2F4B4F]">
+            {offering.name}
+          </span>
+          <span className="mt-1 block truncate text-caption-1 text-[#2F4B4F]/60">
+            {offering.category?.name ?? offering.subType ?? "No category"}
+          </span>
         </span>
-        <input
-          className="min-w-0 flex-1 bg-transparent px-3 text-callout font-semibold uppercase text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40 disabled:text-[#2F4B4F]/55"
-          disabled={autoEnabled}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder={
-            autoEnabled ? "Generated uniquely for each contact" : placeholder
-          }
-          value={autoEnabled ? "" : value}
-        />
-      </div>
+        <span className="shrink-0 text-right">
+          <span className="inline-flex items-center justify-end gap-2">
+            <span className="text-callout font-semibold text-[#2F4B4F]">
+              {formatDiscountedOfferingPrice(offering, rewardLabel)}
+            </span>
+            <span className="rounded-full bg-primary px-2.5 py-1 text-caption-1 font-semibold text-white">
+              {rewardLabel}
+            </span>
+          </span>
+          <span className="mt-1 block text-caption-1 text-[#2F4B4F]/45 line-through">
+            {formatOfferingPrice(offering)}
+          </span>
+        </span>
+      </button>
     </div>
+  );
+}
+
+function OfferingPickerImage({ offering }: { offering: OfferingData }) {
+  const imageUrl = offering.imageUrls?.[0];
+
+  return imageUrl ? (
+    <img
+      alt=""
+      className="size-12 shrink-0 rounded-md object-cover"
+      src={imageUrl}
+    />
+  ) : (
+    <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-fill text-[#2F4B4F]/55">
+      <Package className="size-5" />
+    </span>
   );
 }
 
@@ -379,9 +691,7 @@ function RewardValueFields({
           value={draft.rewardValue}
         />
         <MoneyField
-          currency={draft.currency}
           label="Max discount amount"
-          onCurrencyChange={(currency) => onChange({ currency })}
           onChange={(maxDiscountAmount) => onChange({ maxDiscountAmount })}
           placeholder="Enter max discount amount"
           value={draft.maxDiscountAmount}
@@ -396,14 +706,12 @@ function RewardValueFields({
   ) {
     return (
       <MoneyField
-        currency={draft.currency}
         label={
           draft.rewardType === "cashback_credit"
             ? "Cashback amount"
             : "Discount amount"
         }
         onChange={(rewardValue) => onChange({ rewardValue })}
-        onCurrencyChange={(currency) => onChange({ currency })}
         placeholder="Enter amount"
         value={draft.rewardValue}
       />
@@ -443,18 +751,7 @@ function RewardValueFields({
     );
   }
 
-  if (draft.rewardType === "custom_perk") {
-    return (
-      <TextAreaField
-        label="Perk description"
-        onChange={(perkDescription) => onChange({ perkDescription })}
-        placeholder="Enter perk description"
-        value={draft.perkDescription}
-      />
-    );
-  }
-
-  return <ReadOnlyField label="Discount value" value="Free shipping" />;
+  return null;
 }
 
 function GiftPicker({
@@ -480,11 +777,13 @@ function GiftPicker({
           value={value}
         >
           <option value="">Select gift</option>
-          {gifts.map((gift) => (
-            <option key={gift.id} value={gift.id}>
-              {gift.name} | {gift.id}
-            </option>
-          ))}
+          {gifts
+            .filter((gift) => gift.status === "active" || gift.id === value)
+            .map((gift) => (
+              <option key={gift.id} value={gift.id}>
+                {gift.name}
+              </option>
+            ))}
         </select>
         <button
           aria-label="Create gift"
@@ -505,16 +804,57 @@ function GiftQuickCreateDialog({
   onClose,
   onSave,
   open,
-  tagOptions,
 }: {
   draft: GiftDraft;
   onChange: (updates: Partial<GiftDraft>) => void;
   onClose: () => void;
-  onSave: () => void;
+  onSave: () => Promise<void>;
   open: boolean;
-  tagOptions: string[];
 }) {
+  const [activeStep, setActiveStep] =
+    React.useState<GiftEditorStep>("basics");
+  const [creating, setCreating] = React.useState(false);
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const activeStepIndex = giftEditorSteps.findIndex(
+    (step) => step.key === activeStep,
+  );
+  const isFinalStep = activeStepIndex === giftEditorSteps.length - 1;
+
+  React.useEffect(() => {
+    if (open) {
+      setActiveStep("basics");
+      setSaveError(null);
+    }
+  }, [open]);
+
   if (!open) return null;
+
+  function goToPreviousStep() {
+    if (activeStepIndex === 0) {
+      onClose();
+      return;
+    }
+
+    setActiveStep(giftEditorSteps[activeStepIndex - 1].key);
+  }
+
+  function goToNextStep() {
+    if (activeStepIndex >= giftEditorSteps.length - 1) return;
+    setActiveStep(giftEditorSteps[activeStepIndex + 1].key);
+  }
+
+  async function createGift() {
+    setCreating(true);
+    setSaveError(null);
+
+    try {
+      await onSave();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Save failed");
+    } finally {
+      setCreating(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#102A2D]/45 p-4">
@@ -547,26 +887,48 @@ function GiftQuickCreateDialog({
             <X className="size-5" />
           </button>
         </div>
-        <div className="p-6">
-          <GiftForm draft={draft} onChange={onChange} tagOptions={tagOptions} />
+        <div className="grid gap-5 p-6">
+          <GiftEditorStepper activeStep={activeStep} />
+          {saveError ? (
+            <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
+              {saveError}
+            </p>
+          ) : null}
+          <GiftForm
+            activeStep={activeStep}
+            draft={draft}
+            onChange={onChange}
+          />
         </div>
-        <div className="flex items-center justify-end gap-3 border-t border-border p-6">
+        <div className="flex items-center justify-between gap-3 border-t border-border p-6">
           <Button
             className="bg-fill text-[#2F4B4F] hover:bg-fill-secondary"
-            onClick={onClose}
+            icon={activeStepIndex === 0 ? undefined : <ChevronLeft />}
+            onClick={goToPreviousStep}
             type="button"
             variant="secondary"
           >
-            Cancel
+            {activeStepIndex === 0 ? "Cancel" : "Back"}
           </Button>
-          <Button
-            disabled={!draft.name.trim()}
-            icon={<CheckCircle2 />}
-            onClick={onSave}
-            type="button"
-          >
-            Create gift
-          </Button>
+          {!isFinalStep ? (
+            <Button
+              disabled={!draft.name.trim()}
+              icon={<ChevronRight />}
+              onClick={goToNextStep}
+              type="button"
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button
+              disabled={!draft.name.trim() || creating}
+              icon={<CheckCircle2 />}
+              onClick={createGift}
+              type="button"
+            >
+              {creating ? "Creating..." : "Create gift"}
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -605,17 +967,13 @@ function PercentField({
 }
 
 function MoneyField({
-  currency,
   label,
   onChange,
-  onCurrencyChange,
   placeholder,
   value,
 }: {
-  currency: string;
   label: string;
   onChange: (value: string) => void;
-  onCurrencyChange: (value: string) => void;
   placeholder: string;
   value: string;
 }) {
@@ -623,21 +981,9 @@ function MoneyField({
     <label className="grid gap-2">
       <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex h-12 overflow-hidden rounded-sm border border-border bg-fill transition focus-within:border-primary focus-within:bg-white">
-        <div className="relative flex w-20 shrink-0 items-center border-r border-border">
-          <select
-            aria-label={`${label} currency`}
-            className="h-full w-full appearance-none bg-transparent py-0 pl-3 pr-8 text-callout font-semibold leading-none text-[#2F4B4F] outline-none"
-            onChange={(event) => onCurrencyChange(event.target.value)}
-            value={currency}
-          >
-            {currencies.map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.code}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-[#2F4B4F]/65" />
-        </div>
+        <span className="flex w-16 shrink-0 items-center justify-center border-r border-border text-callout font-semibold text-[#2F4B4F]">
+          NGN
+        </span>
         <input
           className="min-w-0 flex-1 bg-transparent px-3 text-callout text-[#2F4B4F] outline-none placeholder:text-[#2F4B4F]/40"
           inputMode="decimal"
@@ -648,94 +994,6 @@ function MoneyField({
         />
       </div>
     </label>
-  );
-}
-
-function ReadOnlyField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid gap-2">
-      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
-      <div className="flex h-12 items-center rounded-sm border border-border bg-fill px-3 text-callout font-semibold text-[#2F4B4F]/70">
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function OptionPicker({
-  formatOption = formatLabel,
-  label,
-  onChange,
-  options,
-  placeholder,
-  selected,
-}: {
-  formatOption?: (option: string) => string;
-  label: string;
-  onChange: (selected: string[]) => void;
-  options: string[];
-  placeholder: string;
-  selected: string[];
-}) {
-  const [open, setOpen] = React.useState(false);
-  const summary =
-    selected.length > 0 ? `${selected.length} selected` : placeholder;
-
-  function toggle(option: string) {
-    const nextSelected = selected.includes(option)
-      ? selected.filter((item) => item !== option)
-      : [...selected, option];
-
-    onChange(nextSelected);
-  }
-
-  return (
-    <fieldset className="relative grid gap-2">
-      <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
-      <button
-        aria-expanded={open}
-        className="flex h-12 items-center justify-between gap-3 rounded-sm border border-border bg-fill px-3 text-left text-callout text-[#2F4B4F] outline-none transition hover:bg-secondary/30 focus:border-primary focus:bg-white"
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-      >
-        <span
-          className={selected.length > 0 ? "font-semibold" : "text-[#2F4B4F]/45"}
-        >
-          {summary}
-        </span>
-        <ChevronDown
-          className={cn(
-            "size-4 shrink-0 text-[#2F4B4F]/65 transition",
-            open ? "rotate-180" : null,
-          )}
-        />
-      </button>
-      {open ? (
-        <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-64 overflow-y-auto rounded-md border border-border bg-white p-3 shadow-lg">
-          <div className="flex flex-wrap gap-2">
-            {options.map((option) => {
-              const active = selected.includes(option);
-
-              return (
-                <button
-                  className={cn(
-                    "rounded-md border px-3 py-2 text-callout font-semibold transition",
-                    active
-                      ? "border-primary bg-secondary text-primary"
-                      : "border-border bg-fill text-[#2F4B4F]/70 hover:bg-secondary/40",
-                  )}
-                  key={option}
-                  onClick={() => toggle(option)}
-                  type="button"
-                >
-                  {formatOption(option)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </fieldset>
   );
 }
 
@@ -810,6 +1068,58 @@ function splitSelected(value: string) {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function getBusinessItemLabel(singular: string) {
+  return singular.toLowerCase().endsWith("item")
+    ? `${singular}s`
+    : `${singular} items`;
+}
+
+function getDraftRewardLabel(draft: DiscountFormDraft) {
+  if (draft.rewardType === "percentage_discount") {
+    return `${draft.rewardValue || 0}% off`;
+  }
+
+  if (draft.rewardType === "fixed_amount_discount") {
+    return `${formatCurrency(Number(draft.rewardValue || 0))} off`;
+  }
+
+  return formatDiscountLabel(draft.rewardType);
+}
+
+function formatOfferingPrice(offering: OfferingData) {
+  if (offering.price == null) return "No price";
+
+  return new Intl.NumberFormat("en-NG", {
+    currency: offering.currency ?? "NGN",
+    style: "currency",
+  }).format(offering.price);
+}
+
+function formatDiscountedOfferingPrice(
+  offering: OfferingData,
+  rewardLabel: string,
+) {
+  if (offering.price == null) return "No price";
+
+  const percentMatch = rewardLabel.match(/^(\d+(?:\.\d+)?)% off$/);
+  if (!percentMatch) return formatOfferingPrice(offering);
+
+  const discountPercent = Number(percentMatch[1]);
+  const discountedPrice = offering.price * (1 - discountPercent / 100);
+
+  return new Intl.NumberFormat("en-NG", {
+    currency: offering.currency ?? "NGN",
+    style: "currency",
+  }).format(Math.max(discountedPrice, 0));
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-NG", {
+    currency: "NGN",
+    style: "currency",
+  }).format(value);
 }
 
 function formatAmount(value: string) {

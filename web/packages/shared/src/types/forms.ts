@@ -44,12 +44,11 @@ export type GiftDraft = {
   currency: string;
   description: string;
   estimatedValue: string;
+  imageBase64: string;
   imageUrl: string;
-  maxPerContact: string;
   name: string;
   quantityAvailable: string;
   status: GiftStatusType;
-  tags: string;
 };
 
 export type OrderDraft = {
@@ -77,10 +76,9 @@ export type OrderDraft = {
 };
 
 export type DiscountFormDraft = {
+  applicabilityScope: import("../models").DiscountApplicabilityScope;
   buyQuantity: string;
   code: string;
-  codeGeneration: "manual" | "unique_per_contact";
-  currency: string;
   description: string;
   endsAt: string;
   freebieGiftId: string;
@@ -88,13 +86,11 @@ export type DiscountFormDraft = {
   maxDiscountAmount: string;
   maxUsesPerContact: string;
   minimumOrderValue: string;
-  perkDescription: string;
+  offeringIds: string;
   rewardType: RewardType;
   rewardValue: string;
   startsAt: string;
   status: DiscountStatusType;
-  targetBadgeTypes: string;
-  targetTags: string;
   title: string;
   totalUsageLimit: string;
 };
@@ -115,6 +111,7 @@ export type OfferingFormDraft = {
   inventoryTrackQuantity: boolean;
   options: OfferingOptionDraft[];
   checkoutIntents: OfferingCheckoutIntentType[];
+  discountIds: string[];
   locationAddress: string;
   locationCity: string;
   locationCountry: string;

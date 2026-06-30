@@ -74,6 +74,21 @@ class StorageService {
     });
   }
 
+  static async uploadBusinessGiftImage(
+    businessId: string,
+    giftId: string,
+    file: DecodedBase64File,
+  ): Promise<string> {
+    validateImage(file);
+
+    const extension = extensionForContentType(file.contentType);
+    return this.uploadFile({
+      buffer: file.buffer,
+      contentType: file.contentType,
+      destination: `business/${businessId}/gifts/${giftId}/image.${extension}`,
+    });
+  }
+
   static decodeBase64Image(value: string): DecodedBase64File {
     return decodeBase64Image(value);
   }

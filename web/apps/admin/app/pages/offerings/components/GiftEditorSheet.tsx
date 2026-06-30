@@ -1,15 +1,21 @@
 import * as React from "react";
-import { CheckCircle2, ChevronDown, Plus } from "lucide-react";
 import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
+import {
+  AppSelectField,
   AppSheet,
   AppTextareaField,
   AppTextField,
   Button,
   cn,
 } from "@piya/ui";
-import { useGetOfferingsQuery } from "@piya/shared";
 import type { GiftData } from "@piya/shared/models";
-import type { GiftDraft } from "@piya/shared/types";
+import type { GiftDraft, GiftInput } from "@piya/shared/types";
 import {
   createEmptyGiftDraft,
   createGiftDraft,
@@ -17,13 +23,19 @@ import {
 } from "@piya/shared/utils";
 
 type EditorMode = "create" | "edit";
+export type GiftEditorStep =
+  | "basics"
+  | "value"
+  | "availability"
+  | "media";
 
 type GiftEditorSheetProps = {
   gift: GiftData | null;
   mode: EditorMode;
   onClose: () => void;
-  onSave: (gift: GiftData) => void;
+  onSave: (gift: GiftInput) => Promise<void> | void;
   open: boolean;
+  saving?: boolean;
 };
 
 const currencies = [
@@ -33,23 +45,37 @@ const currencies = [
   { code: "KES", label: "Kenya shilling" },
   { code: "ZAR", label: "South African rand" },
 ];
+
+export const giftEditorSteps: { key: GiftEditorStep; label: string }[] = [
+  { key: "basics", label: "Basics" },
+  { key: "value", label: "Value" },
+  { key: "availability", label: "Availability" },
+  { key: "media", label: "Media" },
+];
+
 export function GiftEditorSheet({
   gift,
   mode,
   onClose,
   onSave,
   open,
+  saving = false,
 }: GiftEditorSheetProps) {
-  const { data: offerings = [] } = useGetOfferingsQuery();
   const [draft, setDraft] = React.useState<GiftDraft>(createEmptyGiftDraft);
+  const [activeStep, setActiveStep] =
+    React.useState<GiftEditorStep>("basics");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
   const isEditing = mode === "edit";
-  const offeringTagOptions = React.useMemo(
-    () => Array.from(new Set(offerings.flatMap((offering) => offering.tags))).sort(),
-    [offerings],
+  const activeStepIndex = giftEditorSteps.findIndex(
+    (step) => step.key === activeStep,
   );
+  const isFinalStep = activeStepIndex === giftEditorSteps.length - 1;
+  const canContinue = Boolean(draft.name.trim());
 
   React.useEffect(() => {
     if (open) {
+      setActiveStep("basics");
+      setSaveError(null);
       setDraft(gift ? createGiftDraft(gift) : createEmptyGiftDraft());
     }
   }, [gift, open]);
@@ -58,9 +84,29 @@ export function GiftEditorSheet({
     setDraft((current) => ({ ...current, ...updates }));
   }
 
-  function handleSave() {
-    onSave(draftToGift({ ...draft, status: "active" }, gift));
-    onClose();
+  function goToPreviousStep() {
+    if (activeStepIndex === 0) {
+      onClose();
+      return;
+    }
+
+    setActiveStep(giftEditorSteps[activeStepIndex - 1].key);
+  }
+
+  function goToNextStep() {
+    if (activeStepIndex >= giftEditorSteps.length - 1) return;
+    setActiveStep(giftEditorSteps[activeStepIndex + 1].key);
+  }
+
+  async function saveGift() {
+    setSaveError(null);
+
+    try {
+      await onSave(draftToGift(draft));
+      onClose();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Save failed");
+    }
   }
 
   return (
@@ -68,17 +114,38 @@ export function GiftEditorSheet({
       ariaLabel={isEditing ? "edit gift sheet" : "create gift sheet"}
       footer={
         <>
-          <Button onClick={onClose} type="button" variant="secondary">
-            Cancel
-          </Button>
           <Button
-            disabled={!draft.name.trim()}
-            icon={<CheckCircle2 />}
-            onClick={handleSave}
+            className="bg-fill text-[#2F4B4F] hover:bg-fill-secondary"
+            icon={activeStepIndex === 0 ? undefined : <ChevronLeft />}
+            onClick={goToPreviousStep}
             type="button"
+            variant="secondary"
           >
-            {isEditing ? "Save changes" : "Create gift"}
+            {activeStepIndex === 0 ? "Cancel" : "Back"}
           </Button>
+          {!isFinalStep ? (
+            <Button
+              disabled={!canContinue}
+              icon={<ChevronRight />}
+              onClick={goToNextStep}
+              type="button"
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button
+              disabled={!canContinue || saving}
+              icon={<CheckCircle2 />}
+              onClick={saveGift}
+              type="button"
+            >
+              {saving
+                ? "Saving..."
+                : isEditing
+                  ? "Save changes"
+                  : "Create gift"}
+            </Button>
+          )}
         </>
       }
       maxWidthClassName="max-w-2xl"
@@ -86,39 +153,108 @@ export function GiftEditorSheet({
       open={open}
       title={isEditing ? "Edit gift" : "Create gift"}
     >
-      <GiftForm
-        draft={draft}
-        onChange={updateDraft}
-        tagOptions={offeringTagOptions}
-      />
+      <div className="grid gap-5">
+        <GiftEditorStepper activeStep={activeStep} />
+
+        {saveError ? (
+          <p className="rounded-sm border border-error/30 bg-error/10 px-3 py-2 text-callout text-error">
+            {saveError}
+          </p>
+        ) : null}
+
+        <GiftForm
+          activeStep={activeStep}
+          draft={draft}
+          onChange={updateDraft}
+        />
+      </div>
     </AppSheet>
   );
 }
 
+export function GiftEditorStepper({
+  activeStep,
+}: {
+  activeStep: GiftEditorStep;
+}) {
+  const activeIndex = giftEditorSteps.findIndex(
+    (step) => step.key === activeStep,
+  );
+
+  return (
+    <div className="flex w-full items-center gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {giftEditorSteps.map((step, index) => {
+        const isActive = index === activeIndex;
+        const isComplete = index < activeIndex;
+
+        return (
+          <React.Fragment key={step.key}>
+            <div className="flex shrink-0 items-center gap-2">
+              <span
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full border text-footnote font-semibold",
+                  isActive
+                    ? "border-primary bg-primary text-white"
+                    : isComplete
+                      ? "border-primary bg-secondary text-primary"
+                      : "border-border bg-white text-[#2F4B4F]/55",
+                )}
+              >
+                {isComplete ? <CheckCircle2 className="size-4" /> : index + 1}
+              </span>
+              <span
+                className={cn(
+                  "whitespace-nowrap text-callout font-semibold",
+                  isActive || isComplete ? "text-primary" : "text-[#2F4B4F]/55",
+                )}
+              >
+                {step.label}
+              </span>
+            </div>
+            {index < giftEditorSteps.length - 1 ? (
+              <span
+                className={cn(
+                  "h-px min-w-8 flex-1",
+                  isComplete ? "bg-primary" : "bg-border",
+                )}
+              />
+            ) : null}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
 export function GiftForm({
+  activeStep,
   draft,
   onChange,
-  tagOptions,
 }: {
+  activeStep: GiftEditorStep;
   draft: GiftDraft;
   onChange: (updates: Partial<GiftDraft>) => void;
-  tagOptions: string[];
 }) {
   return (
     <form className="grid gap-4">
-      <TextField
-        label="Gift name"
-        onChange={(name) => onChange({ name })}
-        placeholder="Enter gift name"
-        value={draft.name}
-      />
-      <TextAreaField
-        label="Description"
-        onChange={(description) => onChange({ description })}
-        placeholder="Enter gift description"
-        value={draft.description}
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
+      {activeStep === "basics" ? (
+        <>
+          <TextField
+            label="Gift name"
+            onChange={(name) => onChange({ name })}
+            placeholder="Enter gift name"
+            value={draft.name}
+          />
+          <TextAreaField
+            label="Description"
+            onChange={(description) => onChange({ description })}
+            placeholder="Enter gift description"
+            value={draft.description}
+          />
+        </>
+      ) : null}
+
+      {activeStep === "value" ? (
         <MoneyField
           currency={draft.currency}
           label="Estimated value"
@@ -127,31 +263,41 @@ export function GiftForm({
           placeholder="Enter estimated value"
           value={draft.estimatedValue}
         />
-        <TextField
-          label="Quantity available"
-          onChange={(quantityAvailable) => onChange({ quantityAvailable })}
-          placeholder="Enter quantity available"
-          type="number"
-          value={draft.quantityAvailable}
+      ) : null}
+
+      {activeStep === "availability" ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            label="Quantity available"
+            onChange={(quantityAvailable) => onChange({ quantityAvailable })}
+            placeholder="Leave blank for unlimited"
+            type="number"
+            value={draft.quantityAvailable}
+          />
+          <AppSelectField
+            label="Status"
+            onChange={(event) =>
+              onChange({
+                status: event.target.value as GiftDraft["status"],
+              })
+            }
+            options={[
+              { label: "Active", value: "active" },
+              { label: "Disabled", value: "disabled" },
+            ]}
+            value={draft.status}
+          />
+        </div>
+      ) : null}
+
+      {activeStep === "media" ? (
+        <ImageUploadBox
+          imageBase64={draft.imageBase64}
+          imageUrl={draft.imageUrl}
+          label="Image"
+          onChange={(imageBase64) => onChange({ imageBase64 })}
         />
-        <TextField
-          label="Max per contact"
-          onChange={(maxPerContact) => onChange({ maxPerContact })}
-          placeholder="Enter max per contact"
-          type="number"
-          value={draft.maxPerContact}
-        />
-        <TagPicker
-          onChange={(tags) => onChange({ tags })}
-          options={tagOptions}
-          selected={draft.tags}
-        />
-      </div>
-      <ImageUploadBox
-        label="Image"
-        onChange={(imageUrl) => onChange({ imageUrl })}
-        value={draft.imageUrl}
-      />
+      ) : null}
     </form>
   );
 }
@@ -248,116 +394,56 @@ function TextAreaField({
   );
 }
 
-function TagPicker({
-  onChange,
-  options,
-  selected,
-}: {
-  onChange: (tags: string) => void;
-  options: string[];
-  selected: string;
-}) {
-  const [open, setOpen] = React.useState(false);
-  const selectedTags = splitTags(selected);
-  const label =
-    selectedTags.length > 0 ? `${selectedTags.length} selected` : "Select tags";
-
-  function toggle(tag: string) {
-    const nextTags = selectedTags.includes(tag)
-      ? selectedTags.filter((item) => item !== tag)
-      : [...selectedTags, tag];
-
-    onChange(nextTags.join(", "));
-  }
-
-  return (
-    <fieldset className="relative grid gap-2">
-      <span className="text-footnote font-normal text-[#2F4B4F]">Tags</span>
-      <button
-        className="flex h-12 items-center justify-between gap-3 rounded-sm border border-border bg-fill px-3 text-left text-callout text-[#2F4B4F] outline-none transition hover:bg-secondary/30 focus:border-primary focus:bg-white"
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-      >
-        <span
-          className={selectedTags.length > 0 ? "font-semibold" : "text-[#2F4B4F]/45"}
-        >
-          {label}
-        </span>
-        <ChevronDown
-          className={cn(
-            "size-4 shrink-0 text-[#2F4B4F]/65 transition",
-            open ? "rotate-180" : null,
-          )}
-        />
-      </button>
-      {open ? (
-        <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-64 overflow-y-auto rounded-md border border-border bg-white p-3 shadow-lg">
-          <div className="flex flex-wrap gap-2">
-            {options.map((tag) => {
-              const active = selectedTags.includes(tag);
-
-              return (
-                <button
-                  className={cn(
-                    "rounded-md border px-3 py-2 text-callout font-semibold transition",
-                    active
-                      ? "border-primary bg-secondary text-primary"
-                      : "border-border bg-fill text-[#2F4B4F]/70 hover:bg-secondary/40",
-                  )}
-                  key={tag}
-                  onClick={() => toggle(tag)}
-                  type="button"
-                >
-                  {formatTagLabel(tag)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </fieldset>
-  );
-}
-
 function ImageUploadBox({
+  imageBase64,
+  imageUrl,
   label,
   onChange,
-  value,
 }: {
+  imageBase64: string;
+  imageUrl: string;
   label: string;
   onChange: (value: string) => void;
-  value: string;
 }) {
-  const [imageName, setImageName] = React.useState("");
+  const [imageError, setImageError] = React.useState("");
+  const preview = imageBase64 || imageUrl;
 
-  React.useEffect(() => {
-    if (!value) {
-      setImageName("");
-    }
-  }, [value]);
-
-  function handleFiles(files: FileList | null) {
+  function selectImage(files: FileList | null) {
     const file = files?.[0];
     if (!file) return;
 
-    setImageName(file.name);
-    onChange(URL.createObjectURL(file));
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setImageError("Upload a JPG, PNG, or WebP image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("Gift image must not exceed 5 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        setImageError("Unable to read image. Please try another file.");
+        return;
+      }
+
+      setImageError("");
+      onChange(reader.result);
+    };
+    reader.onerror = () =>
+      setImageError("Unable to read image. Please try another file.");
+    reader.readAsDataURL(file);
   }
 
   return (
     <div className="grid gap-2">
       <span className="text-footnote font-normal text-[#2F4B4F]">{label}</span>
       <div className="flex flex-wrap gap-3">
-        {value ? (
-          <div
-            className="flex size-24 items-center justify-center overflow-hidden rounded-md border border-border bg-fill text-center text-caption-1 font-semibold text-[#2F4B4F]/70"
-            title={imageName || value}
-          >
-            {value.startsWith("blob:") || value.startsWith("http") ? (
-              <img alt="" className="size-full object-cover" src={value} />
-            ) : (
-              <span className="line-clamp-2 break-all">{imageName || value}</span>
-            )}
+        {preview ? (
+          <div className="flex size-24 items-center justify-center overflow-hidden rounded-md border border-border bg-fill">
+            <img alt="" className="size-full object-cover" src={preview} />
           </div>
         ) : null}
         <label className="flex size-24 cursor-pointer items-center justify-center rounded-md border border-dashed border-border bg-fill text-[#2F4B4F]/65 transition hover:border-primary hover:bg-secondary/30">
@@ -368,29 +454,21 @@ function ImageUploadBox({
             <span className="text-caption-1 font-semibold">Add image</span>
           </span>
           <input
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="sr-only"
-            onChange={(event) => handleFiles(event.currentTarget.files)}
+            onChange={(event) => {
+              selectImage(event.currentTarget.files);
+              event.currentTarget.value = "";
+            }}
             type="file"
           />
         </label>
       </div>
+      {imageError ? (
+        <p className="text-footnote text-error">{imageError}</p>
+      ) : null}
     </div>
   );
-}
-
-function splitTags(tags: string) {
-  return tags
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter(Boolean);
-}
-
-function formatTagLabel(value: string) {
-  return value
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function formatAmount(value: string) {

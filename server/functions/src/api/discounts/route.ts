@@ -1,15 +1,13 @@
 import { Router, type Response } from "express";
 import {
-  createOfferingSchema,
-  getOfferingsQuerySchema,
-  offeringParamsSchema,
-  type CreateOfferingBody,
-  type GetOfferingsQuery,
-  type OfferingParams,
-  type UpdateOfferingBody,
-  updateOfferingSchema,
-} from "../../shared/schema/offering.schema";
-import { OfferingService } from "../../shared/services/offering.service";
+  createDiscountSchema,
+  discountParamsSchema,
+  type CreateDiscountBody,
+  type DiscountParams,
+  type UpdateDiscountBody,
+  updateDiscountSchema,
+} from "../../shared/schema/discount.schema";
+import { DiscountService } from "../../shared/services/discount.service";
 import { BusinessTeamService } from "../../shared/services/team.service";
 import {
   asyncHandler,
@@ -19,72 +17,74 @@ import {
 import { API_RESPONSE } from "../../shared/utils/constants";
 import { validateRequest } from "../../shared/utils/validator";
 
-const OfferingRouter = Router();
+const DiscountRouter = Router();
 
-OfferingRouter.get(
+DiscountRouter.get(
   "/",
-  validateRequest({ query: getOfferingsQuerySchema }),
   asyncHandler(async (req, res) => {
     const membership = await getMembership(req.currentUser?.uid);
     if (!membership) return sendError(res, API_RESPONSE.unauthorized);
 
-    const page = await OfferingService.getOfferings(
+    const discounts = await DiscountService.getDiscounts(
       membership.businessId,
-      req.query as unknown as GetOfferingsQuery,
     );
-    const response = API_RESPONSE.offeringsFetched;
+    const response = API_RESPONSE.discountsFetched;
     return SuccessResult(
       res,
       response.message,
-      page,
+      { discounts },
       response.statusCode,
       response.code,
     );
   }),
 );
 
-OfferingRouter.post(
+DiscountRouter.post(
   "/",
-  validateRequest({ body: createOfferingSchema }),
+  validateRequest({ body: createDiscountSchema }),
   asyncHandler(async (req, res) => {
-    const membership = await getMembership(req.currentUser?.uid);
-    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+    const userId = req.currentUser?.uid;
+    const membership = await getMembership(userId);
+    if (!membership || !userId) {
+      return sendError(res, API_RESPONSE.unauthorized);
+    }
 
-    const offering = await OfferingService.createOffering({
+    const discount = await DiscountService.createDiscount({
       businessId: membership.businessId,
-      input: req.body as CreateOfferingBody,
+      createdBy: userId,
+      input: req.body as CreateDiscountBody,
     });
-    const response = API_RESPONSE.offeringCreated;
+    const response = API_RESPONSE.discountCreated;
     return SuccessResult(
       res,
       response.message,
-      { offering },
+      { discount },
       response.statusCode,
       response.code,
     );
   }),
 );
 
-OfferingRouter.patch(
-  "/:offeringId",
-  validateRequest({ body: updateOfferingSchema, params: offeringParamsSchema }),
+DiscountRouter.patch(
+  "/:discountId",
+  validateRequest({ body: updateDiscountSchema, params: discountParamsSchema }),
   asyncHandler(async (req, res) => {
     const membership = await getMembership(req.currentUser?.uid);
     if (!membership) return sendError(res, API_RESPONSE.unauthorized);
 
-    const params = req.params as unknown as OfferingParams;
-    const offering = await OfferingService.updateOffering({
+    const params = req.params as unknown as DiscountParams;
+    const discount = await DiscountService.updateDiscount({
       businessId: membership.businessId,
-      input: req.body as UpdateOfferingBody,
-      offeringId: params.offeringId,
+      discountId: params.discountId,
+      input: req.body as UpdateDiscountBody,
     });
-    if (!offering) return sendError(res, API_RESPONSE.offeringNotFound);
+    if (!discount) return sendError(res, API_RESPONSE.discountNotFound);
 
-    const response = API_RESPONSE.offeringUpdated;
+    const response = API_RESPONSE.discountUpdated;
     return SuccessResult(
       res,
       response.message,
-      { offering },
+      { discount },
       response.statusCode,
       response.code,
     );
@@ -102,4 +102,4 @@ function sendError(
   return ErrorResult(res, response.statusCode, response.message, response.code);
 }
 
-export { OfferingRouter };
+export { DiscountRouter };

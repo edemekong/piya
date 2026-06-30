@@ -1,15 +1,13 @@
 import { Router, type Response } from "express";
 import {
-  createOfferingSchema,
-  getOfferingsQuerySchema,
-  offeringParamsSchema,
-  type CreateOfferingBody,
-  type GetOfferingsQuery,
-  type OfferingParams,
-  type UpdateOfferingBody,
-  updateOfferingSchema,
-} from "../../shared/schema/offering.schema";
-import { OfferingService } from "../../shared/services/offering.service";
+  createGiftSchema,
+  giftParamsSchema,
+  type CreateGiftBody,
+  type GiftParams,
+  type UpdateGiftBody,
+  updateGiftSchema,
+} from "../../shared/schema/gift.schema";
+import { GiftService } from "../../shared/services/gift.service";
 import { BusinessTeamService } from "../../shared/services/team.service";
 import {
   asyncHandler,
@@ -19,72 +17,72 @@ import {
 import { API_RESPONSE } from "../../shared/utils/constants";
 import { validateRequest } from "../../shared/utils/validator";
 
-const OfferingRouter = Router();
+const GiftRouter = Router();
 
-OfferingRouter.get(
+GiftRouter.get(
   "/",
-  validateRequest({ query: getOfferingsQuerySchema }),
   asyncHandler(async (req, res) => {
     const membership = await getMembership(req.currentUser?.uid);
     if (!membership) return sendError(res, API_RESPONSE.unauthorized);
 
-    const page = await OfferingService.getOfferings(
-      membership.businessId,
-      req.query as unknown as GetOfferingsQuery,
-    );
-    const response = API_RESPONSE.offeringsFetched;
+    const gifts = await GiftService.getGifts(membership.businessId);
+    const response = API_RESPONSE.giftsFetched;
     return SuccessResult(
       res,
       response.message,
-      page,
+      { gifts },
       response.statusCode,
       response.code,
     );
   }),
 );
 
-OfferingRouter.post(
+GiftRouter.post(
   "/",
-  validateRequest({ body: createOfferingSchema }),
+  validateRequest({ body: createGiftSchema }),
   asyncHandler(async (req, res) => {
-    const membership = await getMembership(req.currentUser?.uid);
-    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+    const userId = req.currentUser?.uid;
+    const membership = await getMembership(userId);
+    if (!membership || !userId) {
+      return sendError(res, API_RESPONSE.unauthorized);
+    }
 
-    const offering = await OfferingService.createOffering({
+    const gift = await GiftService.createGift({
       businessId: membership.businessId,
-      input: req.body as CreateOfferingBody,
+      createdBy: userId,
+      input: req.body as CreateGiftBody,
     });
-    const response = API_RESPONSE.offeringCreated;
+    const response = API_RESPONSE.giftCreated;
     return SuccessResult(
       res,
       response.message,
-      { offering },
+      { gift },
       response.statusCode,
       response.code,
     );
   }),
 );
 
-OfferingRouter.patch(
-  "/:offeringId",
-  validateRequest({ body: updateOfferingSchema, params: offeringParamsSchema }),
+GiftRouter.patch(
+  "/:giftId",
+  validateRequest({ body: updateGiftSchema, params: giftParamsSchema }),
   asyncHandler(async (req, res) => {
     const membership = await getMembership(req.currentUser?.uid);
     if (!membership) return sendError(res, API_RESPONSE.unauthorized);
 
-    const params = req.params as unknown as OfferingParams;
-    const offering = await OfferingService.updateOffering({
+    const params = req.params as unknown as GiftParams;
+    const gift = await GiftService.updateGift({
       businessId: membership.businessId,
-      input: req.body as UpdateOfferingBody,
-      offeringId: params.offeringId,
+      giftId: params.giftId,
+      input: req.body as UpdateGiftBody,
     });
-    if (!offering) return sendError(res, API_RESPONSE.offeringNotFound);
+    if (!gift) return sendError(res, API_RESPONSE.giftNotFound);
 
-    const response = API_RESPONSE.offeringUpdated;
+    const response = API_RESPONSE.giftUpdated;
     return SuccessResult(
       res,
       response.message,
-      { offering },
+      { gift },
       response.statusCode,
       response.code,
     );
@@ -102,4 +100,4 @@ function sendError(
   return ErrorResult(res, response.statusCode, response.message, response.code);
 }
 
-export { OfferingRouter };
+export { GiftRouter };

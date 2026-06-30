@@ -1,5 +1,5 @@
-import type { DiscountData } from "../models";
-import type { DiscountFormDraft } from "../types";
+import type { DiscountData, DiscountReward } from "../models";
+import type { DiscountFormDraft, DiscountInput } from "../types";
 import { dateInputToTimestamp, formatShortDate, timestampToDateInput } from "./date";
 import { formatEnumLabel } from "./format";
 import { nullableCommaList } from "./list";
@@ -7,10 +7,9 @@ import { numberOrNull, numberOrZero } from "./number";
 
 export function createEmptyDiscountDraft(): DiscountFormDraft {
   return {
+    applicabilityScope: "all_offerings",
     buyQuantity: "",
     code: "",
-    codeGeneration: "manual",
-    currency: "NGN",
     description: "",
     endsAt: "",
     freebieGiftId: "",
@@ -18,13 +17,11 @@ export function createEmptyDiscountDraft(): DiscountFormDraft {
     maxDiscountAmount: "",
     maxUsesPerContact: "1",
     minimumOrderValue: "",
-    perkDescription: "",
+    offeringIds: "",
     rewardType: "percentage_discount",
     rewardValue: "",
     startsAt: timestampToDateInput(Date.now()),
     status: "draft",
-    targetBadgeTypes: "",
-    targetTags: "",
     title: "",
     totalUsageLimit: "",
   };
@@ -32,66 +29,70 @@ export function createEmptyDiscountDraft(): DiscountFormDraft {
 
 export function createDiscountDraft(discount: DiscountData): DiscountFormDraft {
   return {
-    buyQuantity: discount.reward.metadata?.buyQuantity?.toString() ?? "",
+    applicabilityScope: discount.rules.applicabilityScope ?? "all_offerings",
+    buyQuantity:
+      discount.reward.type === "buy_x_get_y"
+        ? discount.reward.metadata.buyQuantity.toString()
+        : "",
     code: discount.code ?? "",
-    codeGeneration: discount.codeGeneration ?? "manual",
-    currency: "NGN",
     description: discount.description,
     endsAt: discount.endsAt ? timestampToDateInput(discount.endsAt) : "",
-    freebieGiftId: discount.reward.metadata?.giftId ?? "",
-    getQuantity: discount.reward.metadata?.getQuantity?.toString() ?? "",
-    maxDiscountAmount: discount.reward.maxDiscountAmount?.toString() ?? "",
+    freebieGiftId:
+      discount.reward.type === "freebie_product"
+        ? discount.reward.metadata.giftId
+        : "",
+    getQuantity:
+      discount.reward.type === "buy_x_get_y"
+        ? discount.reward.metadata.getQuantity.toString()
+        : "",
+    maxDiscountAmount:
+      discount.reward.type === "percentage_discount"
+        ? discount.reward.maxDiscountAmount?.toString() ?? ""
+        : "",
     maxUsesPerContact: discount.rules.maxUsesPerContact.toString(),
     minimumOrderValue: discount.rules.minimumOrderValue?.toString() ?? "",
-    perkDescription: discount.reward.metadata?.customPerkDescription ?? "",
+    offeringIds: discount.rules.offeringIds?.join(", ") ?? "",
     rewardType: discount.reward.type,
-    rewardValue: discount.reward.value.toString(),
+    rewardValue:
+      discount.reward.type === "percentage_discount" ||
+      discount.reward.type === "fixed_amount_discount" ||
+      discount.reward.type === "cashback_credit"
+        ? discount.reward.value.toString()
+        : "",
     startsAt: timestampToDateInput(discount.startsAt),
     status: discount.status,
-    targetBadgeTypes: discount.rules.targetBadgeTypes?.join(", ") ?? "",
-    targetTags: discount.rules.targetTags?.join(", ") ?? "",
     title: discount.title,
     totalUsageLimit: discount.rules.totalUsageLimit?.toString() ?? "",
   };
 }
 
-export function draftToDiscount(
-  draft: DiscountFormDraft,
-  existing?: DiscountData | null,
-): DiscountData {
+export function draftToDiscount(draft: DiscountFormDraft): DiscountInput {
   const now = Date.now();
 
   return {
-    businessId: existing?.businessId ?? "biz_northstar",
-    code: draft.codeGeneration === "manual" ? draft.code.trim() || null : null,
-    codeGeneration: draft.codeGeneration,
-    createdAt: existing?.createdAt ?? now,
-    createdBy: existing?.createdBy ?? "admin_demo",
+    code: draft.code.trim() || null,
     description: draft.description,
     endsAt: dateInputToTimestamp(draft.endsAt),
-    id: existing?.id ?? `discount_${now}`,
-    reward: {
-      maxDiscountAmount: numberOrNull(draft.maxDiscountAmount),
-      metadata: createRewardMetadata(draft),
-      type: draft.rewardType,
-      value: getRewardValue(draft),
-    },
+    reward: createDiscountReward(draft),
     rules: {
+      applicabilityScope: draft.applicabilityScope,
       maxUsesPerContact: numberOrZero(draft.maxUsesPerContact) || 1,
       minimumOrderValue: numberOrNull(draft.minimumOrderValue),
-      targetBadgeTypes: nullableCommaList(draft.targetBadgeTypes),
-      targetTags: nullableCommaList(draft.targetTags),
+      offeringIds:
+        draft.applicabilityScope === "specific_offerings"
+          ? nullableCommaList(draft.offeringIds)
+          : null,
       totalUsageLimit: numberOrNull(draft.totalUsageLimit),
     },
     startsAt: dateInputToTimestamp(draft.startsAt) ?? now,
     status: draft.status,
     title: draft.title,
-    type: "discount",
-    updatedAt: now,
   };
 }
 
 export function formatDiscountLabel(value: string) {
+  if (value === "freebie_product") return "Freebies";
+
   return formatEnumLabel(value);
 }
 
@@ -99,41 +100,36 @@ export function formatDiscountDate(timestamp?: number | null) {
   return formatShortDate(timestamp, "No end date", "en-NG");
 }
 
-function getRewardValue(draft: DiscountFormDraft) {
-  if (
-    draft.rewardType === "free_shipping" ||
-    draft.rewardType === "freebie_product" ||
-    draft.rewardType === "custom_perk"
-  ) {
-    return 0;
-  }
-
-  if (draft.rewardType === "buy_x_get_y") {
-    return numberOrZero(draft.buyQuantity);
-  }
-
-  return numberOrZero(draft.rewardValue);
-}
-
-function createRewardMetadata(draft: DiscountFormDraft) {
+function createDiscountReward(draft: DiscountFormDraft): DiscountReward {
   if (draft.rewardType === "buy_x_get_y") {
     return {
-      buyQuantity: numberOrZero(draft.buyQuantity),
-      getQuantity: numberOrZero(draft.getQuantity),
+      metadata: {
+        buyQuantity: numberOrZero(draft.buyQuantity),
+        getQuantity: numberOrZero(draft.getQuantity),
+      },
+      type: "buy_x_get_y",
     };
   }
 
-  if (draft.rewardType === "freebie_product" && draft.freebieGiftId.trim()) {
+  if (draft.rewardType === "freebie_product") {
     return {
-      giftId: draft.freebieGiftId.trim(),
+      metadata: {
+        giftId: draft.freebieGiftId.trim(),
+      },
+      type: "freebie_product",
     };
   }
 
-  if (draft.rewardType === "custom_perk" && draft.perkDescription.trim()) {
+  if (draft.rewardType === "percentage_discount") {
     return {
-      customPerkDescription: draft.perkDescription.trim(),
+      maxDiscountAmount: numberOrNull(draft.maxDiscountAmount),
+      type: "percentage_discount",
+      value: numberOrZero(draft.rewardValue),
     };
   }
 
-  return null;
+  return {
+    type: draft.rewardType,
+    value: numberOrZero(draft.rewardValue),
+  };
 }

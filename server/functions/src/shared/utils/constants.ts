@@ -154,6 +154,46 @@ const API_RESPONSE = {
     code: "OFFERING_NOT_FOUND",
     message: "Offering not found",
   },
+  discountsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "DISCOUNTS_FETCHED",
+    message: "Discounts fetched",
+  },
+  discountCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "DISCOUNT_CREATED",
+    message: "Discount created",
+  },
+  discountUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "DISCOUNT_UPDATED",
+    message: "Discount updated",
+  },
+  discountNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "DISCOUNT_NOT_FOUND",
+    message: "Discount not found",
+  },
+  giftsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "GIFTS_FETCHED",
+    message: "Gifts fetched",
+  },
+  giftCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "GIFT_CREATED",
+    message: "Gift created",
+  },
+  giftUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "GIFT_UPDATED",
+    message: "Gift updated",
+  },
+  giftNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "GIFT_NOT_FOUND",
+    message: "Gift not found",
+  },
   contactAlreadyExists: {
     statusCode: STATUS_CODES.conflict,
     code: "CONTACT_ALREADY_EXISTS",
