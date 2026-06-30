@@ -10,6 +10,7 @@ import type { TimezoneData } from "./availability";
 
 interface BookingData extends BaseModel {
   businessId: string;
+  orderId: string;
   availabilityId?: string | null;
   createdBy: string;
   service: MiniServiceData;

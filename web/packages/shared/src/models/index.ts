@@ -8,6 +8,7 @@ export const businessModules = [
 
 export type BusinessModule = (typeof businessModules)[number];
 
+export * from "./accommodation";
 export * from "./availability";
 export * from "./badge";
 export * from "./base";
@@ -30,4 +31,5 @@ export * from "./offering";
 export * from "./order";
 export * from "./service-location";
 export * from "./site";
+export * from "./storefront";
 export * from "./user";

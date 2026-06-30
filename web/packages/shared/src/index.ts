@@ -13,6 +13,10 @@ export type {
   AccountSetupPersonalInfoInput,
 } from "./types/api";
 export type {
+  AccommodationReservationStatusType,
+  AccommodationUnitStatusType,
+} from "./types/accommodation.type";
+export type {
   AvailabilityDay,
   AvailabilityPayload,
   AvailabilityScheduleDraft,
@@ -28,6 +32,47 @@ export type {
   InvitableMemberRoleType,
   MemberRoleType,
 } from "./types/business.type";
+export type {
+  AccommodationOrderItem,
+  ConsultationOrderItem,
+  DeliveryOrderItem,
+  DigitalOrderItem,
+  DigitalServiceOrderItem,
+  EventOrderItem,
+  OrderCheckoutIntentType,
+  OrderContact,
+  OrderFulfillmentDetails,
+  OrderItem,
+  OrderItemBase,
+  OrderItemType,
+  OrderPaymentMode,
+  OrderPaymentStatus,
+  OrderRelatedRecord,
+  OrderRelatedRecordType,
+  OrderSourceType,
+  OrderStatus,
+  PhysicalOrderItem,
+} from "./types/order.type";
+export type {
+  OfferingCheckoutIntentType,
+  OfferingFeatureType,
+  OfferingStatusType,
+  OfferingSubType,
+  OfferingType,
+} from "./types/offering.type";
+export type {
+  BusinessDomainFamily,
+  CheckoutIntentType,
+  CheckoutPaymentMode,
+  StorefrontConfigStatus,
+  StorefrontCreateRelation,
+  StorefrontCreateType,
+  StorefrontNodeActionType,
+  StorefrontNodeType,
+  StorefrontPresetId,
+  StorefrontRequirementType,
+  StorefrontSetupRequirementType,
+} from "./types/storefront.type";
 export type {
   CompleteWhatsAppConnectionInput,
   SendWhatsAppMessageInput,

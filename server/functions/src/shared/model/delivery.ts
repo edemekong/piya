@@ -4,6 +4,8 @@ import type { LocationData } from "./location";
 import type { MiniUserData } from "./user";
 
 interface DeliveryData extends BaseModel {
+  businessId: string;
+  orderId: string;
   shareId?: string;
   createdBy: MiniUserData;
   contacts: string[];

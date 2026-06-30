@@ -1,5 +1,3 @@
-import type { BaseModel } from "./base";
-
 type OrderItemType =
   | "accommodation"
   | "physical"
@@ -23,25 +21,30 @@ type OrderStatus =
   | "archived";
 
 type OrderPaymentStatus = "unpaid" | "paid" | "refunded" | "partial";
+
 type OrderSourceType = "storefront" | "admin" | "import" | "api";
+
 type OrderCheckoutIntentType =
   | "buy"
   | "book"
   | "request_quote"
   | "create_delivery"
   | "reserve_room";
+
 type OrderPaymentMode =
   | "none"
   | "pay_now"
   | "pay_later"
   | "deposit"
   | "business_confirms_first";
+
 type OrderRelatedRecordType =
   | "booking"
   | "delivery"
   | "lead_request"
   | "payment"
   | "reservation";
+
 type OrderRelatedRecord = {
   id: string;
   type: OrderRelatedRecordType;
@@ -121,23 +124,6 @@ type OrderItem =
   | DigitalServiceOrderItem
   | DeliveryOrderItem;
 
-interface OrderData extends BaseModel {
-  shareId: string;
-  businessId: string;
-  source?: OrderSourceType;
-  checkoutIntent?: OrderCheckoutIntentType;
-  contact: OrderContact;
-  status: OrderStatus;
-  paymentStatus: OrderPaymentStatus;
-  paymentMode?: OrderPaymentMode | null;
-  currency: string;
-  subtotal: number;
-  total: number;
-  items: OrderItem[];
-  relatedRecords?: OrderRelatedRecord[];
-  notes?: string;
-}
-
 export type {
   AccommodationOrderItem,
   ConsultationOrderItem,
@@ -145,15 +131,14 @@ export type {
   DigitalOrderItem,
   DigitalServiceOrderItem,
   EventOrderItem,
+  OrderCheckoutIntentType,
   OrderContact,
-  OrderData,
   OrderFulfillmentDetails,
   OrderItem,
   OrderItemBase,
   OrderItemType,
-  OrderCheckoutIntentType,
-  OrderPaymentStatus,
   OrderPaymentMode,
+  OrderPaymentStatus,
   OrderRelatedRecord,
   OrderRelatedRecordType,
   OrderSourceType,

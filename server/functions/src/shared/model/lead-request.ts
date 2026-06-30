@@ -1,6 +1,6 @@
 import type { BaseModel } from "./base";
 
-type LeadRequestType = "demo" | "remind_me";
+type LeadRequestType = "demo" | "remind_me" | "quote" | "contact_business";
 type LeadRequestStatus = "new" | "contacted" | "closed";
 
 type DemoLeadRequestData = {
@@ -17,11 +17,35 @@ type RemindMeLeadRequestData = {
   email: string;
 };
 
-type LeadRequestDataPayload = DemoLeadRequestData | RemindMeLeadRequestData;
+type QuoteLeadRequestData = {
+  customerName: string;
+  email: string;
+  phoneNumber?: string | null;
+  offeringId?: string | null;
+  details: string;
+  budget?: number | null;
+  preferredDate?: string | null;
+  attachmentUrls?: string[] | null;
+};
+
+type ContactBusinessLeadRequestData = {
+  customerName: string;
+  email: string;
+  phoneNumber?: string | null;
+  message: string;
+};
+
+type LeadRequestDataPayload =
+  | DemoLeadRequestData
+  | RemindMeLeadRequestData
+  | QuoteLeadRequestData
+  | ContactBusinessLeadRequestData;
 
 type LeadRequestBaseData = BaseModel & {
   email: string;
   status: LeadRequestStatus;
+  businessId?: string | null;
+  orderId?: string | null;
 };
 
 type LeadRequestData =
@@ -32,6 +56,17 @@ type LeadRequestData =
   | (LeadRequestBaseData & {
       type: "remind_me";
       data: RemindMeLeadRequestData;
+    })
+  | (LeadRequestBaseData & {
+      type: "quote";
+      businessId: string;
+      orderId: string;
+      data: QuoteLeadRequestData;
+    })
+  | (LeadRequestBaseData & {
+      type: "contact_business";
+      businessId: string;
+      data: ContactBusinessLeadRequestData;
     });
 
 export {
@@ -39,6 +74,8 @@ export {
   LeadRequestDataPayload,
   LeadRequestStatus,
   LeadRequestType,
+  ContactBusinessLeadRequestData,
   DemoLeadRequestData,
+  QuoteLeadRequestData,
   RemindMeLeadRequestData,
 };

@@ -66,6 +66,11 @@ export type {
 } from "./forms";
 
 export type {
+  AccommodationReservationStatusType,
+  AccommodationUnitStatusType,
+} from "./accommodation.type";
+
+export type {
   AvailabilityIntervalType,
   AvailabilityStatusType,
 } from "./availability.type";
@@ -139,6 +144,29 @@ export type { DeliveryStatusType } from "./delivery.type";
 export type { DocumentStatusType, IDType } from "./document.type";
 
 export type {
+  AccommodationOrderItem,
+  ConsultationOrderItem,
+  DeliveryOrderItem,
+  DigitalOrderItem,
+  DigitalServiceOrderItem,
+  EventOrderItem,
+  OrderCheckoutIntentType,
+  OrderContact,
+  OrderFulfillmentDetails,
+  OrderItem,
+  OrderItemBase,
+  OrderItemType,
+  OrderPaymentMode,
+  OrderPaymentStatus,
+  OrderRelatedRecord,
+  OrderRelatedRecordType,
+  OrderSourceType,
+  OrderStatus,
+  PhysicalOrderItem,
+} from "./order.type";
+
+export type {
+  OfferingCheckoutIntentType,
   OfferingFeatureType,
   OfferingStatusType,
   OfferingSubType,
@@ -148,6 +176,20 @@ export type {
 export type { ServiceType } from "./service.type";
 
 export type { SiteSections, SiteStatusType } from "./site.type";
+
+export type {
+  BusinessDomainFamily,
+  CheckoutIntentType,
+  CheckoutPaymentMode,
+  StorefrontConfigStatus,
+  StorefrontCreateRelation,
+  StorefrontCreateType,
+  StorefrontNodeActionType,
+  StorefrontNodeType,
+  StorefrontPresetId,
+  StorefrontRequirementType,
+  StorefrontSetupRequirementType,
+} from "./storefront.type";
 
 export type { MiniUserData, UserGenderType, UserRoleType } from "./user.type";
 
