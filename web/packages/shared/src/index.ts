@@ -34,10 +34,9 @@ export type {
 } from "./types/business.type";
 export type {
   AccommodationOrderItem,
-  ConsultationOrderItem,
+  AppointmentOrderItem,
   DeliveryOrderItem,
   DigitalOrderItem,
-  DigitalServiceOrderItem,
   EventOrderItem,
   OrderCheckoutIntentType,
   OrderContact,

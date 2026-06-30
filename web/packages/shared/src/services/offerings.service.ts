@@ -1,6 +1,11 @@
 import type { BaseAPIServiceOptions } from "../types";
-import { dummyOfferings } from "../utils/dummy_data";
+import type {
+  OfferingInput,
+  OfferingPayload,
+  OfferingsPayload,
+} from "../types";
 import { BaseAPIService } from "./base-api.service";
+import { authService, type AuthService } from "./auth.service";
 
 export type {
   OfferingData,
@@ -14,12 +19,43 @@ export type {
 } from "../types";
 
 export class OfferingsService extends BaseAPIService {
-  constructor(options: BaseAPIServiceOptions = {}) {
-    super(options);
+  constructor(options: BaseAPIServiceOptions & { auth?: AuthService } = {}) {
+    const auth = options.auth ?? authService;
+    super({
+      ...options,
+      tokenProvider: options.tokenProvider ?? (() => auth.getIdToken()),
+    });
   }
 
-  getOfferings() {
-    return dummyOfferings;
+  getOfferings(): Promise<OfferingsPayload> {
+    return this.get<OfferingsPayload>(this.urlController.offerings, {
+      withToken: true,
+    });
+  }
+
+  createOffering(input: OfferingInput): Promise<OfferingPayload> {
+    return this.post<OfferingPayload, OfferingInput>(
+      this.urlController.offerings,
+      {
+        body: input,
+        maxRetries: 0,
+        withToken: true,
+      },
+    );
+  }
+
+  updateOffering(
+    offeringId: string,
+    input: OfferingInput,
+  ): Promise<OfferingPayload> {
+    return this.patch<OfferingPayload, OfferingInput>(
+      this.urlController.offering(offeringId),
+      {
+        body: input,
+        maxRetries: 0,
+        withToken: true,
+      },
+    );
   }
 }
 

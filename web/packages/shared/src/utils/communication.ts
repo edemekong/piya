@@ -80,7 +80,7 @@ export const COMMUNICATION_VARIABLES = [
   "{{offering.price}}",
   "{{offering.currency}}",
   "{{offering.duration}}",
-  "{{offering.quantity}}",
+  "{{offering.inventoryQuantity}}",
   "{{app.name}}",
 ];
 

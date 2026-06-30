@@ -33,12 +33,12 @@ const itemTypeOptions: OrderItemType[] = [
   "physical",
   "digital",
   "event",
-  "event_online",
-  "consultation",
-  "consultation_online",
-  "digital_service",
+  "appointment",
+  "online_appointment",
   "delivery",
   "pickup",
+  "room",
+  "unit",
 ];
 const statusOptions: OrderStatus[] = [
   "draft",
@@ -85,7 +85,7 @@ export function OrderEditorSheet({
     onClose();
   }
 
-  const showPeopleCount = ["event", "event_online", "consultation", "consultation_online"].includes(
+  const showPeopleCount = ["event", "appointment", "online_appointment"].includes(
     draft.itemType,
   );
   const showDeliveryFields =
@@ -167,7 +167,7 @@ export function OrderEditorSheet({
               type="number"
               value={draft.quantity}
             />
-            {draft.itemType === "event" || draft.itemType === "event_online" ? (
+            {draft.itemType === "event" ? (
               <TextField
                 label="Attendees"
                 onChange={(attendeeCount) => updateDraft({ attendeeCount })}
@@ -176,8 +176,8 @@ export function OrderEditorSheet({
                 value={draft.attendeeCount}
               />
             ) : null}
-            {draft.itemType === "consultation" ||
-            draft.itemType === "consultation_online" ? (
+            {draft.itemType === "appointment" ||
+            draft.itemType === "online_appointment" ? (
               <TextField
                 label="Seats / sessions"
                 onChange={(seatCount) => updateDraft({ seatCount })}

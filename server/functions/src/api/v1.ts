@@ -10,6 +10,7 @@ import { DeliveryPricingRouter } from "./delivery-pricing/route";
 import { DevRouter } from "./dev/route";
 import { LeadRequestRouter } from "./lead-requests/route";
 import { LocationRouter } from "./locations/route";
+import { OfferingRouter } from "./offerings/route";
 import { UserRouter } from "./users/route";
 import {
   ProtectedWhatsAppRouter,
@@ -33,6 +34,7 @@ V1Router.use("/businesses", BusinessRouter);
 V1Router.use("/contacts", ContactRouter);
 V1Router.use("/delivery-pricing", DeliveryPricingRouter);
 V1Router.use("/locations", LocationRouter);
+V1Router.use("/offerings", OfferingRouter);
 V1Router.use("/availability", AvailabilityRouter);
 V1Router.use("/users", UserRouter);
 V1Router.use("/whatsapp", ProtectedWhatsAppRouter);

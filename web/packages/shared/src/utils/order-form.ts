@@ -90,7 +90,7 @@ function draftToOrderItem(
     };
   }
 
-  if (draft.itemType === "consultation" || draft.itemType === "consultation_online") {
+  if (draft.itemType === "appointment" || draft.itemType === "online_appointment") {
     return {
       ...base,
       seatCount: numberOrZero(draft.seatCount) || undefined,
@@ -99,7 +99,7 @@ function draftToOrderItem(
     };
   }
 
-  if (draft.itemType === "event" || draft.itemType === "event_online") {
+  if (draft.itemType === "event") {
     return {
       ...base,
       attendeeCount: numberOrZero(draft.attendeeCount) || undefined,
@@ -117,7 +117,7 @@ function draftToOrderItem(
 
   return {
     ...base,
-    type: "digital_service",
+    type: "digital",
   };
 }
 

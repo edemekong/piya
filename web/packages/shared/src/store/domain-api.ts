@@ -29,6 +29,7 @@ import type {
   CreateLeadRequestInput,
   DeliveryPricingPayload,
   InviteMemberInput,
+  OfferingInput,
   SendWhatsAppMessageInput,
   SendWhatsAppMessagePayload,
   TeamPayload,
@@ -479,8 +480,43 @@ export const domainApi = createApi({
       providesTags: ["Gift"],
     }),
     getOfferings: builder.query<OfferingData[], void>({
-      queryFn: () => ({ data: offeringsService.getOfferings() }),
+      queryFn: async () => {
+        try {
+          const payload = await offeringsService.getOfferings();
+          return { data: payload.offerings };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
       providesTags: ["Offering"],
+    }),
+    createOffering: builder.mutation<OfferingData, OfferingInput>({
+      queryFn: async (input) => {
+        try {
+          const payload = await offeringsService.createOffering(input);
+          return { data: payload.offering };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Offering"],
+    }),
+    updateOffering: builder.mutation<
+      OfferingData,
+      { input: OfferingInput; offeringId: string }
+    >({
+      queryFn: async ({ input, offeringId }) => {
+        try {
+          const payload = await offeringsService.updateOffering(
+            offeringId,
+            input,
+          );
+          return { data: payload.offering };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Offering"],
     }),
     getOrders: builder.query<OrderData[], void>({
       queryFn: () => ({ data: ordersService.getOrders() }),
@@ -497,6 +533,7 @@ export const {
   useCreateContactMutation,
   useCreateBadgeMutation,
   useCreateLeadRequestMutation,
+  useCreateOfferingMutation,
   useCompleteWhatsAppConnectionMutation,
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
@@ -522,6 +559,7 @@ export const {
   useUpdatePrimaryDeliveryPricingMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
+  useUpdateOfferingMutation,
   useUpdateAccountSetupMutation,
   useUpdateContactMutation,
   useUpdateCurrentUserMutation,

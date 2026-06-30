@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { NavLink } from "@remix-run/react";
 import { AppAvatar, cn } from "@piya/ui";
+import { useGetAccountSetupQuery } from "@piya/shared";
+import { getOfferingDisplayConfig } from "@/utils/offering-display";
 
 type SidebarItem = {
   label: string;
@@ -24,6 +26,16 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 export function Sidebar() {
+  const { data: accountSetup } = useGetAccountSetupQuery();
+  const offeringDisplay = getOfferingDisplayConfig(
+    accountSetup?.business?.category ?? null,
+  );
+  const items = sidebarItems.map((item) =>
+    item.to === "/offerings"
+      ? { ...item, label: offeringDisplay.plural }
+      : item,
+  );
+
   return (
     <aside className="sticky top-0 flex h-screen w-24 shrink-0 flex-col items-center border-r border-primary/20 bg-secondary py-6">
       <img
@@ -33,7 +45,7 @@ export function Sidebar() {
       />
 
       <nav aria-label="Admin" className="mt-10 flex flex-1 flex-col gap-4">
-        {sidebarItems.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
 
           return (

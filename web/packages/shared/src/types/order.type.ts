@@ -1,14 +1,13 @@
 type OrderItemType =
-  | "accommodation"
   | "physical"
   | "digital"
-  | "consultation"
-  | "consultation_online"
+  | "appointment"
+  | "online_appointment"
   | "event"
-  | "event_online"
-  | "digital_service"
   | "delivery"
-  | "pickup";
+  | "pickup"
+  | "room"
+  | "unit";
 
 type OrderStatus =
   | "draft"
@@ -88,19 +87,15 @@ type DigitalOrderItem = OrderItemBase & {
   downloadUrl?: string;
 };
 
-type ConsultationOrderItem = OrderItemBase & {
-  type: "consultation" | "consultation_online";
+type AppointmentOrderItem = OrderItemBase & {
+  type: "appointment" | "online_appointment";
   seatCount?: number;
   sessionCount?: number;
 };
 
 type EventOrderItem = OrderItemBase & {
-  type: "event" | "event_online";
+  type: "event";
   attendeeCount?: number;
-};
-
-type DigitalServiceOrderItem = OrderItemBase & {
-  type: "digital_service";
 };
 
 type DeliveryOrderItem = OrderItemBase & {
@@ -109,7 +104,7 @@ type DeliveryOrderItem = OrderItemBase & {
 };
 
 type AccommodationOrderItem = OrderItemBase & {
-  type: "accommodation";
+  type: "room" | "unit";
   checkInDate: string;
   checkOutDate: string;
   guestCount: number;
@@ -119,17 +114,15 @@ type OrderItem =
   | AccommodationOrderItem
   | PhysicalOrderItem
   | DigitalOrderItem
-  | ConsultationOrderItem
+  | AppointmentOrderItem
   | EventOrderItem
-  | DigitalServiceOrderItem
   | DeliveryOrderItem;
 
 export type {
   AccommodationOrderItem,
-  ConsultationOrderItem,
+  AppointmentOrderItem,
   DeliveryOrderItem,
   DigitalOrderItem,
-  DigitalServiceOrderItem,
   EventOrderItem,
   OrderCheckoutIntentType,
   OrderContact,

@@ -77,6 +77,14 @@ export class URLController {
     return this.path(`/v1/badges/${encodeURIComponent(id)}`);
   }
 
+  get offerings() {
+    return this.path("/v1/offerings");
+  }
+
+  offering(id: string) {
+    return this.path(`/v1/offerings/${encodeURIComponent(id)}`);
+  }
+
   get contactTags() {
     return this.path("/v1/contacts/tags");
   }

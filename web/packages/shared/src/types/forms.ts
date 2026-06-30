@@ -8,10 +8,37 @@ import type {
 import type { DiscountStatusType, RewardType } from "../models/discount";
 import type {
   OfferingFeatureType,
+  OfferingAttributeValueType,
+  OfferingCheckoutIntentType,
   OfferingStatusType,
   OfferingSubType,
   OfferingType,
 } from "./offering.type";
+import type { CheckoutPaymentMode } from "./storefront.type";
+
+export type OfferingAttributeDraft = {
+  id: string;
+  name: string;
+  unit: string;
+  value: string;
+  valueType: OfferingAttributeValueType;
+};
+
+export type OfferingOptionDraft = {
+  id: string;
+  name: string;
+  values: string;
+};
+
+export type OfferingVariantDraft = {
+  id: string;
+  imageUrl: string;
+  price: string;
+  quantity: string;
+  sku: string;
+  status: OfferingStatusType;
+  title: string;
+};
 
 export type GiftDraft = {
   currency: string;
@@ -73,25 +100,40 @@ export type DiscountFormDraft = {
 };
 
 export type OfferingFormDraft = {
+  categoryId: string;
+  categoryName: string;
+  attributes: OfferingAttributeDraft[];
   currency: string;
   description: string;
   duration: string;
   features: OfferingFeatureType[];
   imageUrl: string;
   imageUrls: string;
+  inventoryAllowBackorders: boolean;
+  inventoryQuantity: string;
+  inventorySku: string;
+  inventoryTrackQuantity: boolean;
+  options: OfferingOptionDraft[];
+  checkoutIntents: OfferingCheckoutIntentType[];
   locationAddress: string;
   locationCity: string;
   locationCountry: string;
   locationPostalCode: string;
   locationState: string;
+  maxQuantity: string;
   meetingLink: string;
+  minQuantity: string;
   name: string;
+  paymentModes: CheckoutPaymentMode[];
   price: string;
-  quantity: string;
+  depositAmount: string;
+  depositPercent: string;
+  requiresBusinessConfirmation: boolean;
   status: OfferingStatusType;
   subType: OfferingSubType | "";
   tags: string;
   type: OfferingType | "";
+  variants: OfferingVariantDraft[];
 };
 
 export type AddContactMode = "manual" | "csv";

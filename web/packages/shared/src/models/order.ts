@@ -1,10 +1,9 @@
 import type { BaseModel } from "./base";
 import type {
   AccommodationOrderItem,
-  ConsultationOrderItem,
+  AppointmentOrderItem,
   DeliveryOrderItem,
   DigitalOrderItem,
-  DigitalServiceOrderItem,
   EventOrderItem,
   OrderCheckoutIntentType,
   OrderContact,
@@ -40,10 +39,9 @@ interface OrderData extends BaseModel {
 
 export type {
   AccommodationOrderItem,
-  ConsultationOrderItem,
+  AppointmentOrderItem,
   DeliveryOrderItem,
   DigitalOrderItem,
-  DigitalServiceOrderItem,
   EventOrderItem,
   OrderContact,
   OrderData,

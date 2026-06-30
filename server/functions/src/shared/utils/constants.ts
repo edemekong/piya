@@ -134,6 +134,26 @@ const API_RESPONSE = {
     code: "DEFAULT_BADGE_IMMUTABLE",
     message: "Default badges cannot be edited or deleted",
   },
+  offeringsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "OFFERINGS_FETCHED",
+    message: "Offerings fetched",
+  },
+  offeringCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "OFFERING_CREATED",
+    message: "Offering created",
+  },
+  offeringUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "OFFERING_UPDATED",
+    message: "Offering updated",
+  },
+  offeringNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "OFFERING_NOT_FOUND",
+    message: "Offering not found",
+  },
   contactAlreadyExists: {
     statusCode: STATUS_CODES.conflict,
     code: "CONTACT_ALREADY_EXISTS",

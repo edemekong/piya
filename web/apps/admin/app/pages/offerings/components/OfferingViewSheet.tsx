@@ -41,12 +41,20 @@ export function OfferingViewSheet({
           {offering.type === "product" ? (
             <>
               <Detail
-                label="Sub type"
+                label="Category"
                 value={formatOfferingLabel(offering.subType ?? "Not set")}
               />
               <Detail
-                label="Quantity"
-                value={offering.quantity?.toString() ?? "Not set"}
+                label="Stock"
+                value={
+                  offering.inventory?.trackQuantity
+                    ? (offering.inventory.quantity?.toString() ?? "Not set")
+                    : "Not tracked"
+                }
+              />
+              <Detail
+                label="SKU"
+                value={offering.inventory?.sku ?? "Not set"}
               />
               <Detail
                 label="Image URLs"
@@ -56,7 +64,7 @@ export function OfferingViewSheet({
           ) : (
             <>
               <Detail
-                label="Sub type"
+                label="Category"
                 value={formatOfferingLabel(offering.subType ?? "Not set")}
               />
               <Detail

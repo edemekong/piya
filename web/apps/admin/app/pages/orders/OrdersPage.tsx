@@ -71,7 +71,7 @@ export function OrdersPage() {
               Orders
             </h1>
             <p className="mt-2 max-w-2xl text-callout text-[#2F4B4F]/75">
-              View, create, and track customer orders across offerings.
+              View, create, and track customer orders across catalog items.
             </p>
           </div>
           <Button icon={<Plus />} onClick={() => setIsCreateSheetOpen(true)}>

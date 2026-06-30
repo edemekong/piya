@@ -139,6 +139,25 @@ export type BadgeInput = Pick<
   "description" | "icon" | "name" | "rule"
 >;
 
+export type OfferingsPayload = {
+  offerings: import("../models").OfferingData[];
+};
+
+export type OfferingPayload = {
+  offering: import("../models").OfferingData;
+};
+
+export type OfferingInput = Omit<
+  import("../models").OfferingData,
+  "businessId" | "createdAt" | "id" | "updatedAt"
+> &
+  Partial<
+    Pick<
+      import("../models").OfferingData,
+      "businessId" | "createdAt" | "id" | "updatedAt"
+    >
+  >;
+
 export type LocationPredictionsPayload = {
   predictions: import("../models").LocationPrediction[];
 };

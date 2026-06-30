@@ -8,10 +8,14 @@ import {
   TicketPercent,
 } from "lucide-react";
 import { Button, SegmentedTabs } from "@piya/ui";
+import { getOfferingDisplayConfig } from "@/utils/offering-display";
 import {
+  useGetAccountSetupQuery,
   useGetDiscountsQuery,
   useGetGiftsQuery,
   useGetOfferingsQuery,
+  useCreateOfferingMutation,
+  useUpdateOfferingMutation,
 } from "@piya/shared";
 import type { DiscountData, GiftData, OfferingData } from "@piya/shared/models";
 import {
@@ -26,31 +30,36 @@ import {
 type MainTab = "offerings" | "discounts" | "gifts";
 type EditorMode = "create" | "edit";
 
-const mainTabs = [
-  {
-    icon: <Package className="size-4" />,
-    label: "Offerings",
-    value: "offerings",
-  },
-  {
-    icon: <TicketPercent className="size-4" />,
-    label: "Discounts",
-    value: "discounts",
-  },
-  {
-    icon: <Gift className="size-4" />,
-    label: "Gifts",
-    value: "gifts",
-  },
-] satisfies { icon: React.ReactNode; label: string; value: MainTab }[];
-
 export function OfferingPage() {
+  const { data: accountSetup } = useGetAccountSetupQuery();
+  const offeringDisplay = getOfferingDisplayConfig(
+    accountSetup?.business?.category ?? null,
+  );
+  const mainTabs = [
+    {
+      icon: <Package className="size-4" />,
+      label: offeringDisplay.plural,
+      value: "offerings",
+    },
+    {
+      icon: <TicketPercent className="size-4" />,
+      label: "Discounts",
+      value: "discounts",
+    },
+    {
+      icon: <Gift className="size-4" />,
+      label: "Gifts",
+      value: "gifts",
+    },
+  ] satisfies { icon: React.ReactNode; label: string; value: MainTab }[];
   const { data: queriedDiscounts = [] } = useGetDiscountsQuery();
   const { data: queriedGifts = [] } = useGetGiftsQuery();
-  const { data: queriedOfferings = [] } = useGetOfferingsQuery();
+  const { data: offerings = [] } = useGetOfferingsQuery();
+  const [createOffering, { isLoading: isCreatingOffering }] =
+    useCreateOfferingMutation();
+  const [updateOffering, { isLoading: isUpdatingOffering }] =
+    useUpdateOfferingMutation();
   const [activeTab, setActiveTab] = React.useState<MainTab>("offerings");
-  const [offerings, setOfferings] =
-    React.useState<OfferingData[]>([]);
   const [discounts, setDiscounts] =
     React.useState<DiscountData[]>([]);
   const [gifts, setGifts] = React.useState<GiftData[]>([]);
@@ -68,10 +77,6 @@ export function OfferingPage() {
   const [selectedDiscount, setSelectedDiscount] =
     React.useState<DiscountData | null>(null);
   const [selectedGift, setSelectedGift] = React.useState<GiftData | null>(null);
-
-  React.useEffect(() => {
-    setOfferings(queriedOfferings);
-  }, [queriedOfferings]);
 
   React.useEffect(() => {
     setDiscounts(queriedDiscounts);
@@ -119,13 +124,16 @@ export function OfferingPage() {
     setIsGiftEditorOpen(true);
   }
 
-  function handleSave(offering: OfferingData) {
-    setOfferings((current) => {
-      const exists = current.some((item) => item.id === offering.id);
-      return exists
-        ? current.map((item) => (item.id === offering.id ? offering : item))
-        : [offering, ...current];
-    });
+  async function handleSave(offering: OfferingData) {
+    if (offeringEditorMode === "edit" && selectedOffering) {
+      await updateOffering({
+        input: offering,
+        offeringId: selectedOffering.id,
+      }).unwrap();
+      return;
+    }
+
+    await createOffering(offering).unwrap();
   }
 
   function handleSaveDiscount(discount: DiscountData) {
@@ -152,17 +160,18 @@ export function OfferingPage() {
     ? "Create discount"
     : isGiftsTab
       ? "Create gift"
-      : "Create offering";
+      : offeringDisplay.createLabel;
   const searchPlaceholder = isDiscountsTab
     ? "Search discounts"
     : isGiftsTab
       ? "Search gifts"
-      : "Search offerings";
+      : offeringDisplay.searchPlaceholder;
   const filterLabel = isDiscountsTab
     ? "Filter discounts"
     : isGiftsTab
       ? "Filter gifts"
-      : "Filter offerings";
+      : offeringDisplay.filterLabel;
+  const isSavingOffering = isCreatingOffering || isUpdatingOffering;
 
   return (
     <>
@@ -170,10 +179,10 @@ export function OfferingPage() {
         <header className="flex flex-col gap-4 rounded-md bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-title-1 font-semibold text-[#2F4B4F]">
-              Offerings
+              {offeringDisplay.plural}
             </h1>
             <p className="mt-2 max-w-2xl text-callout text-[#2F4B4F]/75">
-              Create, view, and manage products and services from one catalog.
+              {offeringDisplay.description}
             </p>
           </div>
           <Button icon={<Plus />} onClick={openCreateSheet}>
@@ -209,6 +218,7 @@ export function OfferingPage() {
           <div className="mt-4 border-t border-border pt-4">
             {activeTab === "offerings" ? (
               <OfferingsTable
+                display={offeringDisplay}
                 offerings={offerings}
                 onEdit={openEditSheet}
                 onView={openEditSheet}
@@ -231,10 +241,13 @@ export function OfferingPage() {
       </div>
 
       <OfferingEditorSheet
+        businessCategory={accountSetup?.business?.category ?? null}
+        display={offeringDisplay}
         mode={offeringEditorMode}
         offering={selectedOffering}
         onClose={() => setIsOfferingEditorOpen(false)}
         onSave={handleSave}
+        saving={isSavingOffering}
         open={isOfferingEditorOpen}
       />
       <DiscountEditorSheet

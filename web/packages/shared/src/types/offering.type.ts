@@ -1,12 +1,13 @@
-type OfferingType = "product" | "service";
+type OfferingType = "product" | "service" | "accommodation" | "delivery";
 type OfferingSubType =
-  | "consultation"
-  | "consultation_online"
-  | "event"
-  | "event_online"
-  | "digital_service"
   | "physical"
-  | "digital";
+  | "digital"
+  | "appointment"
+  | "online_appointment"
+  | "event"
+  | "delivery"
+  | "room"
+  | "unit";
 
 type OfferingStatusType =
   | "draft"
@@ -14,17 +15,20 @@ type OfferingStatusType =
   | "paused"
   | "disabled";
 
-type OfferingFeatureType = "booking" | "delivery";
+type OfferingFeatureType = "booking" | "delivery" | "inventory";
+type OfferingAttributeValueType = "text" | "number" | "yes_no" | "date";
 type OfferingCheckoutIntentType =
   | "buy"
   | "book"
   | "request_quote"
+  | "create_delivery"
   | "reserve_room";
 
 export type {
   OfferingType,
   OfferingSubType,
   OfferingStatusType,
+  OfferingAttributeValueType,
   OfferingFeatureType,
   OfferingCheckoutIntentType,
 };

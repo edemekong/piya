@@ -98,6 +98,7 @@ export function BusinessProfilePage({
           description: businessProfile.description.trim(),
           email: businessProfile.email || undefined,
           phoneNumber: businessProfile.phoneNumber || undefined,
+          logo: emptyStringToUndefined(businessProfile.logo),
         },
       }).unwrap();
       const savedBusiness = result.business;
@@ -211,4 +212,9 @@ export function BusinessProfilePage({
       </SettingsCard>
     </ProfileSectionShell>
   );
+}
+
+function emptyStringToUndefined(value: string | null | undefined) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
 }

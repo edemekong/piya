@@ -28,7 +28,7 @@ export function OverviewPage() {
               Overview
             </h1>
             <p className="mt-2 max-w-2xl text-callout text-[#2F4B4F]/75">
-              Track contacts, communications, messaging, orders, and offering
+              Track contacts, communications, messaging, orders, and catalog
               performance across your business.
             </p>
           </div>

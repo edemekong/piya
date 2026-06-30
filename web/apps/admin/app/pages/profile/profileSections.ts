@@ -51,7 +51,7 @@ export const profileMenuItems: ProfileMenuItem[] = [
     value: "channels",
   },
   {
-    description: "Offerings, communications, and chat alerts.",
+    description: "Catalog, communications, and chat alerts.",
     icon: Bell,
     label: "Notifications",
     value: "notifications",

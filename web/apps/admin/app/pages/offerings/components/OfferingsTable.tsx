@@ -8,16 +8,22 @@ import {
   Trash2,
 } from "lucide-react";
 import { Badge, cn } from "@piya/ui";
+import type {
+  OfferingDisplayConfig,
+  OfferingTableColumn,
+} from "@/utils/offering-display";
 import type { OfferingData } from "@piya/shared/models";
 import { formatOfferingLabel } from "@piya/shared/utils";
 
 type OfferingsTableProps = {
+  display: OfferingDisplayConfig;
   offerings: OfferingData[];
   onEdit: (offering: OfferingData) => void;
   onView: (offering: OfferingData) => void;
 };
 
 export function OfferingsTable({
+  display,
   offerings,
   onEdit,
   onView,
@@ -27,11 +33,12 @@ export function OfferingsTable({
       <table className="w-full min-w-[820px] border-collapse text-left">
         <thead>
           <tr className="border-b border-border text-caption-1 text-[#2F4B4F]/60">
-            <th className="py-3 pr-4 font-semibold">Name</th>
-            <th className="px-4 py-3 font-semibold">Type</th>
-            <th className="px-4 py-3 font-semibold">Category</th>
-            <th className="px-4 py-3 font-semibold">Price</th>
-            <th className="px-4 py-3 font-semibold">Status</th>
+            <th className="py-3 pr-4 font-semibold">{display.singular}</th>
+            {display.tableColumns.map((column) => (
+              <th className="px-4 py-3 font-semibold" key={column}>
+                {getColumnLabel(column, display)}
+              </th>
+            ))}
             <th className="py-3 pl-4 text-right font-semibold">Actions</th>
           </tr>
         </thead>
@@ -55,20 +62,20 @@ export function OfferingsTable({
                   </span>
                 </button>
               </td>
-              <td className="px-4 py-4 text-callout font-semibold text-[#2F4B4F]">
-                {formatOfferingLabel(offering.type)}
-              </td>
-              <td className="px-4 py-4 text-callout text-[#2F4B4F]/75">
-                {formatOfferingLabel(offering.subType ?? "Not set")}
-              </td>
-              <td className="px-4 py-4 text-callout text-[#2F4B4F]/75">
-                {formatPrice(offering)}
-              </td>
-              <td className="px-4 py-4">
-                <StatusBadge status={offering.status} />
-              </td>
+              {display.tableColumns.map((column) => (
+                <td
+                  className="px-4 py-4 text-callout text-[#2F4B4F]/75"
+                  key={column}
+                >
+                  <OfferingTableValue column={column} offering={offering} />
+                </td>
+              ))}
               <td className="py-4 pl-4">
-                <OfferingActions offering={offering} onEdit={onEdit} />
+                <OfferingActions
+                  editLabel={display.editActionLabel}
+                  offering={offering}
+                  onEdit={onEdit}
+                />
               </td>
             </tr>
           ))}
@@ -76,6 +83,38 @@ export function OfferingsTable({
       </table>
     </div>
   );
+}
+
+function OfferingTableValue({
+  column,
+  offering,
+}: {
+  column: OfferingTableColumn;
+  offering: OfferingData;
+}) {
+  if (column === "category") {
+    return (
+      <>
+        {formatOfferingLabel(
+          offering.category?.name ?? offering.subType ?? "Not set",
+        )}
+      </>
+    );
+  }
+
+  if (column === "duration") {
+    return <>{offering.duration ? `${offering.duration} minutes` : "Not set"}</>;
+  }
+
+  if (column === "price") {
+    return <>{formatPrice(offering)}</>;
+  }
+
+  if (column === "stock") {
+    return <>{formatStock(offering)}</>;
+  }
+
+  return <StatusBadge status={offering.status} />;
 }
 
 function OfferingImage({ offering }: { offering: OfferingData }) {
@@ -115,9 +154,11 @@ function StatusBadge({ status }: { status: OfferingData["status"] }) {
 }
 
 function OfferingActions({
+  editLabel,
   offering,
   onEdit,
 }: {
+  editLabel: string;
   offering: OfferingData;
   onEdit: (offering: OfferingData) => void;
 }) {
@@ -139,7 +180,7 @@ function OfferingActions({
         <div className="absolute right-0 top-10 z-20 w-48 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg">
           <ActionMenuItem
             icon={<Pencil className="size-4" />}
-            label="Edit offering"
+            label={editLabel}
             onClick={() => {
               setOpen(false);
               onEdit(offering);
@@ -200,4 +241,23 @@ function formatPrice(offering: OfferingData) {
     currency: offering.currency ?? "NGN",
     style: "currency",
   }).format(offering.price);
+}
+
+function formatStock(offering: OfferingData) {
+  if (offering.inventory?.trackQuantity) {
+    return offering.inventory.quantity?.toString() ?? "Not set";
+  }
+
+  return offering.inventory?.sku ?? "Not set";
+}
+
+function getColumnLabel(
+  column: OfferingTableColumn,
+  display: OfferingDisplayConfig,
+) {
+  if (column === "category") return display.categoryColumnLabel;
+  if (column === "duration") return "Duration";
+  if (column === "price") return "Price";
+  if (column === "stock") return "Stock";
+  return "Status";
 }

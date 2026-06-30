@@ -12,7 +12,7 @@ const actions = [
     description: "Add a product, service, booking, or delivery option.",
     href: "/offerings",
     icon: <PackagePlus />,
-    label: "Add offering",
+    label: "Add catalog item",
   },
   {
     description: "Send a campaign or customer update.",

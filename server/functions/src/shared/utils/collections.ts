@@ -14,6 +14,7 @@ const BUSINESS_SUBCOLLECTIONS = {
   deliveryPricing: "delivery_pricing",
   memberInvitations: "member_invitations",
   members: "members",
+  offerings: "offerings",
   tags: "tags",
 } as const;
 

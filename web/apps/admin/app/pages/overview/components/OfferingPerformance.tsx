@@ -2,27 +2,27 @@ import { Badge } from "@piya/ui";
 import { formatMoney } from "@piya/shared/utils";
 import { productPerformance } from "../overview.mock";
 
-const topOfferings = productPerformance.slice(0, 4);
+const topCatalogItems = productPerformance.slice(0, 4);
 
 export function OfferingPerformance() {
   return (
     <section className="flex h-full min-h-[360px] flex-col rounded-md bg-white p-6 shadow-sm">
       <h2 className="text-title-3 font-semibold text-[#2F4B4F]">
-        Offering performance
+        Catalog performance
       </h2>
 
       <div className="mt-5 overflow-x-auto">
         <table className="w-full min-w-[560px] border-collapse text-left">
           <thead>
             <tr className="border-b border-border text-caption-1 text-[#2F4B4F]/60">
-              <th className="py-3 pr-4 font-semibold">Offering</th>
+              <th className="py-3 pr-4 font-semibold">Item</th>
               <th className="px-4 py-3 font-semibold">Revenue</th>
               <th className="px-4 py-3 font-semibold">Sold</th>
               <th className="py-3 pl-4 font-semibold">Status</th>
             </tr>
           </thead>
           <tbody>
-            {topOfferings.map((product) => (
+            {topCatalogItems.map((product) => (
               <tr
                 className="border-b border-border last:border-0"
                 key={product.name}

@@ -41,6 +41,9 @@ export type {
   MemberPayload,
   LocationPayload,
   LocationPredictionsPayload,
+  OfferingInput,
+  OfferingPayload,
+  OfferingsPayload,
   TeamPayload,
   TokenProvider,
   UpdateAccountSetupRequest,
@@ -60,7 +63,10 @@ export type {
   ContactViewParentTab,
   DiscountFormDraft,
   GiftDraft,
+  OfferingAttributeDraft,
   OfferingFormDraft,
+  OfferingOptionDraft,
+  OfferingVariantDraft,
   OrderDraft,
   OverviewRange,
 } from "./forms";
@@ -145,10 +151,9 @@ export type { DocumentStatusType, IDType } from "./document.type";
 
 export type {
   AccommodationOrderItem,
-  ConsultationOrderItem,
+  AppointmentOrderItem,
   DeliveryOrderItem,
   DigitalOrderItem,
-  DigitalServiceOrderItem,
   EventOrderItem,
   OrderCheckoutIntentType,
   OrderContact,
@@ -166,6 +171,7 @@ export type {
 } from "./order.type";
 
 export type {
+  OfferingAttributeValueType,
   OfferingCheckoutIntentType,
   OfferingFeatureType,
   OfferingStatusType,
