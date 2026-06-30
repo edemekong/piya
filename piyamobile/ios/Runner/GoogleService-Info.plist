@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>470260094307-qubrs8tdnp8vqu26bh6eb2mcborfuqkm.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.470260094307-qubrs8tdnp8vqu26bh6eb2mcborfuqkm</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDHcL9iG0b8RuW3TDFd7RwUNpP0lXJJJr0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>470260094307</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>store.piya.managestore</string>
+	<key>PROJECT_ID</key>
+	<string>zoltlogisticsapp</string>
+	<key>STORAGE_BUCKET</key>
+	<string>zoltlogisticsapp.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:470260094307:ios:d8dd02ecd985dec6afaf56</string>
+</dict>
+</plist>

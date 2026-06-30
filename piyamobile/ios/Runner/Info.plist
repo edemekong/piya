@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).refresh</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).processing</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Piya</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>zolt</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+		<string>1:470260094307:ios:d8dd02ecd985dec6afaf56</string>
+		<string>com.googleusercontent.apps.470260094307-qubrs8tdnp8vqu26bh6eb2mcborfuqkm</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Bundle ID</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>zoltridee.com</string>
+				<string>zoltride</string>
+				<string>1:470260094307:ios:d8dd02ecd985dec6afaf56</string>
+				<string>com.googleusercontent.apps.470260094307-qubrs8tdnp8vqu26bh6eb2mcborfuqkm</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>mailto</string>
+		<string>tel</string>
+		<string>facetime</string>
+		<string>sms</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow access to camera for video calls</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Turning on location service allow us to share your location with your riders</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Turning on location service allow us to share your location with your riders</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Turning on location service allow us to share your location with your riders</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow access to mic to record and send audio messages from device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to photos to upload from photos from library.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>FlutterSceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>location</string>
+		<string>remote-notification</string>
+		<string>audio</string>
+		<string>voip</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

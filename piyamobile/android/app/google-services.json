@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "470260094307",
+    "project_id": "zoltlogisticsapp",
+    "storage_bucket": "zoltlogisticsapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470260094307:android:ec35d088b9815fe9afaf56",
+        "android_client_info": {
+          "package_name": "store.piya.managestore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470260094307-1hrus1tmadmstdtua6mbbe7g4711f15h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCstTfIDZgOxTwWP45VCfkeTyVKMBPGV64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470260094307-1hrus1tmadmstdtua6mbbe7g4711f15h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "470260094307-qubrs8tdnp8vqu26bh6eb2mcborfuqkm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "store.piya.managestore"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
