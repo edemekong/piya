@@ -154,6 +154,16 @@ const API_RESPONSE = {
     code: "OFFERING_NOT_FOUND",
     message: "Offering not found",
   },
+  offeringDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "OFFERING_DELETED",
+    message: "Offering deleted",
+  },
+  offeringInUse: {
+    statusCode: STATUS_CODES.conflict,
+    code: "OFFERING_IN_USE",
+    message: "This offering is used by a discount and cannot be deleted",
+  },
   discountsFetched: {
     statusCode: STATUS_CODES.ok,
     code: "DISCOUNTS_FETCHED",
@@ -174,6 +184,16 @@ const API_RESPONSE = {
     code: "DISCOUNT_NOT_FOUND",
     message: "Discount not found",
   },
+  discountDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "DISCOUNT_DELETED",
+    message: "Discount deleted",
+  },
+  discountInUse: {
+    statusCode: STATUS_CODES.conflict,
+    code: "DISCOUNT_IN_USE",
+    message: "This discount is attached to an offering and cannot be deleted",
+  },
   giftsFetched: {
     statusCode: STATUS_CODES.ok,
     code: "GIFTS_FETCHED",
@@ -193,6 +213,16 @@ const API_RESPONSE = {
     statusCode: STATUS_CODES.notFound,
     code: "GIFT_NOT_FOUND",
     message: "Gift not found",
+  },
+  giftDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "GIFT_DELETED",
+    message: "Gift deleted",
+  },
+  giftInUse: {
+    statusCode: STATUS_CODES.conflict,
+    code: "GIFT_IN_USE",
+    message: "This gift is used by a discount and cannot be deleted",
   },
   contactAlreadyExists: {
     statusCode: STATUS_CODES.conflict,

@@ -1,15 +1,48 @@
 import * as React from "react";
-import { Gift, MoreVertical, Pencil } from "lucide-react";
-import { cn } from "@piya/ui";
+import { Gift, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { AppPopup, EmptyState, cn } from "@piya/ui";
 import type { GiftData } from "@piya/shared/models";
 
 type GiftsTableProps = {
   gifts: GiftData[];
+  isLoading: boolean;
+  onDelete: (gift: GiftData) => void;
   onEdit: (gift: GiftData) => void;
   onView: (gift: GiftData) => void;
 };
 
-export function GiftsTable({ gifts, onEdit, onView }: GiftsTableProps) {
+export function GiftsTable({
+  gifts,
+  isLoading,
+  onDelete,
+  onEdit,
+  onView,
+}: GiftsTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-[200px] items-center justify-center">
+        <Loader2
+          aria-label="Loading gifts"
+          className="size-6 animate-spin text-primary"
+        />
+      </div>
+    );
+  }
+
+  if (gifts.length === 0) {
+    return (
+      <EmptyState
+        className="flex h-[200px] flex-col items-center justify-center border-0 bg-transparent p-0 text-center"
+        icon={<Gift className="size-5" />}
+        title={
+          <span className="font-normal text-[#2F4B4F]/55">
+            Gifts you add will appear here.
+          </span>
+        }
+      />
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[820px] border-collapse text-left">
@@ -59,7 +92,11 @@ export function GiftsTable({ gifts, onEdit, onView }: GiftsTableProps) {
                 </span>
               </td>
               <td className="py-4 pl-4">
-                <GiftActions gift={gift} onEdit={onEdit} />
+                <GiftActions
+                  gift={gift}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                />
               </td>
             </tr>
           ))}
@@ -85,12 +122,16 @@ function GiftImage({ gift }: { gift: GiftData }) {
 
 function GiftActions({
   gift,
+  onDelete,
   onEdit,
 }: {
   gift: GiftData;
+  onDelete: (gift: GiftData) => void;
   onEdit: (gift: GiftData) => void;
 }) {
   const [open, setOpen] = React.useState(false);
+  const [anchorElement, setAnchorElement] =
+    React.useState<HTMLButtonElement | null>(null);
 
   return (
     <div className="relative flex justify-end">
@@ -98,14 +139,22 @@ function GiftActions({
         aria-expanded={open}
         aria-label={`Open actions for ${gift.name}`}
         className="flex size-9 items-center justify-center rounded-full text-[#2F4B4F]/65 transition hover:bg-fill hover:text-[#2F4B4F]"
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          setAnchorElement(event.currentTarget);
+          setOpen((current) => !current);
+        }}
         type="button"
       >
         <MoreVertical className="size-5" />
       </button>
 
-      {open ? (
-        <div className="absolute right-0 top-10 z-20 w-44 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg">
+      <AppPopup
+        anchorElement={anchorElement}
+        className="w-44 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg"
+        onClose={() => setOpen(false)}
+        open={open}
+        placement="bottom-end"
+      >
           <ActionMenuItem
             icon={<Pencil className="size-4" />}
             label="Edit gift"
@@ -114,24 +163,37 @@ function GiftActions({
               onEdit(gift);
             }}
           />
-        </div>
-      ) : null}
+          <ActionMenuItem
+            destructive
+            icon={<Trash2 className="size-4" />}
+            label="Delete"
+            onClick={() => {
+              setOpen(false);
+              onDelete(gift);
+            }}
+          />
+      </AppPopup>
     </div>
   );
 }
 
 function ActionMenuItem({
+  destructive = false,
   icon,
   label,
   onClick,
 }: {
+  destructive?: boolean;
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
 }) {
   return (
     <button
-      className="flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left text-[#2F4B4F] transition last:border-b-0 hover:bg-fill"
+      className={cn(
+        "flex w-full items-center gap-3 border-b border-border px-5 py-3 text-left transition last:border-b-0 hover:bg-fill",
+        destructive ? "text-error" : "text-[#2F4B4F]",
+      )}
       onClick={onClick}
       type="button"
     >

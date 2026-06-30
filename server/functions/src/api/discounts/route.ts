@@ -91,6 +91,36 @@ DiscountRouter.patch(
   }),
 );
 
+DiscountRouter.delete(
+  "/:discountId",
+  validateRequest({ params: discountParamsSchema }),
+  asyncHandler(async (req, res) => {
+    const membership = await getMembership(req.currentUser?.uid);
+    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+
+    const params = req.params as unknown as DiscountParams;
+    const result = await DiscountService.deleteDiscount({
+      businessId: membership.businessId,
+      discountId: params.discountId,
+    });
+    if (result === "not-found") {
+      return sendError(res, API_RESPONSE.discountNotFound);
+    }
+    if (result === "in-use") {
+      return sendError(res, API_RESPONSE.discountInUse);
+    }
+
+    const response = API_RESPONSE.discountDeleted;
+    return SuccessResult(
+      res,
+      response.message,
+      null,
+      response.statusCode,
+      response.code,
+    );
+  }),
+);
+
 async function getMembership(userId?: string) {
   return userId ? BusinessTeamService.getMembership(userId) : null;
 }

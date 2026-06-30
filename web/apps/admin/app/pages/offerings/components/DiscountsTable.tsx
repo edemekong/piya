@@ -1,6 +1,6 @@
 import * as React from "react";
-import { CalendarDays, MoreVertical, Pencil, TicketPercent, Trash2 } from "lucide-react";
-import { cn } from "@piya/ui";
+import { CalendarDays, Loader2, MoreVertical, Pencil, TicketPercent, Trash2 } from "lucide-react";
+import { AppPopup, EmptyState, cn } from "@piya/ui";
 import type { DiscountData } from "@piya/shared/models";
 import {
   formatDiscountDate,
@@ -9,15 +9,44 @@ import {
 
 type DiscountsTableProps = {
   discounts: DiscountData[];
+  isLoading: boolean;
+  onDelete: (discount: DiscountData) => void;
   onEdit: (discount: DiscountData) => void;
   onView: (discount: DiscountData) => void;
 };
 
 export function DiscountsTable({
   discounts,
+  isLoading,
+  onDelete,
   onEdit,
   onView,
 }: DiscountsTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-[200px] items-center justify-center">
+        <Loader2
+          aria-label="Loading discounts"
+          className="size-6 animate-spin text-primary"
+        />
+      </div>
+    );
+  }
+
+  if (discounts.length === 0) {
+    return (
+      <EmptyState
+        className="flex h-[200px] flex-col items-center justify-center border-0 bg-transparent p-0 text-center"
+        icon={<TicketPercent className="size-5" />}
+        title={
+          <span className="font-normal text-[#2F4B4F]/55">
+            Discounts you create will appear here.
+          </span>
+        }
+      />
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[900px] border-collapse text-left">
@@ -81,7 +110,11 @@ export function DiscountsTable({
                 </p>
               </td>
               <td className="py-4 pl-4">
-                <DiscountActions discount={discount} onEdit={onEdit} />
+                <DiscountActions
+                  discount={discount}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                />
               </td>
             </tr>
           ))}
@@ -93,12 +126,16 @@ export function DiscountsTable({
 
 function DiscountActions({
   discount,
+  onDelete,
   onEdit,
 }: {
   discount: DiscountData;
+  onDelete: (discount: DiscountData) => void;
   onEdit: (discount: DiscountData) => void;
 }) {
   const [open, setOpen] = React.useState(false);
+  const [anchorElement, setAnchorElement] =
+    React.useState<HTMLButtonElement | null>(null);
 
   return (
     <div className="relative flex justify-end">
@@ -106,14 +143,22 @@ function DiscountActions({
         aria-expanded={open}
         aria-label={`Open actions for ${discount.title}`}
         className="flex size-9 items-center justify-center rounded-full text-[#2F4B4F]/65 transition hover:bg-fill hover:text-[#2F4B4F]"
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          setAnchorElement(event.currentTarget);
+          setOpen((current) => !current);
+        }}
         type="button"
       >
         <MoreVertical className="size-5" />
       </button>
 
-      {open ? (
-        <div className="absolute right-0 top-10 z-20 w-48 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg">
+      <AppPopup
+        anchorElement={anchorElement}
+        className="w-48 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg"
+        onClose={() => setOpen(false)}
+        open={open}
+        placement="bottom-end"
+      >
           <ActionMenuItem
             icon={<Pencil className="size-4" />}
             label="Edit discount"
@@ -126,10 +171,12 @@ function DiscountActions({
             destructive
             icon={<Trash2 className="size-4" />}
             label="Delete"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              onDelete(discount);
+            }}
           />
-        </div>
-      ) : null}
+      </AppPopup>
     </div>
   );
 }

@@ -59,6 +59,13 @@ export class OfferingsService extends BaseAPIService {
       },
     );
   }
+
+  deleteOffering(offeringId: string): Promise<void> {
+    return this.delete<void>(this.urlController.offering(offeringId), {
+      maxRetries: 0,
+      withToken: true,
+    });
+  }
 }
 
 export const offeringsService = new OfferingsService();

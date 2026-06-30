@@ -54,6 +54,13 @@ export class DiscountsService extends BaseAPIService {
       },
     );
   }
+
+  deleteDiscount(discountId: string): Promise<void> {
+    return this.delete<void>(this.urlController.discount(discountId), {
+      maxRetries: 0,
+      withToken: true,
+    });
+  }
 }
 
 export const discountsService = new DiscountsService();

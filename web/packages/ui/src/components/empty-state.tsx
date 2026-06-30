@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "../lib/cn";
 
-export type EmptyStateProps = React.HTMLAttributes<HTMLDivElement> & {
+export type EmptyStateProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"> & {
   description?: React.ReactNode;
   icon?: React.ReactNode;
   title?: React.ReactNode;
@@ -24,7 +24,7 @@ export function EmptyState({
       {...props}
     >
       {icon ? (
-        <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
+        <span className="mx-auto flex size-12 items-center justify-center rounded-md bg-secondary text-primary">
           {icon}
         </span>
       ) : null}

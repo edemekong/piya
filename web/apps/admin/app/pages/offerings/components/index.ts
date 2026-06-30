@@ -1,3 +1,4 @@
+export { CatalogDeleteDialog } from "./CatalogDeleteDialog";
 export { DiscountEditorSheet } from "./DiscountEditorSheet";
 export { DiscountsTable } from "./DiscountsTable";
 export { GiftEditorSheet } from "./GiftEditorSheet";

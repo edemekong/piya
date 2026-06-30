@@ -61,6 +61,28 @@ export class DiscountService {
     return discount;
   }
 
+  static async deleteDiscount(params: {
+    businessId: string;
+    discountId: string;
+  }): Promise<"deleted" | "in-use" | "not-found"> {
+    const { businessId, discountId } = params;
+    const discountRef = this.discountsCollection(businessId).doc(discountId);
+    const snapshot = await discountRef.get();
+    if (!snapshot.exists) return "not-found";
+
+    const offeringsSnapshot = await db()
+      .collection(COLLECTIONS.business)
+      .doc(businessId)
+      .collection(BUSINESS_SUBCOLLECTIONS.offerings)
+      .where("commerce.discountIds", "array-contains", discountId)
+      .limit(1)
+      .get();
+    if (!offeringsSnapshot.empty) return "in-use";
+
+    await discountRef.delete();
+    return "deleted";
+  }
+
   private static discountsCollection(businessId: string) {
     return db()
       .collection(COLLECTIONS.business)

@@ -30,6 +30,7 @@ export function Sidebar() {
   const offeringDisplay = getOfferingDisplayConfig(
     accountSetup?.business?.category ?? null,
   );
+  const userName = accountSetup?.user.name || "User";
   const items = sidebarItems.map((item) =>
     item.to === "/offerings"
       ? { ...item, label: offeringDisplay.plural }
@@ -85,7 +86,8 @@ export function Sidebar() {
       >
         <AppAvatar
           className="size-12 text-headline"
-          name="Admin User"
+          imageUrl={accountSetup?.user.profileImageUrl}
+          name={userName}
         />
         <span className="pointer-events-none absolute left-[calc(100%+12px)] top-1/2 z-20 -translate-y-1/2 whitespace-nowrap rounded-md bg-primary px-3 py-2 text-footnote font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100">
           Profile

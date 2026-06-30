@@ -1,8 +1,8 @@
 import {
   FieldPath,
+  Filter,
   type DocumentData,
   type Query,
-  type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { db } from "../../configs/firebase";
@@ -19,9 +19,8 @@ import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
 import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
 
-const CONTACT_SCAN_BATCH_SIZE = 100;
-
 type ContactCursor = {
+  bmd?: string;
   createdAt: number;
   id: string;
 };
@@ -60,9 +59,7 @@ export class ContactService {
     const searchToken = input.query
       ? this.getContactSearchToken(input.query)
       : null;
-    let baseQuery: Query<DocumentData> = this.contactsCollection(businessId)
-      .orderBy("createdAt", "desc")
-      .orderBy(FieldPath.documentId(), "desc");
+    let baseQuery: Query<DocumentData> = this.contactsCollection(businessId);
 
     if (searchToken) {
       baseQuery = baseQuery.where(
@@ -71,37 +68,56 @@ export class ContactService {
         searchToken
       );
     }
-
-    let scanCursor = input.cursor
-      ? this.decodeContactCursor(input.cursor)
-      : null;
-    const matchedContacts: ContactData[] = [];
-
-    while (matchedContacts.length <= input.limit) {
-      let batchQuery = baseQuery;
-      if (scanCursor) {
-        batchQuery = batchQuery.startAfter(scanCursor.createdAt, scanCursor.id);
-      }
-
-      const snapshot = await batchQuery.limit(CONTACT_SCAN_BATCH_SIZE).get();
-      if (snapshot.empty) break;
-
-      for (const document of snapshot.docs) {
-        const contact = document.data() as ContactData;
-        if (this.matchesContactFilters(contact, input)) {
-          matchedContacts.push(contact);
-          if (matchedContacts.length > input.limit) break;
-        }
-      }
-
-      if (matchedContacts.length > input.limit) break;
-      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-      if (!lastDocument || snapshot.size < CONTACT_SCAN_BATCH_SIZE) break;
-      scanCursor = this.getDocumentCursor(lastDocument);
+    if (input.status) {
+      baseQuery = baseQuery.where("status", "==", input.status);
+    }
+    if (input.tagId) {
+      baseQuery = baseQuery.where("tags", "array-contains", input.tagId);
+    }
+    if (input.bmdFrom && input.bmdTo) {
+      baseQuery =
+        input.bmdFrom <= input.bmdTo
+          ? baseQuery
+              .where("bmd", ">=", input.bmdFrom)
+              .where("bmd", "<=", input.bmdTo)
+          : baseQuery.where(
+              Filter.or(
+                Filter.where("bmd", ">=", input.bmdFrom),
+                Filter.where("bmd", "<=", input.bmdTo)
+              )
+            );
+      baseQuery = baseQuery
+        .orderBy("bmd", "asc")
+        .orderBy("createdAt", "desc")
+        .orderBy(FieldPath.documentId(), "desc");
+    } else {
+      baseQuery = baseQuery
+        .orderBy("createdAt", "desc")
+        .orderBy(FieldPath.documentId(), "desc");
     }
 
+    if (input.cursor) {
+      const cursor = this.decodeContactCursor(
+        input.cursor,
+        Boolean(input.bmdFrom)
+      );
+      if (input.bmdFrom) {
+        baseQuery = baseQuery.startAfter(
+          cursor.bmd,
+          cursor.createdAt,
+          cursor.id
+        );
+      } else {
+        baseQuery = baseQuery.startAfter(cursor.createdAt, cursor.id);
+      }
+    }
+
+    const snapshot = await baseQuery.limit(input.limit + 1).get();
+    const matchedContacts = snapshot.docs.map(
+      (document) => document.data() as ContactData
+    );
     const contacts = matchedContacts.slice(0, input.limit);
-    const hasNextPage = matchedContacts.length > input.limit;
+    const hasNextPage = snapshot.size > input.limit;
     const lastContact = contacts[contacts.length - 1];
 
     return {
@@ -110,6 +126,7 @@ export class ContactService {
       nextCursor:
         hasNextPage && lastContact
           ? this.encodeContactCursor({
+              bmd: input.bmdFrom ? lastContact.bmd ?? undefined : undefined,
               createdAt: lastContact.createdAt,
               id: lastContact.id,
             })
@@ -376,35 +393,6 @@ export class ContactService {
     return contact;
   }
 
-  private static matchesContactFilters(
-    contact: ContactData,
-    input: GetContactsQuery
-  ) {
-    if (input.status && contact.status !== input.status) return false;
-    if (
-      input.bmdFrom &&
-      input.bmdTo &&
-      (!contact.bmd ||
-        !this.isBirthdayWithinRange(contact.bmd, input.bmdFrom, input.bmdTo))
-    ) {
-      return false;
-    }
-    if (input.tagId && !contact.tags.includes(input.tagId)) return false;
-    return true;
-  }
-
-  private static isBirthdayWithinRange(
-    birthday: string,
-    rangeStart: string,
-    rangeEnd: string
-  ) {
-    if (rangeStart <= rangeEnd) {
-      return birthday >= rangeStart && birthday <= rangeEnd;
-    }
-
-    return birthday >= rangeStart || birthday <= rangeEnd;
-  }
-
   private static getContactSearchToken(query: string) {
     const normalizedQuery = this.normalizeSearchValue(query);
     const isPhoneQuery = /^[+\d\s()-]+$/.test(query);
@@ -614,18 +602,28 @@ export class ContactService {
     return Buffer.from(JSON.stringify(cursor)).toString("base64url");
   }
 
-  private static decodeContactCursor(cursor: string): ContactCursor {
+  private static decodeContactCursor(
+    cursor: string,
+    requiresBirthday: boolean
+  ): ContactCursor {
     try {
       const value = JSON.parse(
         Buffer.from(cursor, "base64url").toString("utf8")
       ) as Partial<ContactCursor>;
       if (
+        (!requiresBirthday ||
+          (typeof value.bmd === "string" &&
+            /^\d{2}-\d{2}$/.test(value.bmd))) &&
         typeof value.createdAt === "number" &&
         Number.isFinite(value.createdAt) &&
         typeof value.id === "string" &&
         value.id.length > 0
       ) {
-        return { createdAt: value.createdAt, id: value.id };
+        return {
+          bmd: typeof value.bmd === "string" ? value.bmd : undefined,
+          createdAt: value.createdAt,
+          id: value.id,
+        };
       }
     } catch {
       // Return the standardized invalid request response below.
@@ -633,13 +631,6 @@ export class ContactService {
 
     const response = API_RESPONSE.invalidRequest;
     throw new ApiError(response.statusCode, response.message, response.code);
-  }
-
-  private static getDocumentCursor(
-    document: QueryDocumentSnapshot<DocumentData>
-  ): ContactCursor {
-    const contact = document.data() as ContactData;
-    return { createdAt: contact.createdAt, id: document.id };
   }
 
   private static async getDuplicateContact(

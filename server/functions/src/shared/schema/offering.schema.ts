@@ -187,6 +187,10 @@ const getOfferingsQuerySchema = z
     type: offeringTypeSchema.optional(),
   })
   .strict()
+  .refine((query) => !(query.query && query.tag), {
+    message: "Search query and tag filter cannot be combined",
+    path: ["tag"],
+  })
   .transform(({ token: _token, ...query }) => query);
 
 const offeringParamsSchema = z

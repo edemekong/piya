@@ -3,6 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Loader2,
   Mail,
   MoreVertical,
   NotebookPen,
@@ -11,8 +12,9 @@ import {
   Search,
   Send,
   Trash2,
+  UsersRound,
 } from "lucide-react";
-import { AppAvatar, AppCheckbox, AppPopup, Button, cn } from "@piya/ui";
+import { AppAvatar, AppCheckbox, AppPopup, Badge, Button, EmptyState, cn } from "@piya/ui";
 import {
   showToast,
   useGetBadgesQuery,
@@ -33,14 +35,14 @@ function statusClassName(status: ContactData["status"]) {
   }
 
   if (status === "lead") {
-    return "border-secondary-dark/20 bg-secondary/40 text-primary";
+    return "border-blue-200 bg-blue-50 text-blue-700";
   }
 
   if (status === "blocked") {
     return "border-error/20 bg-error/10 text-error";
   }
 
-  return "border-border bg-fill text-text-tertiary";
+  return "border-border bg-fill text-[#2F4B4F]/65";
 }
 
 function statusLabel(status: ContactData["status"]) {
@@ -178,7 +180,7 @@ export function ContactsTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[820px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border bg-fill/70 text-caption-1 text-[#2F4B4F]/65">
+            <tr className="border-b border-border text-caption-1 text-[#2F4B4F]/60">
               <th className="w-10 py-4 pl-4 pr-2">
                 <AppCheckbox
                   checked={areAllPageContactsSelected}
@@ -197,13 +199,30 @@ export function ContactsTable({
             </tr>
           </thead>
           <tbody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={6}>
+                  <div className="flex h-[200px] items-center justify-center">
+                    <Loader2
+                      aria-label="Loading contacts"
+                      className="size-6 animate-spin text-primary"
+                    />
+                  </div>
+                </td>
+              </tr>
+            ) : null}
             {!isLoading && !isError && contacts.length === 0 ? (
               <tr>
-                <td
-                  className="px-5 py-12 text-center text-callout text-[#2F4B4F]/60"
-                  colSpan={6}
-                >
-                  No contacts match these filters.
+                <td colSpan={6}>
+                  <EmptyState
+                    className="flex h-[200px] flex-col items-center justify-center rounded-none border-0 bg-transparent p-0 text-center"
+                    icon={<UsersRound className="size-5" />}
+                    title={
+                      <span className="font-normal text-[#2F4B4F]/55">
+                        Contacts you add will appear here.
+                      </span>
+                    }
+                  />
                 </td>
               </tr>
             ) : null}
@@ -217,7 +236,7 @@ export function ContactsTable({
                 </td>
               </tr>
             ) : null}
-            {contacts.map((contact) => (
+            {!isLoading && contacts.map((contact) => (
               <tr
                 className="cursor-pointer border-b border-border transition hover:bg-fill/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary last:border-0"
                 key={contact.id}
@@ -298,14 +317,14 @@ export function ContactsTable({
                   </div>
                 </td>
                 <td className="px-5 py-4">
-                  <span
+                  <Badge
                     className={cn(
-                      "inline-flex rounded-full border px-2.5 py-1 text-caption-1 font-semibold",
+                      "h-auto rounded-full px-3 py-1.5 text-caption-1 font-semibold",
                       statusClassName(contact.status)
                     )}
                   >
                     {statusLabel(contact.status)}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-5 py-4 text-callout text-[#2F4B4F]/65">
                   {formatDate(contact.lastInteractionAt)}
@@ -335,7 +354,7 @@ export function ContactsTable({
       <footer className="flex items-center justify-between gap-4 border-t border-border px-5 py-4">
         <span className="text-footnote text-[#2F4B4F]/65">
           {isLoading
-            ? "Loading contacts…"
+            ? "Loading"
             : `Page ${page} · ${contacts.length} contacts`}
         </span>
         <div className="flex items-center gap-2">

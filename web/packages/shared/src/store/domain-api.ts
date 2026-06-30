@@ -514,6 +514,17 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["Discount"],
     }),
+    deleteDiscount: builder.mutation<void, string>({
+      queryFn: async (discountId) => {
+        try {
+          await discountsService.deleteDiscount(discountId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Discount"],
+    }),
     getGifts: builder.query<GiftData[], void>({
       queryFn: async () => {
         try {
@@ -544,6 +555,17 @@ export const domainApi = createApi({
         try {
           const payload = await giftsService.updateGift(giftId, input);
           return { data: payload.gift };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Gift"],
+    }),
+    deleteGift: builder.mutation<void, string>({
+      queryFn: async (giftId) => {
+        try {
+          await giftsService.deleteGift(giftId);
+          return { data: undefined };
         } catch (error) {
           return { error: getDomainApiError(error) };
         }
@@ -599,6 +621,17 @@ export const domainApi = createApi({
       },
       invalidatesTags: ["Offering"],
     }),
+    deleteOffering: builder.mutation<void, string>({
+      queryFn: async (offeringId) => {
+        try {
+          await offeringsService.deleteOffering(offeringId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Offering"],
+    }),
     getOrders: builder.query<OrderData[], void>({
       queryFn: () => ({ data: ordersService.getOrders() }),
       providesTags: ["Order"],
@@ -621,6 +654,9 @@ export const {
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useDeleteBadgeMutation,
+  useDeleteDiscountMutation,
+  useDeleteGiftMutation,
+  useDeleteOfferingMutation,
   useDisconnectWhatsAppConnectionMutation,
   useGetAccountSetupQuery,
   useGetPrimaryAvailabilityQuery,

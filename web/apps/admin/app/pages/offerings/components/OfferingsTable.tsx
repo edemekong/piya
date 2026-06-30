@@ -1,13 +1,13 @@
 import * as React from "react";
 import {
   Megaphone,
+  Loader2,
   MoreVertical,
   Package,
   Pencil,
-  Percent,
   Trash2,
 } from "lucide-react";
-import { Badge, cn } from "@piya/ui";
+import { AppPopup, Badge, EmptyState, cn } from "@piya/ui";
 import type {
   OfferingDisplayConfig,
   OfferingTableColumn,
@@ -17,17 +17,46 @@ import { formatOfferingLabel } from "@piya/shared/utils";
 
 type OfferingsTableProps = {
   display: OfferingDisplayConfig;
+  isLoading: boolean;
   offerings: OfferingData[];
+  onDelete: (offering: OfferingData) => void;
   onEdit: (offering: OfferingData) => void;
   onView: (offering: OfferingData) => void;
 };
 
 export function OfferingsTable({
   display,
+  isLoading,
   offerings,
+  onDelete,
   onEdit,
   onView,
 }: OfferingsTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-[200px] items-center justify-center">
+        <Loader2
+          aria-label={`Loading ${display.plural.toLowerCase()}`}
+          className="size-6 animate-spin text-primary"
+        />
+      </div>
+    );
+  }
+
+  if (offerings.length === 0) {
+    return (
+      <EmptyState
+        className="flex h-[200px] flex-col items-center justify-center border-0 bg-transparent p-0 text-center"
+        icon={<Package className="size-5" />}
+        title={
+          <span className="font-normal text-[#2F4B4F]/55">
+            {display.plural} you add will appear here.
+          </span>
+        }
+      />
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[820px] border-collapse text-left">
@@ -74,6 +103,7 @@ export function OfferingsTable({
                 <OfferingActions
                   editLabel={display.editActionLabel}
                   offering={offering}
+                  onDelete={onDelete}
                   onEdit={onEdit}
                 />
               </td>
@@ -156,13 +186,17 @@ function StatusBadge({ status }: { status: OfferingData["status"] }) {
 function OfferingActions({
   editLabel,
   offering,
+  onDelete,
   onEdit,
 }: {
   editLabel: string;
   offering: OfferingData;
+  onDelete: (offering: OfferingData) => void;
   onEdit: (offering: OfferingData) => void;
 }) {
   const [open, setOpen] = React.useState(false);
+  const [anchorElement, setAnchorElement] =
+    React.useState<HTMLButtonElement | null>(null);
 
   return (
     <div className="relative flex justify-end">
@@ -170,14 +204,22 @@ function OfferingActions({
         aria-expanded={open}
         aria-label={`Open actions for ${offering.name}`}
         className="flex size-9 items-center justify-center rounded-full text-[#2F4B4F]/65 transition hover:bg-fill hover:text-[#2F4B4F]"
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          setAnchorElement(event.currentTarget);
+          setOpen((current) => !current);
+        }}
         type="button"
       >
         <MoreVertical className="size-5" />
       </button>
 
-      {open ? (
-        <div className="absolute right-0 top-10 z-20 w-48 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg">
+      <AppPopup
+        anchorElement={anchorElement}
+        className="w-48 rounded-md border border-border bg-white py-2 text-callout text-[#2F4B4F] shadow-lg"
+        onClose={() => setOpen(false)}
+        open={open}
+        placement="bottom-end"
+      >
           <ActionMenuItem
             icon={<Pencil className="size-4" />}
             label={editLabel}
@@ -185,11 +227,6 @@ function OfferingActions({
               setOpen(false);
               onEdit(offering);
             }}
-          />
-          <ActionMenuItem
-            icon={<Percent className="size-4" />}
-            label="Add discount"
-            onClick={() => setOpen(false)}
           />
           <ActionMenuItem
             icon={<Megaphone className="size-4" />}
@@ -200,10 +237,12 @@ function OfferingActions({
             destructive
             icon={<Trash2 className="size-4" />}
             label="Delete"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              onDelete(offering);
+            }}
           />
-        </div>
-      ) : null}
+      </AppPopup>
     </div>
   );
 }

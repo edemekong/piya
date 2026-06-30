@@ -91,6 +91,36 @@ OfferingRouter.patch(
   }),
 );
 
+OfferingRouter.delete(
+  "/:offeringId",
+  validateRequest({ params: offeringParamsSchema }),
+  asyncHandler(async (req, res) => {
+    const membership = await getMembership(req.currentUser?.uid);
+    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+
+    const params = req.params as unknown as OfferingParams;
+    const result = await OfferingService.deleteOffering({
+      businessId: membership.businessId,
+      offeringId: params.offeringId,
+    });
+    if (result === "not-found") {
+      return sendError(res, API_RESPONSE.offeringNotFound);
+    }
+    if (result === "in-use") {
+      return sendError(res, API_RESPONSE.offeringInUse);
+    }
+
+    const response = API_RESPONSE.offeringDeleted;
+    return SuccessResult(
+      res,
+      response.message,
+      null,
+      response.statusCode,
+      response.code,
+    );
+  }),
+);
+
 async function getMembership(userId?: string) {
   return userId ? BusinessTeamService.getMembership(userId) : null;
 }

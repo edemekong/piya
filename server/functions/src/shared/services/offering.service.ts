@@ -2,7 +2,6 @@ import {
   FieldPath,
   type DocumentData,
   type Query,
-  type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { db } from "../../configs/firebase";
 import type { OfferingData } from "../model/offering";
@@ -15,8 +14,6 @@ import { ApiError } from "../utils/api-response";
 import { BUSINESS_SUBCOLLECTIONS, COLLECTIONS } from "../utils/collections";
 import { API_RESPONSE } from "../utils/constants";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
-
-const OFFERING_SCAN_BATCH_SIZE = 100;
 
 type OfferingCursor = {
   createdAt: number;
@@ -60,33 +57,17 @@ export class OfferingService {
       baseQuery = baseQuery.where("tags", "array-contains", input.tag);
     }
 
-    let scanCursor = input.cursor
-      ? this.decodeOfferingCursor(input.cursor)
-      : null;
-    const matchedOfferings: OfferingData[] = [];
-
-    while (matchedOfferings.length <= input.limit) {
-      let batchQuery = baseQuery;
-      if (scanCursor) {
-        batchQuery = batchQuery.startAfter(scanCursor.createdAt, scanCursor.id);
-      }
-
-      const snapshot = await batchQuery.limit(OFFERING_SCAN_BATCH_SIZE).get();
-      if (snapshot.empty) break;
-
-      snapshot.docs.some((document) => {
-        matchedOfferings.push(document.data() as OfferingData);
-        return matchedOfferings.length > input.limit;
-      });
-
-      if (matchedOfferings.length > input.limit) break;
-      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-      if (!lastDocument || snapshot.size < OFFERING_SCAN_BATCH_SIZE) break;
-      scanCursor = this.getDocumentCursor(lastDocument);
+    if (input.cursor) {
+      const cursor = this.decodeOfferingCursor(input.cursor);
+      baseQuery = baseQuery.startAfter(cursor.createdAt, cursor.id);
     }
 
+    const snapshot = await baseQuery.limit(input.limit + 1).get();
+    const matchedOfferings = snapshot.docs.map(
+      (document) => document.data() as OfferingData,
+    );
     const offerings = matchedOfferings.slice(0, input.limit);
-    const hasNextPage = matchedOfferings.length > input.limit;
+    const hasNextPage = snapshot.size > input.limit;
     const lastOffering = offerings[offerings.length - 1];
 
     return {
@@ -147,18 +128,33 @@ export class OfferingService {
     return offering;
   }
 
+  static async deleteOffering(params: {
+    businessId: string;
+    offeringId: string;
+  }): Promise<"deleted" | "in-use" | "not-found"> {
+    const { businessId, offeringId } = params;
+    const offeringRef = this.offeringsCollection(businessId).doc(offeringId);
+    const snapshot = await offeringRef.get();
+    if (!snapshot.exists) return "not-found";
+
+    const discountsSnapshot = await db()
+      .collection(COLLECTIONS.business)
+      .doc(businessId)
+      .collection(BUSINESS_SUBCOLLECTIONS.discounts)
+      .where("rules.offeringIds", "array-contains", offeringId)
+      .limit(1)
+      .get();
+    if (!discountsSnapshot.empty) return "in-use";
+
+    await offeringRef.delete();
+    return "deleted";
+  }
+
   private static offeringsCollection(businessId: string) {
     return db()
       .collection(COLLECTIONS.business)
       .doc(businessId)
       .collection(BUSINESS_SUBCOLLECTIONS.offerings);
-  }
-
-  private static getDocumentCursor(
-    document: QueryDocumentSnapshot<DocumentData>,
-  ): OfferingCursor {
-    const data = document.data() as Pick<OfferingData, "createdAt">;
-    return { createdAt: data.createdAt, id: document.id };
   }
 
   private static encodeOfferingCursor(cursor: OfferingCursor) {

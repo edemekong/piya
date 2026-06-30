@@ -18,12 +18,19 @@ import {
   useUpdateOfferingMutation,
   useCreateDiscountMutation,
   useCreateGiftMutation,
+  useDeleteDiscountMutation,
+  useDeleteGiftMutation,
+  useDeleteOfferingMutation,
   useUpdateDiscountMutation,
   useUpdateGiftMutation,
+  showToast,
+  type AppDispatch,
 } from "@piya/shared";
 import type { DiscountData, GiftData, OfferingData } from "@piya/shared/models";
 import type { DiscountInput, GiftInput } from "@piya/shared/types";
+import { useDispatch } from "react-redux";
 import {
+  CatalogDeleteDialog,
   DiscountEditorSheet,
   DiscountsTable,
   GiftEditorSheet,
@@ -34,8 +41,13 @@ import {
 
 type MainTab = "offerings" | "discounts" | "gifts";
 type EditorMode = "create" | "edit";
+type CatalogDeleteTarget =
+  | { item: OfferingData; type: "offering" }
+  | { item: DiscountData; type: "discount" }
+  | { item: GiftData; type: "gift" };
 
 export function OfferingPage() {
+  const dispatch = useDispatch<AppDispatch>();
   const { data: accountSetup } = useGetAccountSetupQuery();
   const offeringDisplay = getOfferingDisplayConfig(
     accountSetup?.business?.category ?? null,
@@ -57,9 +69,12 @@ export function OfferingPage() {
       value: "gifts",
     },
   ] satisfies { icon: React.ReactNode; label: string; value: MainTab }[];
-  const { data: queriedDiscounts = [] } = useGetDiscountsQuery();
-  const { data: queriedGifts = [] } = useGetGiftsQuery();
-  const { data: offerings = [] } = useGetOfferingsQuery();
+  const { data: queriedDiscounts = [], isLoading: isLoadingDiscounts } =
+    useGetDiscountsQuery();
+  const { data: queriedGifts = [], isLoading: isLoadingGifts } =
+    useGetGiftsQuery();
+  const { data: offerings = [], isLoading: isLoadingOfferings } =
+    useGetOfferingsQuery();
   const [createOffering, { isLoading: isCreatingOffering }] =
     useCreateOfferingMutation();
   const [updateOffering, { isLoading: isUpdatingOffering }] =
@@ -72,6 +87,12 @@ export function OfferingPage() {
     useCreateGiftMutation();
   const [updateGift, { isLoading: isUpdatingGift }] =
     useUpdateGiftMutation();
+  const [deleteOffering, { isLoading: isDeletingOffering }] =
+    useDeleteOfferingMutation();
+  const [deleteDiscount, { isLoading: isDeletingDiscount }] =
+    useDeleteDiscountMutation();
+  const [deleteGift, { isLoading: isDeletingGift }] =
+    useDeleteGiftMutation();
   const [activeTab, setActiveTab] = React.useState<MainTab>("offerings");
   const [discounts, setDiscounts] =
     React.useState<DiscountData[]>([]);
@@ -90,6 +111,8 @@ export function OfferingPage() {
   const [selectedDiscount, setSelectedDiscount] =
     React.useState<DiscountData | null>(null);
   const [selectedGift, setSelectedGift] = React.useState<GiftData | null>(null);
+  const [deleteTarget, setDeleteTarget] =
+    React.useState<CatalogDeleteTarget | null>(null);
 
   React.useEffect(() => {
     setDiscounts(queriedDiscounts);
@@ -177,6 +200,31 @@ export function OfferingPage() {
     await createGift(input).unwrap();
   }
 
+  async function deleteSelectedCatalogItem() {
+    if (!deleteTarget) return;
+
+    try {
+      if (deleteTarget.type === "offering") {
+        await deleteOffering(deleteTarget.item.id).unwrap();
+      } else if (deleteTarget.type === "discount") {
+        await deleteDiscount(deleteTarget.item.id).unwrap();
+      } else {
+        await deleteGift(deleteTarget.item.id).unwrap();
+      }
+
+      showToast(dispatch, {
+        message: `${capitalize(deleteTarget.type)} deleted.`,
+        variant: "success",
+      });
+      setDeleteTarget(null);
+    } catch (error) {
+      showToast(dispatch, {
+        message: getCatalogDeleteErrorMessage(error),
+        variant: "error",
+      });
+    }
+  }
+
   const isDiscountsTab = activeTab === "discounts";
   const isGiftsTab = activeTab === "gifts";
   const ctaLabel = isDiscountsTab
@@ -197,6 +245,8 @@ export function OfferingPage() {
   const isSavingOffering = isCreatingOffering || isUpdatingOffering;
   const isSavingDiscount = isCreatingDiscount || isUpdatingDiscount;
   const isSavingGift = isCreatingGift || isUpdatingGift;
+  const isDeletingCatalogItem =
+    isDeletingOffering || isDeletingDiscount || isDeletingGift;
 
   return (
     <>
@@ -244,19 +294,31 @@ export function OfferingPage() {
             {activeTab === "offerings" ? (
               <OfferingsTable
                 display={offeringDisplay}
+                isLoading={isLoadingOfferings}
                 offerings={offerings}
+                onDelete={(offering) =>
+                  setDeleteTarget({ item: offering, type: "offering" })
+                }
                 onEdit={openEditSheet}
                 onView={openEditSheet}
               />
             ) : activeTab === "discounts" ? (
               <DiscountsTable
                 discounts={discounts}
+                isLoading={isLoadingDiscounts}
+                onDelete={(discount) =>
+                  setDeleteTarget({ item: discount, type: "discount" })
+                }
                 onEdit={openEditDiscountSheet}
                 onView={openEditDiscountSheet}
               />
             ) : (
               <GiftsTable
                 gifts={gifts}
+                isLoading={isLoadingGifts}
+                onDelete={(gift) =>
+                  setDeleteTarget({ item: gift, type: "gift" })
+                }
                 onEdit={openEditGiftSheet}
                 onView={openEditGiftSheet}
               />
@@ -293,6 +355,37 @@ export function OfferingPage() {
         open={isGiftEditorOpen}
         saving={isSavingGift}
       />
+      <CatalogDeleteDialog
+        deleting={isDeletingCatalogItem}
+        itemName={
+          deleteTarget
+            ? deleteTarget.type === "discount"
+              ? deleteTarget.item.title
+              : deleteTarget.item.name
+            : ""
+        }
+        itemType={deleteTarget?.type ?? "offering"}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={deleteSelectedCatalogItem}
+        open={Boolean(deleteTarget)}
+      />
     </>
   );
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function getCatalogDeleteErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Unable to delete this item.";
 }

@@ -89,6 +89,15 @@ class StorageService {
     });
   }
 
+  static async deleteBusinessGiftImages(
+    businessId: string,
+    giftId: string,
+  ): Promise<void> {
+    await storage()
+      .bucket()
+      .deleteFiles({ prefix: `business/${businessId}/gifts/${giftId}/` });
+  }
+
   static decodeBase64Image(value: string): DecodedBase64File {
     return decodeBase64Image(value);
   }

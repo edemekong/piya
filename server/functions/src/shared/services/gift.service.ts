@@ -80,6 +80,29 @@ export class GiftService {
     return gift;
   }
 
+  static async deleteGift(params: {
+    businessId: string;
+    giftId: string;
+  }): Promise<"deleted" | "in-use" | "not-found"> {
+    const { businessId, giftId } = params;
+    const giftRef = this.giftsCollection(businessId).doc(giftId);
+    const snapshot = await giftRef.get();
+    if (!snapshot.exists) return "not-found";
+
+    const discountsSnapshot = await db()
+      .collection(COLLECTIONS.business)
+      .doc(businessId)
+      .collection(BUSINESS_SUBCOLLECTIONS.discounts)
+      .where("reward.metadata.giftId", "==", giftId)
+      .limit(1)
+      .get();
+    if (!discountsSnapshot.empty) return "in-use";
+
+    await giftRef.delete();
+    await StorageService.deleteBusinessGiftImages(businessId, giftId);
+    return "deleted";
+  }
+
   private static giftsCollection(businessId: string) {
     return db()
       .collection(COLLECTIONS.business)

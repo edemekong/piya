@@ -7,14 +7,16 @@ import {
   Link,
   List,
   ListOrdered,
+  Loader2,
   NotebookPen,
   Quote,
   Search,
   Strikethrough,
   Underline,
+  UsersRound,
   X,
 } from "lucide-react";
-import { AppAvatar, AppPopup, AppSheet, Button, cn } from "@piya/ui";
+import { AppAvatar, AppPopup, AppSheet, Button, EmptyState, cn } from "@piya/ui";
 import { useGetContactsQuery } from "@piya/shared";
 import type { ContactData } from "@piya/shared/models";
 
@@ -621,7 +623,7 @@ function ContactPickerPopup({
       </div>
 
       <div className="max-h-96 overflow-y-auto">
-        {contacts.map((contact) => {
+        {!isFetching && contacts.map((contact) => {
           const selected = contact.id === selectedContactId;
 
           return (
@@ -650,13 +652,22 @@ function ContactPickerPopup({
         })}
 
         {!isFetching && contacts.length === 0 ? (
-          <div className="px-3 py-6 text-center text-footnote text-[#2F4B4F]/55">
-            No contacts found.
-          </div>
+          <EmptyState
+            className="flex h-[200px] flex-col items-center justify-center border-0 bg-transparent p-3 text-center"
+            icon={<UsersRound className="size-5" />}
+            title={
+              <span className="font-normal text-[#2F4B4F]/55">
+                Contacts you add will appear here.
+              </span>
+            }
+          />
         ) : null}
         {isFetching ? (
-          <div className="px-3 py-3 text-center text-footnote text-[#2F4B4F]/55">
-            Loading contacts...
+          <div className="flex h-[200px] items-center justify-center">
+            <Loader2
+              aria-label="Loading contacts"
+              className="size-5 animate-spin text-primary"
+            />
           </div>
         ) : null}
       </div>

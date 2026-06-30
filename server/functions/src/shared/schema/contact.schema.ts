@@ -201,6 +201,10 @@ const getContactsQuerySchema = z
     (query) => Boolean(query.bmdFrom) === Boolean(query.bmdTo),
     "Birthday range requires both bmdFrom and bmdTo"
   )
+  .refine((query) => !(query.query && query.tagId), {
+    message: "Search query and tag filter cannot be combined",
+    path: ["tagId"],
+  })
   .transform(({ token: _token, ...query }) => query);
 
 type CreateContactBody = z.infer<typeof createContactSchema>;

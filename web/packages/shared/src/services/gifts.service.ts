@@ -42,6 +42,13 @@ export class GiftsService extends BaseAPIService {
       },
     );
   }
+
+  deleteGift(giftId: string): Promise<void> {
+    return this.delete<void>(this.urlController.gift(giftId), {
+      maxRetries: 0,
+      withToken: true,
+    });
+  }
 }
 
 export const giftsService = new GiftsService();

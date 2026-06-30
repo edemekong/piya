@@ -89,6 +89,36 @@ GiftRouter.patch(
   }),
 );
 
+GiftRouter.delete(
+  "/:giftId",
+  validateRequest({ params: giftParamsSchema }),
+  asyncHandler(async (req, res) => {
+    const membership = await getMembership(req.currentUser?.uid);
+    if (!membership) return sendError(res, API_RESPONSE.unauthorized);
+
+    const params = req.params as unknown as GiftParams;
+    const result = await GiftService.deleteGift({
+      businessId: membership.businessId,
+      giftId: params.giftId,
+    });
+    if (result === "not-found") {
+      return sendError(res, API_RESPONSE.giftNotFound);
+    }
+    if (result === "in-use") {
+      return sendError(res, API_RESPONSE.giftInUse);
+    }
+
+    const response = API_RESPONSE.giftDeleted;
+    return SuccessResult(
+      res,
+      response.message,
+      null,
+      response.statusCode,
+      response.code,
+    );
+  }),
+);
+
 async function getMembership(userId?: string) {
   return userId ? BusinessTeamService.getMembership(userId) : null;
 }
