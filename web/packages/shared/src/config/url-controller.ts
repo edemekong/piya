@@ -77,6 +77,18 @@ export class URLController {
     return this.path(`/v1/badges/${encodeURIComponent(id)}`);
   }
 
+  get communications() {
+    return this.path("/v1/communications");
+  }
+
+  communication(id: string) {
+    return this.path(`/v1/communications/${encodeURIComponent(id)}`);
+  }
+
+  communicationRecipients(id: string) {
+    return this.path(`/v1/communications/${encodeURIComponent(id)}/recipients`);
+  }
+
   get offerings() {
     return this.path("/v1/offerings");
   }
@@ -140,14 +152,14 @@ export class URLController {
   acceptMemberInvitation(businessId: string) {
     return this.path(
       `/v1/businesses/${encodeURIComponent(
-        businessId
-      )}/member-invitations/accept`
+        businessId,
+      )}/member-invitations/accept`,
     );
   }
 
   memberInvitation(invitationId: string) {
     return this.path(
-      `/v1/businesses/member-invitations/${encodeURIComponent(invitationId)}`
+      `/v1/businesses/member-invitations/${encodeURIComponent(invitationId)}`,
     );
   }
 
@@ -162,7 +174,7 @@ export class URLController {
   private path(pathname: string) {
     return `${requireConfigValue(
       this.urlPrefix,
-      "VITE_API_BASE_URL"
+      "VITE_API_BASE_URL",
     )}${pathname}`;
   }
 }

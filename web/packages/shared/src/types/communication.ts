@@ -1,16 +1,15 @@
 import type {
   AudienceFilter,
   CommunicationCTA,
+  CommunicationChannel,
   CommunicationData,
   CommunicationMessage,
   CommunicationSchedule,
+  CommunicationStats,
+  CommunicationStatus,
   CommunicationTemplate,
   CommunicationTrigger,
 } from "../models";
-
-export type CommunicationChannel = "email" | "sms" | "whatsapp";
-
-export type CommunicationStatus = "active" | "paused" | "draft";
 
 export type CommunicationAdminStep = {
   channel: CommunicationChannel;
@@ -21,12 +20,7 @@ export type CommunicationAdminStep = {
   template?: CommunicationTemplate | null;
 };
 
-export type CommunicationAdminStats = {
-  recipients: number;
-  delivered: number;
-  failed: number;
-  pending: number;
-};
+export type CommunicationAdminStats = CommunicationStats;
 
 export type CommunicationAdminData = Omit<
   CommunicationData,
@@ -51,4 +45,8 @@ export type CommunicationRecipient = {
 
 export type CommunicationEditorMode = "create" | "edit";
 
-export type { CommunicationSchedule };
+export type {
+  CommunicationChannel,
+  CommunicationSchedule,
+  CommunicationStatus,
+};

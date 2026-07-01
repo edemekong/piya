@@ -124,7 +124,9 @@ export type AppTextareaFieldProps = Omit<
   "className"
 > & {
   className?: string;
+  error?: React.ReactNode;
   label: string;
+  success?: React.ReactNode;
   textareaClassName?: string;
 };
 
@@ -135,9 +137,11 @@ export const AppTextareaField = React.forwardRef<
   (
     {
       className,
+      error,
       label,
       onChange,
       required,
+      success,
       textareaClassName: customTextareaClassName,
       value,
       ...props
@@ -153,12 +157,26 @@ export const AppTextareaField = React.forwardRef<
       <label className={cn("grid gap-2", className)}>
         <FieldLabel label={label} required={required} />
         <textarea
-          className={cn(textareaClassName, customTextareaClassName)}
+          className={cn(
+            textareaClassName,
+            error && "border-error focus:border-error",
+            success && !error && "border-success focus:border-success",
+            customTextareaClassName
+          )}
           ref={ref}
           required={required}
           {...valueProps}
           {...props}
         />
+        {error ? (
+          <span className="text-footnote leading-relaxed text-error">
+            {error}
+          </span>
+        ) : success ? (
+          <span className="text-footnote leading-relaxed text-success">
+            {success}
+          </span>
+        ) : null}
       </label>
     );
   }

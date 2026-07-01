@@ -10,6 +10,8 @@ const BUSINESS_SUBCOLLECTIONS = {
   badges: "badges",
   branding: "branding",
   channelSettings: "channel_settings",
+  communicationRecipients: "communication_recipients",
+  communications: "communications",
   contacts: "contacts",
   deliveryPricing: "delivery_pricing",
   discounts: "discounts",

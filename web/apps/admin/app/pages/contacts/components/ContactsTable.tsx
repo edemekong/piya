@@ -3,6 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Icon,
   Loader2,
   Mail,
   MoreVertical,
@@ -173,7 +174,7 @@ export function ContactsTable({
           onClick={() => setIsBadgeSheetOpen(true)}
           type="button"
         >
-          View badges
+          Points & Badges
         </button>
       </div>
 

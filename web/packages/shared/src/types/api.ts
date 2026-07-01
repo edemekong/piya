@@ -139,6 +139,29 @@ export type BadgeInput = Pick<
   "description" | "icon" | "name" | "rule"
 >;
 
+export type CommunicationsPayload = {
+  communications: import("./communication").CommunicationAdminData[];
+};
+
+export type CommunicationPayload = {
+  communication: import("./communication").CommunicationAdminData;
+};
+
+export type CommunicationRecipientsPayload = {
+  recipients: import("./communication").CommunicationRecipient[];
+};
+
+export type CommunicationInput = Omit<
+  import("./communication").CommunicationAdminData,
+  "businessId" | "createdAt" | "createdBy" | "id" | "updatedAt"
+> &
+  Partial<
+    Pick<
+      import("./communication").CommunicationAdminData,
+      "businessId" | "createdAt" | "createdBy" | "id" | "updatedAt"
+    >
+  >;
+
 export type OfferingsPayload = {
   offerings: import("../models").OfferingData[];
   nextCursor?: string | null;

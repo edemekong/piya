@@ -4,11 +4,16 @@ import type {
 } from "../types/communication.type";
 import type { BaseModel } from "./base";
 
+type CommunicationChannel = "email" | "sms" | "whatsapp";
+type CommunicationStatus = "active" | "paused";
+
 interface CommunicationData extends BaseModel {
   name: string;
   businessId: string;
   createdBy: string;
   isActive: boolean;
+  status: CommunicationStatus;
+  stats: CommunicationStats;
   type: CommunicationEventType;
   hasPendingBatch: boolean;
   lastExecutedAt?: number | null;
@@ -19,7 +24,7 @@ interface CommunicationData extends BaseModel {
   targetAudience?: AudienceFilter | null;
 }
 interface CommunicationStep {
-  channel: CommunicationSchedule;
+  channel: CommunicationChannel;
   identityId?: string | null;
   delay: number;
   message: CommunicationMessage;
@@ -58,8 +63,24 @@ interface AudienceFilter {
   targetBadgeTypes?: string[];
   segmentQuery?: Record<string, any>;
 }
+interface CommunicationStats {
+  recipients: number;
+  delivered: number;
+  failed: number;
+  pending: number;
+}
+interface CommunicationRecipient {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: "pending" | "delivered" | "failed";
+  channel: CommunicationChannel;
+  lastActivityAt: number;
+}
 
 export {
+  CommunicationChannel,
   CommunicationData,
   CommunicationStep,
   CommunicationTemplate,
@@ -68,4 +89,7 @@ export {
   CommunicationMessage,
   CommunicationCTA,
   AudienceFilter,
+  CommunicationRecipient,
+  CommunicationStats,
+  CommunicationStatus,
 };

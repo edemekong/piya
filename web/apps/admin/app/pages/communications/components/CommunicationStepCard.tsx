@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Code2, Link2, Mail, Timer, Trash2 } from "lucide-react";
-import { Button, cn } from "@piya/ui";
+import { Code2, Link2, Timer, Trash2 } from "lucide-react";
+import { AppTextField, Button, cn } from "@piya/ui";
 import type {
   CommunicationAdminStep as CommunicationStep,
   CommunicationChannel,
@@ -11,7 +11,9 @@ import {
   formatDelay,
   formatLabel,
 } from "@piya/shared/utils";
+import { RichDescriptionField } from "../../../components/RichDescriptionField";
 import { CommunicationChannelIcon } from "./CommunicationChannelIcon";
+import { getCommunicationStepErrors } from "./communication-editor-validation";
 
 type CommunicationStepCardProps = {
   canRemove: boolean;
@@ -29,14 +31,39 @@ export function CommunicationStepCard({
   stepNumber,
 }: CommunicationStepCardProps) {
   const subjectInputRef = React.useRef<HTMLInputElement | null>(null);
-  const bodyTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const [touchedFields, setTouchedFields] = React.useState<
+    Partial<
+      Record<"body" | "ctaLabel" | "ctaUrl" | "delay" | "subject", boolean>
+    >
+  >({});
+  const errors = getCommunicationStepErrors(step);
+  const hasCta = Boolean(
+    step.ctas[0]?.label.trim() || step.ctas[0]?.url.trim(),
+  );
+  const visibleErrors = {
+    body: touchedFields.body ? errors.body : undefined,
+    ctaLabel: touchedFields.ctaLabel || hasCta ? errors.ctaLabel : undefined,
+    ctaUrl: touchedFields.ctaUrl || hasCta ? errors.ctaUrl : undefined,
+    delay: touchedFields.delay ? errors.delay : undefined,
+    subject: touchedFields.subject ? errors.subject : undefined,
+  };
+
+  function markFieldTouched(
+    field: "body" | "ctaLabel" | "ctaUrl" | "delay" | "subject",
+  ) {
+    setTouchedFields((current) =>
+      current[field] ? current : { ...current, [field]: true },
+    );
+  }
 
   function insertSubjectVariable(variable: string) {
     const subject = step.message.subject ?? "";
     const input = subjectInputRef.current;
     const start = input?.selectionStart ?? subject.length;
     const end = input?.selectionEnd ?? subject.length;
-    const nextSubject = `${subject.slice(0, start)}${variable}${subject.slice(end)}`;
+    const nextSubject = `${subject.slice(0, start)}${variable}${subject.slice(
+      end,
+    )}`;
     const nextCursorPosition = start + variable.length;
 
     onUpdate({
@@ -52,47 +79,52 @@ export function CommunicationStepCard({
     });
   }
 
-  function insertBodyVariable(variable: string) {
-    const body = step.message.body;
-    const textarea = bodyTextareaRef.current;
-    const start = textarea?.selectionStart ?? body.length;
-    const end = textarea?.selectionEnd ?? body.length;
-    const nextBody = `${body.slice(0, start)}${variable}${body.slice(end)}`;
-    const nextCursorPosition = start + variable.length;
-
-    onUpdate({
-      message: { ...step.message, body: nextBody },
-    });
-
-    requestAnimationFrame(() => {
-      bodyTextareaRef.current?.focus();
-      bodyTextareaRef.current?.setSelectionRange(
-        nextCursorPosition,
-        nextCursorPosition,
-      );
-    });
-  }
-
   return (
     <div className="relative my-4 rounded-md border border-border bg-white p-4 pt-8">
       <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
-        <label className="flex items-center gap-2 rounded-full border border-border bg-white px-3 py-2 shadow-sm">
+        <label
+          className={cn(
+            "flex items-center gap-2 rounded-full border border-border bg-white px-3 py-2 shadow-sm transition focus-within:border-primary",
+            errors.delay && "border-error focus-within:border-error",
+          )}
+        >
           <Timer className="size-4 text-[#2F4B4F]/45" />
-          <span className="sr-only">Delay minutes for step {stepNumber}</span>
+          <span className="sr-only">
+            Delay minutes for step {stepNumber} (required)
+          </span>
           <input
+            aria-describedby={
+              visibleErrors.delay
+                ? `communication-step-${stepNumber}-delay-error`
+                : undefined
+            }
+            aria-invalid={Boolean(visibleErrors.delay)}
             aria-label={`Delay minutes for step ${stepNumber}`}
             className="w-20 bg-transparent text-center text-callout font-semibold text-[#2F4B4F] outline-none"
             min={0}
             onChange={(event) =>
-              onUpdate({ delay: Number(event.target.value || 0) })
+              onUpdate({
+                delay:
+                  event.target.value === "" ? NaN : Number(event.target.value),
+              })
             }
+            onBlur={() => markFieldTouched("delay")}
+            required
             type="number"
-            value={step.delay}
+            value={Number.isFinite(step.delay) ? step.delay : ""}
           />
           <span className="text-caption-1 font-semibold text-[#2F4B4F]/55">
             mins
           </span>
         </label>
+        {visibleErrors.delay ? (
+          <p
+            className="mt-1 w-max max-w-60 rounded-full bg-white px-2 text-center text-caption-1 font-semibold text-error shadow-sm"
+            id={`communication-step-${stepNumber}-delay-error`}
+          >
+            {visibleErrors.delay}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -127,11 +159,12 @@ export function CommunicationStepCard({
       <div className="mt-4 grid gap-4">
         <label className="grid gap-2">
           <span className="text-footnote font-normal text-[#2F4B4F]">
-            Channel
+            Channel <span className="text-error">*</span>
           </span>
           <div className="grid gap-2 sm:grid-cols-3">
             {CHANNEL_OPTIONS.map((channel) => (
               <button
+                aria-pressed={step.channel === channel}
                 className={cn(
                   "flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-callout font-semibold transition",
                   step.channel === channel
@@ -151,65 +184,59 @@ export function CommunicationStepCard({
 
         <div className="grid gap-4">
           {step.channel === "email" ? (
-            <label className="grid gap-2">
-              <span className="text-footnote font-normal text-[#2F4B4F]">
-                Subject
-              </span>
-              <span className="relative block">
-                <input
-                  className="h-12 w-full rounded-sm border border-border bg-fill px-3 pr-12 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-                  onChange={(event) =>
-                    onUpdate({
-                      message: { ...step.message, subject: event.target.value },
-                    })
-                  }
-                  placeholder="Enter email subject"
-                  ref={subjectInputRef}
-                  value={step.message.subject ?? ""}
-                />
+            <AppTextField
+              error={visibleErrors.subject}
+              label="Subject"
+              maxLength={200}
+              onBlur={() => markFieldTouched("subject")}
+              onChange={(event) => {
+                markFieldTouched("subject");
+                onUpdate({
+                  message: { ...step.message, subject: event.target.value },
+                });
+              }}
+              placeholder="Enter email subject"
+              ref={subjectInputRef}
+              required
+              suffix={
                 <VariableInsertButton
-                  align="right"
+                  align="inline"
                   label="Insert subject variable"
                   onSelect={insertSubjectVariable}
                 />
-              </span>
-            </label>
+              }
+              value={step.message.subject ?? ""}
+            />
           ) : null}
         </div>
 
-        <label className="grid gap-2">
-          <span className="text-footnote font-normal text-[#2F4B4F]">
-            Message
-          </span>
-          <span className="relative block">
-            <textarea
-              className="min-h-32 w-full rounded-sm border border-border bg-fill px-3 py-3 pb-12 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary focus:bg-white"
-              onChange={(event) =>
-                onUpdate({
-                  message: { ...step.message, body: event.target.value },
-                })
-              }
-              placeholder="Enter message body"
-              ref={bodyTextareaRef}
-              value={step.message.body}
-            />
-            <VariableInsertButton
-              align="bottom-right"
-              label="Insert message variable"
-              onSelect={insertBodyVariable}
-            />
-          </span>
-        </label>
+        <RichDescriptionField
+          error={visibleErrors.body}
+          label="Message"
+          onBlur={() => markFieldTouched("body")}
+          onChange={(body) => {
+            markFieldTouched("body");
+            onUpdate({
+              message: { ...step.message, body },
+            });
+          }}
+          required
+          value={step.message.body}
+        />
 
         <div className="rounded-md border border-dashed border-border bg-fill p-3">
           <div className="flex items-center gap-2 text-footnote font-normal text-[#2F4B4F]">
             <Link2 className="size-4 text-[#2F4B4F]/60" />
-            CTA
+            CTA (optional)
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <input
-              className="h-11 rounded-sm border border-border bg-white px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary"
-              onChange={(event) =>
+            <AppTextField
+              error={visibleErrors.ctaLabel}
+              label="Button label"
+              maxLength={80}
+              onBlur={() => markFieldTouched("ctaLabel")}
+              onChange={(event) => {
+                markFieldTouched("ctaLabel");
                 onUpdate({
                   ctas: [
                     {
@@ -218,14 +245,19 @@ export function CommunicationStepCard({
                       url: step.ctas[0]?.url ?? "",
                     },
                   ],
-                })
-              }
+                });
+              }}
               placeholder="Enter button label"
+              required={Boolean(step.ctas[0]?.url.trim())}
               value={step.ctas[0]?.label ?? ""}
             />
-            <input
-              className="h-11 rounded-sm border border-border bg-white px-3 text-callout text-[#2F4B4F] outline-none transition placeholder:text-[#2F4B4F]/40 focus:border-primary"
-              onChange={(event) =>
+            <AppTextField
+              error={visibleErrors.ctaUrl}
+              label="Button URL"
+              maxLength={2048}
+              onBlur={() => markFieldTouched("ctaUrl")}
+              onChange={(event) => {
+                markFieldTouched("ctaUrl");
                 onUpdate({
                   ctas: [
                     {
@@ -234,9 +266,11 @@ export function CommunicationStepCard({
                       url: event.target.value,
                     },
                   ],
-                })
-              }
+                });
+              }}
               placeholder="Enter button URL"
+              required={Boolean(step.ctas[0]?.label.trim())}
+              type="url"
               value={step.ctas[0]?.url ?? ""}
             />
           </div>
@@ -251,7 +285,7 @@ function VariableInsertButton({
   label,
   onSelect,
 }: {
-  align: "right" | "bottom-right";
+  align: "inline";
   label: string;
   onSelect: (variable: string) => void;
 }) {
@@ -274,10 +308,8 @@ function VariableInsertButton({
   return (
     <span
       className={cn(
-        "absolute z-10",
-        align === "right"
-          ? "right-2 top-1/2 -translate-y-1/2"
-          : "bottom-3 right-3",
+        "z-10",
+        align === "inline" ? "relative mr-2 self-center" : null,
       )}
       ref={menuRef}
     >

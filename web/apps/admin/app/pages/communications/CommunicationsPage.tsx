@@ -2,25 +2,43 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@piya/ui";
 import {
+  showToast,
+  useCreateCommunicationMutation,
+  useDeleteCommunicationMutation,
   useGetCommunicationRecipientsQuery,
   useGetCommunicationsQuery,
+  useUpdateCommunicationMutation,
+  type AppDispatch,
 } from "@piya/shared";
 import type {
   CommunicationAdminData as CommunicationData,
   CommunicationEditorMode,
+  CommunicationInput,
 } from "@piya/shared/types";
+import { useDispatch } from "react-redux";
 import {
-  CommunicationCardsList,
+  CommunicationActionDialog,
+  type CommunicationAction,
   CommunicationEditorSheet,
   CommunicationRecipientsSheet,
   CommunicationStatsBar,
   CommunicationViewSheet,
+  CommunicationsTable,
 } from "./components";
 
 export function CommunicationsPage() {
-  const { data: queriedCommunications = [] } = useGetCommunicationsQuery();
-  const [communications, setCommunications] =
-    React.useState<CommunicationData[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    data: queriedCommunications = [],
+    isError: isCommunicationsError,
+    isLoading: isCommunicationsLoading,
+  } = useGetCommunicationsQuery();
+  const [createCommunication, createCommunicationState] =
+    useCreateCommunicationMutation();
+  const [updateCommunication, updateCommunicationState] =
+    useUpdateCommunicationMutation();
+  const [deleteCommunication, deleteCommunicationState] =
+    useDeleteCommunicationMutation();
   const [editorMode, setEditorMode] =
     React.useState<CommunicationEditorMode>("create");
   const [isEditorOpen, setIsEditorOpen] = React.useState(false);
@@ -30,14 +48,17 @@ export function CommunicationsPage() {
     React.useState<CommunicationData | null>(null);
   const [recipientsCommunication, setRecipientsCommunication] =
     React.useState<CommunicationData | null>(null);
+  const [pendingAction, setPendingAction] = React.useState<{
+    action: CommunicationAction;
+    communication: CommunicationData;
+  } | null>(null);
   const { data: recipients = [] } = useGetCommunicationRecipientsQuery(
     recipientsCommunication?.id ?? "",
     { skip: !recipientsCommunication },
   );
-
-  React.useEffect(() => {
-    setCommunications(queriedCommunications);
-  }, [queriedCommunications]);
+  const communications = queriedCommunications;
+  const isSavingCommunication =
+    createCommunicationState.isLoading || updateCommunicationState.isLoading;
 
   const stats = React.useMemo(
     () => ({
@@ -64,20 +85,63 @@ export function CommunicationsPage() {
     setIsEditorOpen(true);
   }
 
-  function handlePause(communication: CommunicationData) {
-    setCommunications((current) =>
-      current.map((item) =>
-        item.id === communication.id
-          ? { ...item, isActive: false, status: "paused" }
-          : item,
-      ),
-    );
+  async function handleSave(communication: CommunicationData) {
+    const input = getCommunicationInput(communication);
+
+    if (editorMode === "edit" && selectedCommunication) {
+      await updateCommunication({
+        communicationId: selectedCommunication.id,
+        input,
+      }).unwrap();
+    } else {
+      await createCommunication(input).unwrap();
+    }
+
+    setIsEditorOpen(false);
+    setSelectedCommunication(null);
   }
 
-  function handleDelete(communication: CommunicationData) {
-    setCommunications((current) =>
-      current.filter((item) => item.id !== communication.id),
-    );
+  function requestStatusChange(communication: CommunicationData) {
+    setPendingAction({
+      action: communication.status === "active" ? "pause" : "enable",
+      communication,
+    });
+  }
+
+  async function confirmCommunicationAction() {
+    if (!pendingAction) return;
+
+    const { action, communication } = pendingAction;
+
+    try {
+      if (action === "delete") {
+        await deleteCommunication(communication.id).unwrap();
+      } else {
+        const isEnabling = action === "enable";
+        await updateCommunication({
+          communicationId: communication.id,
+          input: getCommunicationInput({
+            ...communication,
+            isActive: isEnabling,
+            status: isEnabling ? "active" : "paused",
+          }),
+        }).unwrap();
+      }
+
+      showToast(dispatch, {
+        message:
+          action === "delete"
+            ? "Communication deleted."
+            : `Communication ${action === "enable" ? "enabled" : "paused"}.`,
+        variant: "success",
+      });
+      setPendingAction(null);
+    } catch (error) {
+      showToast(dispatch, {
+        message: getCommunicationActionErrorMessage(error, action),
+        variant: "error",
+      });
+    }
   }
 
   return (
@@ -100,11 +164,15 @@ export function CommunicationsPage() {
 
         <CommunicationStatsBar stats={stats} />
 
-        <CommunicationCardsList
+        <CommunicationsTable
           communications={communications}
-          onDelete={handleDelete}
+          isError={isCommunicationsError}
+          isLoading={isCommunicationsLoading}
+          onDelete={(communication) =>
+            setPendingAction({ action: "delete", communication })
+          }
           onEdit={openEditEditor}
-          onPause={handlePause}
+          onStatusChange={requestStatusChange}
           onView={setViewingCommunication}
           onViewRecipients={setRecipientsCommunication}
         />
@@ -114,7 +182,9 @@ export function CommunicationsPage() {
         communication={selectedCommunication}
         mode={editorMode}
         onClose={() => setIsEditorOpen(false)}
+        onSave={handleSave}
         open={isEditorOpen}
+        saving={isSavingCommunication}
       />
       <CommunicationViewSheet
         communication={viewingCommunication}
@@ -127,6 +197,47 @@ export function CommunicationsPage() {
         open={Boolean(recipientsCommunication)}
         recipients={recipients}
       />
+      <CommunicationActionDialog
+        action={pendingAction?.action ?? "delete"}
+        communication={pendingAction?.communication ?? null}
+        loading={
+          deleteCommunicationState.isLoading ||
+          updateCommunicationState.isLoading
+        }
+        onClose={() => setPendingAction(null)}
+        onConfirm={() => void confirmCommunicationAction()}
+      />
     </>
   );
+}
+
+function getCommunicationInput(
+  communication: CommunicationData,
+): CommunicationInput {
+  const {
+    businessId: _businessId,
+    createdAt: _createdAt,
+    createdBy: _createdBy,
+    id: _id,
+    updatedAt: _updatedAt,
+    ...input
+  } = communication;
+
+  return input;
+}
+
+function getCommunicationActionErrorMessage(
+  error: unknown,
+  action: CommunicationAction,
+) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return `Unable to ${action} this communication.`;
 }

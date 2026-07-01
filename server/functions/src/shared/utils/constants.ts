@@ -114,6 +114,36 @@ const API_RESPONSE = {
     code: "CONTACT_TAGS_FETCHED",
     message: "Contact tags fetched",
   },
+  communicationsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "COMMUNICATIONS_FETCHED",
+    message: "Communications fetched",
+  },
+  communicationCreated: {
+    statusCode: STATUS_CODES.created,
+    code: "COMMUNICATION_CREATED",
+    message: "Communication created",
+  },
+  communicationUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "COMMUNICATION_UPDATED",
+    message: "Communication updated",
+  },
+  communicationDeleted: {
+    statusCode: STATUS_CODES.ok,
+    code: "COMMUNICATION_DELETED",
+    message: "Communication deleted",
+  },
+  communicationNotFound: {
+    statusCode: STATUS_CODES.notFound,
+    code: "COMMUNICATION_NOT_FOUND",
+    message: "Communication not found",
+  },
+  communicationRecipientsFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "COMMUNICATION_RECIPIENTS_FETCHED",
+    message: "Communication recipients fetched",
+  },
   badgesFetched: {
     statusCode: STATUS_CODES.ok,
     code: "BADGES_FETCHED",

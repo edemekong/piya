@@ -21,6 +21,7 @@ import type {
   BulkCreateContactsPayload,
   BusinessSlugAvailabilityPayload,
   CommunicationAdminData,
+  CommunicationInput,
   CommunicationRecipient,
   CompleteWhatsAppConnectionInput,
   ContactListQuery,
@@ -206,7 +207,7 @@ export const domainApi = createApi({
         try {
           return {
             data: await deliveryPricingService.updatePrimaryDeliveryPricing(
-              input
+              input,
             ),
           };
         } catch (error) {
@@ -357,20 +358,77 @@ export const domainApi = createApi({
       invalidatesTags: ["WhatsAppConnection"],
     }),
     getCommunications: builder.query<CommunicationAdminData[], void>({
-      queryFn: () => ({ data: communicationsService.getCommunications() }),
+      queryFn: async () => {
+        try {
+          const payload = await communicationsService.getCommunications();
+          return { data: payload.communications };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
       providesTags: ["Communication"],
+    }),
+    createCommunication: builder.mutation<
+      CommunicationAdminData,
+      CommunicationInput
+    >({
+      queryFn: async (input) => {
+        try {
+          const payload = await communicationsService.createCommunication(
+            input,
+          );
+          return { data: payload.communication };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Communication"],
+    }),
+    updateCommunication: builder.mutation<
+      CommunicationAdminData,
+      { communicationId: string; input: CommunicationInput }
+    >({
+      queryFn: async ({ communicationId, input }) => {
+        try {
+          const payload = await communicationsService.updateCommunication(
+            communicationId,
+            input,
+          );
+          return { data: payload.communication };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Communication"],
+    }),
+    deleteCommunication: builder.mutation<void, string>({
+      queryFn: async (communicationId) => {
+        try {
+          await communicationsService.deleteCommunication(communicationId);
+          return { data: undefined };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["Communication"],
     }),
     getCommunicationRecipients: builder.query<CommunicationRecipient[], string>(
       {
-        queryFn: (communicationId) => ({
-          data: communicationsService.getCommunicationRecipients(
-            communicationId
-          ),
-        }),
+        queryFn: async (communicationId) => {
+          try {
+            const payload =
+              await communicationsService.getCommunicationRecipients(
+                communicationId,
+              );
+            return { data: payload.recipients };
+          } catch (error) {
+            return { error: getDomainApiError(error) };
+          }
+        },
         providesTags: (_result, _error, communicationId) => [
           { id: communicationId, type: "CommunicationRecipient" },
         ],
-      }
+      },
     ),
     getContacts: builder.query<ContactsPayload, ContactListQuery>({
       queryFn: async (input) => {
@@ -454,7 +512,9 @@ export const domainApi = createApi({
     >({
       queryFn: async ({ contactId, input }) => {
         try {
-          return { data: await contactsService.updateContact(contactId, input) };
+          return {
+            data: await contactsService.updateContact(contactId, input),
+          };
         } catch (error) {
           return { error: getDomainApiError(error) };
         }
@@ -491,7 +551,7 @@ export const domainApi = createApi({
           return {
             data: await locationsService.getLocationDetails(
               { placeId },
-              api.signal
+              api.signal,
             ),
           };
         } catch (error) {
@@ -668,6 +728,7 @@ export const {
   useLazyGetLocationDetailsQuery,
   useLazySearchLocationsQuery,
   useBulkCreateContactsMutation,
+  useCreateCommunicationMutation,
   useCreateContactMutation,
   useCreateBadgeMutation,
   useCreateDiscountMutation,
@@ -678,6 +739,7 @@ export const {
   useDeleteMemberInvitationMutation,
   useDeleteMemberMutation,
   useDeleteBadgeMutation,
+  useDeleteCommunicationMutation,
   useDeleteDiscountMutation,
   useDeleteGiftMutation,
   useDeleteOfferingMutation,
@@ -704,6 +766,7 @@ export const {
   useUpdatePrimaryDeliveryPricingMutation,
   useUpdateMemberInvitationRoleMutation,
   useUpdateMemberRoleMutation,
+  useUpdateCommunicationMutation,
   useUpdateDiscountMutation,
   useUpdateGiftMutation,
   useUpdateOfferingMutation,

@@ -48,9 +48,6 @@ export function CommunicationCardsList({
             type="search"
           />
         </div>
-        <p className="text-footnote text-[#2F4B4F]/65">
-          Showing {communications.length} communications
-        </p>
       </div>
 
       <div className="grid gap-4 p-5">

@@ -1,7 +1,14 @@
 import * as React from "react";
 import { Megaphone } from "lucide-react";
 import { Button } from "@piya/ui";
-import { useGetContactsQuery } from "@piya/shared";
+import {
+  useCreateCommunicationMutation,
+  useGetContactsQuery,
+} from "@piya/shared";
+import type {
+  CommunicationAdminData as CommunicationData,
+  CommunicationInput,
+} from "@piya/shared/types";
 import { CommunicationEditorSheet } from "@/pages/communications/components";
 import {
   CommunicationTrendChart,
@@ -15,9 +22,16 @@ import {
 
 export function OverviewPage() {
   const { data: contactsPage } = useGetContactsQuery({ limit: 50 });
+  const [createCommunication, createCommunicationState] =
+    useCreateCommunicationMutation();
   const contacts = contactsPage?.contacts ?? [];
   const [isCommunicationSheetOpen, setIsCommunicationSheetOpen] =
     React.useState(false);
+
+  async function handleCreateCommunication(communication: CommunicationData) {
+    await createCommunication(getCommunicationInput(communication)).unwrap();
+    setIsCommunicationSheetOpen(false);
+  }
 
   return (
     <>
@@ -61,8 +75,25 @@ export function OverviewPage() {
         communication={null}
         mode="create"
         onClose={() => setIsCommunicationSheetOpen(false)}
+        onSave={handleCreateCommunication}
         open={isCommunicationSheetOpen}
+        saving={createCommunicationState.isLoading}
       />
     </>
   );
+}
+
+function getCommunicationInput(
+  communication: CommunicationData,
+): CommunicationInput {
+  const {
+    businessId: _businessId,
+    createdAt: _createdAt,
+    createdBy: _createdBy,
+    id: _id,
+    updatedAt: _updatedAt,
+    ...input
+  } = communication;
+
+  return input;
 }
