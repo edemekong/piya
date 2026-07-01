@@ -26,7 +26,6 @@ type CommunicationsTableProps = {
   onDelete: (communication: CommunicationData) => void;
   onEdit: (communication: CommunicationData) => void;
   onStatusChange: (communication: CommunicationData) => void;
-  onView: (communication: CommunicationData) => void;
   onViewRecipients: (communication: CommunicationData) => void;
 };
 
@@ -37,7 +36,6 @@ export function CommunicationsTable({
   onDelete,
   onEdit,
   onStatusChange,
-  onView,
   onViewRecipients,
 }: CommunicationsTableProps) {
   const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
@@ -116,17 +114,24 @@ export function CommunicationsTable({
 
                 return (
                   <tr
-                    className="text-callout text-[#2F4B4F] transition hover:bg-fill/70"
+                    className="cursor-pointer text-callout text-[#2F4B4F] transition hover:bg-fill/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                     key={communication.id}
+                    onClick={() => onEdit(communication)}
+                    onKeyDown={(event) => {
+                      if (event.currentTarget !== event.target) return;
+
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEdit(communication);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                   >
                     <td className="px-5 py-4">
-                      <button
-                        className="max-w-xs truncate text-left font-semibold text-[#2F4B4F] hover:text-primary"
-                        onClick={() => onView(communication)}
-                        type="button"
-                      >
+                      <p className="max-w-xs truncate font-semibold text-[#2F4B4F]">
                         {communication.name}
-                      </button>
+                      </p>
                     </td>
                     <td className="px-5 py-4 text-[#2F4B4F]/70">
                       {formatLabel(communication.trigger.type)}
@@ -166,12 +171,13 @@ export function CommunicationsTable({
                           aria-expanded={openMenuId === communication.id}
                           aria-label={`Open actions for ${communication.name}`}
                           className="flex size-9 items-center justify-center rounded-full text-[#2F4B4F]/65 transition hover:bg-fill hover:text-[#2F4B4F]"
-                          onClick={(event) =>
+                          onClick={(event) => {
+                            event.stopPropagation();
                             openCommunicationMenu(
                               communication.id,
                               event.currentTarget,
-                            )
-                          }
+                            );
+                          }}
                           title="More actions"
                           type="button"
                         >

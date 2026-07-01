@@ -22,7 +22,6 @@ import {
   CommunicationEditorSheet,
   CommunicationRecipientsSheet,
   CommunicationStatsBar,
-  CommunicationViewSheet,
   CommunicationsTable,
 } from "./components";
 
@@ -43,8 +42,6 @@ export function CommunicationsPage() {
     React.useState<CommunicationEditorMode>("create");
   const [isEditorOpen, setIsEditorOpen] = React.useState(false);
   const [selectedCommunication, setSelectedCommunication] =
-    React.useState<CommunicationData | null>(null);
-  const [viewingCommunication, setViewingCommunication] =
     React.useState<CommunicationData | null>(null);
   const [recipientsCommunication, setRecipientsCommunication] =
     React.useState<CommunicationData | null>(null);
@@ -173,7 +170,6 @@ export function CommunicationsPage() {
           }
           onEdit={openEditEditor}
           onStatusChange={requestStatusChange}
-          onView={setViewingCommunication}
           onViewRecipients={setRecipientsCommunication}
         />
       </div>
@@ -185,11 +181,6 @@ export function CommunicationsPage() {
         onSave={handleSave}
         open={isEditorOpen}
         saving={isSavingCommunication}
-      />
-      <CommunicationViewSheet
-        communication={viewingCommunication}
-        onClose={() => setViewingCommunication(null)}
-        open={Boolean(viewingCommunication)}
       />
       <CommunicationRecipientsSheet
         communication={recipientsCommunication}

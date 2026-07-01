@@ -23,7 +23,6 @@ type CommunicationCardsListProps = {
   onDelete: (communication: CommunicationData) => void;
   onEdit: (communication: CommunicationData) => void;
   onPause: (communication: CommunicationData) => void;
-  onView: (communication: CommunicationData) => void;
   onViewRecipients: (communication: CommunicationData) => void;
 };
 
@@ -32,7 +31,6 @@ export function CommunicationCardsList({
   onDelete,
   onEdit,
   onPause,
-  onView,
   onViewRecipients,
 }: CommunicationCardsListProps) {
   const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
@@ -59,11 +57,7 @@ export function CommunicationCardsList({
               className="group relative grid gap-4 rounded-md border border-border bg-white p-5 text-left transition hover:border-primary/30 hover:shadow-sm lg:grid-cols-[1fr_auto]"
               key={communication.id}
             >
-              <button
-                className="min-w-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                onClick={() => onView(communication)}
-                type="button"
-              >
+              <div className="min-w-0 text-left">
                 <div className="flex flex-wrap items-center gap-3">
                   <h2 className="text-title-3 font-semibold text-[#2F4B4F]">
                     {communication.name}
@@ -92,7 +86,7 @@ export function CommunicationCardsList({
                     </span>
                   ))}
                 </div>
-              </button>
+              </div>
 
               <div className="flex items-start justify-between gap-4 lg:justify-end">
                 <div className="grid grid-cols-3 gap-3 text-center">
