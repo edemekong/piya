@@ -13,6 +13,7 @@ import { GiftRouter } from "./gifts/route";
 import { LeadRequestRouter } from "./lead-requests/route";
 import { LocationRouter } from "./locations/route";
 import { OfferingRouter } from "./offerings/route";
+import { SiteFlowRouter } from "./site-flow/route";
 import { UserRouter } from "./users/route";
 import {
   ProtectedWhatsAppRouter,
@@ -39,6 +40,7 @@ V1Router.use("/discounts", DiscountRouter);
 V1Router.use("/gifts", GiftRouter);
 V1Router.use("/locations", LocationRouter);
 V1Router.use("/offerings", OfferingRouter);
+V1Router.use("/site-flow", SiteFlowRouter);
 V1Router.use("/availability", AvailabilityRouter);
 V1Router.use("/users", UserRouter);
 V1Router.use("/whatsapp", ProtectedWhatsAppRouter);

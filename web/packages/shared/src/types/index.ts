@@ -188,6 +188,8 @@ export type {
 
 export type { ServiceType } from "./service.type";
 
+export type { SiteFlowPayload, UpdateSiteFlowInput } from "./site-flow";
+
 export type { SiteSections, SiteStatusType } from "./site.type";
 
 export type {

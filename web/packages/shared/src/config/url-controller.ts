@@ -81,6 +81,10 @@ export class URLController {
     return this.path("/v1/offerings");
   }
 
+  get siteFlow() {
+    return this.path("/v1/site-flow");
+  }
+
   offering(id: string) {
     return this.path(`/v1/offerings/${encodeURIComponent(id)}`);
   }

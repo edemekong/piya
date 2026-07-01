@@ -9,6 +9,7 @@ import {
   AccountSetupStepQuery,
 } from "../../shared/schema/account-setup.schema";
 import { BusinessService } from "../../shared/services/business.service";
+import { SiteFlowService } from "../../shared/services/site-flow.service";
 import { UserService } from "../../shared/services/user.service";
 import {
   asyncHandler,
@@ -249,6 +250,7 @@ accountSetupRouter.patch(
       );
     }
 
+    await SiteFlowService.createStarterFlowIfMissing(completion.business);
     const completedUser = await UserService.completeAccountSetup(
       currentUser.uid,
     );

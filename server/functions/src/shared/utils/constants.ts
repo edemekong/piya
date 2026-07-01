@@ -74,6 +74,16 @@ const API_RESPONSE = {
     code: "AVAILABILITY_UPDATED",
     message: "Availability updated",
   },
+  siteFlowFetched: {
+    statusCode: STATUS_CODES.ok,
+    code: "SITE_FLOW_FETCHED",
+    message: "Site flow fetched",
+  },
+  siteFlowUpdated: {
+    statusCode: STATUS_CODES.ok,
+    code: "SITE_FLOW_UPDATED",
+    message: "Site flow updated",
+  },
   contactsFetched: {
     statusCode: STATUS_CODES.ok,
     code: "CONTACTS_FETCHED",

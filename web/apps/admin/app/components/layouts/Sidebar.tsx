@@ -1,4 +1,5 @@
 import {
+  Globe,
   LayoutDashboard,
   Megaphone,
   Package,
@@ -22,6 +23,7 @@ const sidebarItems: SidebarItem[] = [
   { label: "Contacts", to: "/contacts", icon: Users },
   { label: "Orders", to: "/orders", icon: ShoppingCart },
   { label: "Offerings", to: "/offerings", icon: Package },
+  { label: "Site", to: "/site", icon: Globe },
   { label: "Communications", to: "/communications", icon: Megaphone },
 ];
 

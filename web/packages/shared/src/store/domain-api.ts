@@ -36,12 +36,14 @@ import type {
   OfferingsPayload,
   SendWhatsAppMessageInput,
   SendWhatsAppMessagePayload,
+  SiteFlowPayload,
   TeamPayload,
   UpdateContactInput,
   UpdateDeliveryPricingInput,
   UpdateAccountSetupRequest,
   UpdateMemberInvitationRoleRequest,
   UpdateMemberRoleRequest,
+  UpdateSiteFlowInput,
   UpdateUserInput,
   WhatsAppConnectionPayload,
 } from "../types";
@@ -58,6 +60,7 @@ import { leadRequestService } from "../services/lead-request.service";
 import { locationsService } from "../services/locations.service";
 import { offeringsService } from "../services/offerings.service";
 import { ordersService } from "../services/orders.service";
+import { siteFlowService } from "../services/site-flow.service";
 import { teamService } from "../services/team.service";
 import { userService } from "../services/user.service";
 import { whatsappService } from "../services/whatsapp.service";
@@ -98,6 +101,7 @@ export const domainApi = createApi({
     "Gift",
     "Offering",
     "Order",
+    "SiteFlow",
     "Team",
     "WhatsAppConnection",
   ],
@@ -136,6 +140,26 @@ export const domainApi = createApi({
         }
       },
       invalidatesTags: ["AccountSetup"],
+    }),
+    getSiteFlow: builder.query<SiteFlowPayload, void>({
+      queryFn: async () => {
+        try {
+          return { data: await siteFlowService.getSiteFlow() };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      providesTags: ["SiteFlow"],
+    }),
+    updateSiteFlow: builder.mutation<SiteFlowPayload, UpdateSiteFlowInput>({
+      queryFn: async (input) => {
+        try {
+          return { data: await siteFlowService.updateSiteFlow(input) };
+        } catch (error) {
+          return { error: getDomainApiError(error) };
+        }
+      },
+      invalidatesTags: ["SiteFlow"],
     }),
     getPrimaryAvailability: builder.query<AvailabilityPayload, void>({
       queryFn: async () => {
@@ -671,6 +695,7 @@ export const {
   useGetOfferingsPageQuery,
   useGetOfferingsQuery,
   useGetOrdersQuery,
+  useGetSiteFlowQuery,
   useGetTeamQuery,
   useGetWhatsAppConnectionQuery,
   useInviteMemberMutation,
@@ -682,6 +707,7 @@ export const {
   useUpdateDiscountMutation,
   useUpdateGiftMutation,
   useUpdateOfferingMutation,
+  useUpdateSiteFlowMutation,
   useUpdateAccountSetupMutation,
   useUpdateContactMutation,
   useUpdateCurrentUserMutation,

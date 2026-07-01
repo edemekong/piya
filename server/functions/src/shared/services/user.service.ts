@@ -2,6 +2,7 @@ import { db } from "../../configs/firebase";
 import type { BusinessData } from "../model/business";
 import type { UserData } from "../model/user";
 import type { AccountSetupPersonalInfoBody } from "../schema/account-setup.schema";
+import type { BusinessCategoryTypes } from "../types/business.type";
 import type { UpdateUserBody } from "../schema/user.schema";
 import { COLLECTIONS } from "../utils/collections";
 import { getUTCTimeNow } from "../utils/helpers/helper-functions";
@@ -111,7 +112,7 @@ class UserService {
   static async getAccountSetupCompletion(userId: string): Promise<
     | {
         success: true;
-        business: BusinessData;
+        business: BusinessData & { category: BusinessCategoryTypes };
         user: UserData;
       }
     | {
@@ -144,6 +145,7 @@ class UserService {
     const business = await BusinessService.getBusiness(businessId);
     if (
       !business?.name?.trim() ||
+      !business.category ||
       !business.description?.trim()
     ) {
       return {
@@ -171,7 +173,11 @@ class UserService {
       };
     }
 
-    return { success: true, business, user };
+    return {
+      success: true,
+      business: { ...business, category: business.category },
+      user,
+    };
   }
 
 }
